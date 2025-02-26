@@ -21,7 +21,7 @@ const AppNav = ({ data, state, isLoggedIn, organisationType, recentActivities, s
   const getLi = (activity) => {
     return (
       <li
-        key={activity.id}
+        key={activity._id}
         onClick={() => {navigate(goTo(activity, data, recentActivities, setRecentActivities))}}
         className={state.currentActivity === undefined ? 'active' : ''}
         style={{

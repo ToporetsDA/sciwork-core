@@ -6,19 +6,10 @@ const projectSchema = new mongoose.Schema({
   startDate: { type: String, required: true },
   endDate: { type: String, required: true },
   access: { type: Number, required: true },
-  activities: [
+  notifications: [
     {
-      name: { type: String, required: true },
-      startDate: { type: String, required: true },
-      endDate: { type: String, required: true },
-      startTime: { type: String, default: "" },
-      endTime: { type: String, default: "" },
-      page: { type: Boolean, default: false },
-      repeat: { type: Boolean, default: false },
-      days: { type: [String], default: [] }, // Array of days
-      thirdParty: { type: Boolean, default: false },
-      serviceName: { type: String, default: null },
-      id: { type: String, required: true }
+      _id: { type: String, required: true },
+      name: { type: String, required: true }
     }
   ],
   userList: [
@@ -27,7 +18,7 @@ const projectSchema = new mongoose.Schema({
       access: { type: Number, required: true }
     }
   ],
-  _id: { type: mongoose.Schema.Types.ObjectId, auto: true } // Ensures proper ObjectId creation
+  _id: { type: String, auto: true } // Ensures proper ObjectId creation
 })
 
 // Export the Project model

@@ -1,15 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import useWebSocket from 'react-use-websocket'
 import LogIn from './pages/dialogs/LogIn'
 
-const Connection = ({ state, setState, userData, setUserData, data, setData, isLoggedIn, setLoggedIn, setRights, setUsers, isUserUpdatingData, setIsUserUpdatingData, isUserUpdatingUserData, setIsUserUpdatingUserData, editedProject, setEditedProject }) => {
+const Connection = ({ state, setState, userData, setUserData, data, setData, isLoggedIn, setLoggedIn, setRights, setUsers, isUserUpdatingData, setIsUserUpdatingData, isUserUpdatingUserData, setIsUserUpdatingUserData }) => {
 
     const [servers, setServers] = useState([])
     const [loading, setLoading] = useState(true)
     const [sessionToken, setToken] = useState()
-    const [receivedData, setReceivedData] = useState()
     const [formValues, setFormValues] = useState()
     const [wsUrl, setWsUrl] = useState(null)
+
+    const format = (str) => {
+        return str.replace(/\s+/g, '')
+    }
 
     //create server address string
     const serverAddress = (address) => {
@@ -35,7 +38,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
         onOpen: () => {
             console.log('WebSocket connection established.')
             // Send the login message after the connection is established
-            sendMsg(receivedData.sessionToken, "login", { login: formValues.login });
+            sendMsg("login", { login: formValues.login });
         },
         onClose: () => console.log('WebSocket connection closed'),
         onMessage: (event) => handleResponse(event),
@@ -48,7 +51,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
     })
 
     // Callback to send a message
-    const sendMsg = useCallback((sessionToken, type, data) => {
+    const sendMsg = useCallback((type, data) => {
         const message = {
             type: type,          // e.g., "login"
             sessionToken,        // Auth token
@@ -60,13 +63,12 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
         sendMessage(JSON.stringify(message))
         console.log('Sent message:', message)
 
-        setEditedProject()
         setIsUserUpdatingData(false) // Reset flag
         setIsUserUpdatingUserData(false) // Reset flag
-    }, [sendMessage, setEditedProject, setIsUserUpdatingData, setIsUserUpdatingUserData])
+    }, [sendMessage, sessionToken, setIsUserUpdatingData, setIsUserUpdatingUserData])
 
     const handleResponse = useCallback((event) => {
-        console.log("from handleResponse: ", data)
+        console.log("from handleResponse: ")
         try {
             const response = JSON.parse(event.data)
             console.log(response) // This will log the entire response
@@ -83,7 +85,8 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
                 switch (type) {
                 case "all": {
                     setUserData(data.user)
-                    setData(data.projects)
+                    console.log(data.items)
+                    setData(data.items)
                     setRights(data.organisation.rights)
                     setUsers(data.users)
                     break
@@ -92,7 +95,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
                     setUserData(data)
                     break
                 }
-                case "projects": {
+                case "data": {
                     setData(data)
                     break
                 }
@@ -101,7 +104,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
                     break
                 }
                 case "users": {
-                    setUsers(data.users)
+                    setUsers(data)
                     break
                 }
                 default: {
@@ -118,15 +121,15 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
         
                 // You can handle the data based on the type (user, projects, etc.)
                 switch (type) {
-                case"project": {
+                case"item": {
                     const item = fetchedData
-                    if (data.find(project => project._id === item._id).length === 0) {
+                    if (data.find(d => d._id === item._id).length === 0) {
                     setData(prevData => ({ ...prevData, item }))
                     }
                     else {
                         setData(prevData => 
-                            prevData.map(project => 
-                            project._id === item._id ? item : project
+                            prevData.map(d => 
+                            d._id === item._id ? item : d
                         ))
                     }
                     break
@@ -151,14 +154,22 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
         }
     }, [data, setData, setLoggedIn, setRights, setUsers, setUserData])
 
-    // Track user-initiated changes to `data` (projects)
-    const updateProject = useCallback((sessionToken, editedProject) => {
+    //send update ONLY when project value changes
+    const lastSentProject = useRef(null)
+    useEffect(() => {
+        if (lastSentProject.current === state.currentPage || !isLoggedIn) return
+            sendMsg("goTo", format(state.currentPage))
+        lastSentProject.current = state.currentPage
+    }, [sendMsg, state.currentPage, isLoggedIn])
+
+    // Track user-initiated changes to `data`
+    const updateItem = useCallback((item) => {
 
         if (readyState === 1) { // Check if WebSocket is open
-            sendMsg(sessionToken, "addEditProject", editedProject)
-            console.log("Sent project update:", editedProject)
+            sendMsg("addEditData", item)
+            console.log("Sent item update:", item)
         } else {
-            console.error("WebSocket is not open. Cannot send project update.")
+            console.error("WebSocket is not open. Cannot send item update.")
         }
 
     }, [readyState, sendMsg])
@@ -166,15 +177,15 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
     // Trigger project update when a user modifies `data`
     useEffect(() => {
         if (isUserUpdatingData) {
-            updateProject(sessionToken, editedProject)
+            updateItem(data.find(item => item._id === isUserUpdatingData))
         }
-    }, [data, updateProject, editedProject, sessionToken, isUserUpdatingData])
+    }, [data, updateItem, isUserUpdatingData])
 
     // Track user-initiated changes to `userData`
-    const updateUser = useCallback((sessionToken, updatedUserData) => {
+    const updateUser = useCallback((updatedUserData) => {
 
         if (readyState === 1) { // Check if WebSocket is open
-            sendMsg(sessionToken, "addEditUser", updatedUserData)
+            sendMsg("addEditUser", updatedUserData)
             console.log("Sent user update:", updatedUserData)
         } else {
             console.error("WebSocket is not open. Cannot send user update.")
@@ -184,9 +195,9 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
     // Trigger user update when a user modifies `userData`
     useEffect(() => {
         if (isUserUpdatingUserData) {
-            updateUser(sessionToken, userData) // Pass session token and updated user data
+            updateUser(userData) // Pass session token and updated user data
         }
-    }, [userData, updateUser, sessionToken, isUserUpdatingUserData])
+    }, [userData, updateUser, isUserUpdatingUserData])
 
     //on login
     const loginToServer = async (formValues) => {
@@ -209,7 +220,6 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
                 const data = await response.json()
                 setToken(data.sessionToken)
 
-                setReceivedData(data)
                 setFormValues(formValues)
 
                 // Set WebSocket URL dynamically

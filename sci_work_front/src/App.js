@@ -10,9 +10,9 @@ import AppDynamicContent from './Components/AppDynamicContent'
 const App = () => {
 
   const [state, setState] = useState({
-    currentPage: 'Home Page',   //string
+    currentPage: 'HomePage',   //string
     currentProject: undefined,  //object
-    currentActivity: undefined, //object
+    currentActivity: undefined, //string
     currentDialog: {
       name: undefined,  //string
       params: []        //[any]
@@ -26,7 +26,7 @@ const App = () => {
 
   const [rights, setRights] = useState()
 
-  const defaultProfileData = {// [isOptional, type]
+  const defaultProfileData = {// [isRequired, type]
     basic: {
       name:         [true,  'string'],
       middleName:   [false, 'string'],
@@ -89,7 +89,7 @@ const App = () => {
     }
   }, [])
 
-  const [projects, setProjects] = useState()
+  const [data, setData] = useState([])
 
   //header
   const isCompany = true;
@@ -105,27 +105,24 @@ const App = () => {
   const [isUserUpdatingData, setIsUserUpdatingData] = useState(false)
   const [isUserUpdatingUserData, setIsUserUpdatingUserData] = useState(false)
 
-  const [editedProject, setEditedProject] = useState()
-
   const [users, setUsers] = useState()
 
-  const updateProjects = (data) => {
+  const updateData = (data) => {
 
-    setIsUserUpdatingData(true)
     const { action, item } = data
-    setEditedProject(item)
+    setIsUserUpdatingData(item._id)
 
     if (action === "add") {
-      setProjects(prevProjects => [ ...prevProjects, item ])
+      setData(prevData => [ ...prevData, item ])
     }
     if (action === "edit") {
-      setProjects(prevProjects => 
-        prevProjects.map(project => 
-            project._id === item._id ? item : project
+      setData(prevData => 
+        prevData.map(d => 
+          d._id === item._id ? item : d
         )
       )
     }
-    console.log("from updateProjects: ", projects)
+    console.log("from updateData: ", data)
   }
 
   const updateUser = (newData) => {
@@ -161,7 +158,7 @@ const App = () => {
         />
         <div>
           <AppNav
-            data={projects}
+            data={data}
             state={state}
             isLoggedIn={isLoggedIn}
             organisationType={isCompany}
@@ -176,8 +173,8 @@ const App = () => {
                 profileData={defaultProfileData}
                 state={state}
                 setState={setState}
-                data={projects}
-                setData={updateProjects}
+                data={data}
+                setData={updateData}
                 rights={rights}
                 users={users}
                 itemStructure={defaultItemStructure}
@@ -197,8 +194,8 @@ const App = () => {
       setState={setState}
       userData={userData}
       setUserData={setUserData}
-      data={projects}
-      setData={setProjects}
+      data={data}
+      setData={setData}
       isLoggedIn={isLoggedIn}
       setLoggedIn={setLoggedIn}
       setRights={setRights}
@@ -207,8 +204,6 @@ const App = () => {
       setIsUserUpdatingData={setIsUserUpdatingData}
       isUserUpdatingUserData={isUserUpdatingUserData}
       setIsUserUpdatingUserData={setIsUserUpdatingUserData}
-      editedProject={editedProject}
-      setEditedProject={setEditedProject}
     />
   </Router>
   )

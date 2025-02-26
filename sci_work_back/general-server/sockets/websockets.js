@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const User = require("../models/User")
 const Project = require("../models/Project")
 const Organisation = require("../models/Organisation")
+const Activity = require("../models/Activity")
 
 // Map to store WebSocket connections by session token
 const clients = new Map(); // This will store WebSocket connections keyed by session token
@@ -24,10 +25,13 @@ const getData = async (type, login, ws, sessionToken) => {
       if (!user) {
         throw new Error(`User not found for login: ${login}`)
       }
-      const projects = await Project.find({
-        "userList.id": user._id.toString(),
-      });
-      const organisation = await Organisation.findOne({ name: "default" })
+      const items = await Project.find({
+        "userList.id": user._id
+      })
+
+      const organisation = await Organisation.findOne({
+        name: "default"
+      })
 
       const users = await User.find({}, {
         login: 0,
@@ -37,7 +41,7 @@ const getData = async (type, login, ws, sessionToken) => {
         statusName: 0
       })
 
-      data = { user, projects, organisation, users }
+      data = { user, items, organisation, users }
       break
     }
     case "user": {
@@ -50,18 +54,27 @@ const getData = async (type, login, ws, sessionToken) => {
       data =  user
       break
     }
-    case "projects": {
+    case "data": {
 
       // Fetch projects where user is in userList
       const user = await User.findOne({ login })
       if (!user) {
         throw new Error(`User not found for login: ${login}`)
       }
-      const projects = await Project.find({
-        "userList.id": user._id.toString(),
-      })
+      let items
+      if (admins.get(sessionToken).projectId) {
+        items = await Project.find({
+          "userList.id": user._id
+        })
+      }
+      else {
+        items = await Activity.find({
+          _id: { $regex: `^${admins.get(sessionToken).projectId}\\.` }
+        })
+      }
+      
 
-      data =  projects
+      data = items
       break
     }
     case "organisation": {
@@ -122,6 +135,12 @@ const startWebSocketServer = (port) => {
             else {
               ws.send(JSON.stringify({ error: "Session token missing" }))
             }
+            break
+          }
+          case "goTo": {
+            admins.get(sessionToken).projectId = parsedMessage.data
+
+            getData("activities", parsedMessage.data.login, ws, sessionToken)
             break
           }
           case "addEditProject": {

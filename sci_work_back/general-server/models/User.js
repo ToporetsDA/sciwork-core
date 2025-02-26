@@ -18,17 +18,19 @@ const userSchema = new mongoose.Schema({
     statusFilter: { type: String, default: "all" },
   },
   notifications: [{
-    id: { type: Number, required: true },
     page: { type: Boolean, default: false },
     state: { type: String, required: true },
     content: { type: String, required: true },
     generationDate: { type: String, required: true },
     generationTime: { type: String, required: true },
     notificationId: { type: Number, required: true },
+    itemId: { type: String, required: true },
+    userId: { type: String, required: true },
+    _id: { type: String, auto: true }
   }],
   login: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  _id: { type: mongoose.Schema.Types.ObjectId, auto: true } // Ensures proper ObjectId creation
+  _id: { type: String, auto: true }
 })
 
 // Validation schema with Joi

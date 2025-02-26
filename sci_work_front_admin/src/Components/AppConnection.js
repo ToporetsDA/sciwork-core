@@ -7,7 +7,6 @@ const Connection = ({ state, setState, editorData, setEditorData, userData, setU
     const [servers, setServers] = useState([])
     const [loading, setLoading] = useState(true)
     const [sessionToken, setToken] = useState()
-    const [receivedData, setReceivedData] = useState()
     const [formValues, setFormValues] = useState()
     const [wsUrl, setWsUrl] = useState(null)
 
@@ -146,7 +145,7 @@ const Connection = ({ state, setState, editorData, setEditorData, userData, setU
         }
     }, [editorData, setEditorData, setUserData, setLoggedIn, setOrgData, setUsers])
 
-    //send update ONLY when value changes
+    //send update ONLY when page value changes
     const lastSentPage = useRef(null)
     useEffect(() => {
         if (lastSentPage.current === state.currentPage || !isLoggedIn) return
@@ -196,7 +195,6 @@ const Connection = ({ state, setState, editorData, setEditorData, userData, setU
                 const data = await response.json()
                 setToken(data.sessionToken)
 
-                setReceivedData(data)
                 setFormValues(formValues)
 
                 // Set WebSocket URL dynamically
