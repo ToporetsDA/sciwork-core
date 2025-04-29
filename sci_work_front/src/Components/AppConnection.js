@@ -107,6 +107,10 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
                     setUsers(data)
                     break
                 }
+                case "notifications": {
+                    
+                    break
+                }
                 default: {
                     console.log("Unknown data type:", type)
                 }

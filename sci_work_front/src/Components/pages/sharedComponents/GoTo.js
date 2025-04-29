@@ -8,8 +8,9 @@ const GoTo = (destination, data, recentActivities, setRecentActivities) => {
         return id.split('.')[0]
     }
 
-    if (destination.id) {
-        const activityExists = recentActivities.some(recent => recent._id === destination.id)
+    if (destination._id.includes(".")) {
+        //update list of recent activities
+        const activityExists = recentActivities.some(recent => recent._id === destination._id)
         if (activityExists === false) {
             setRecentActivities((prevActivities) => [
                 ...prevActivities,
@@ -18,18 +19,19 @@ const GoTo = (destination, data, recentActivities, setRecentActivities) => {
         }
     }
 
-    if (!destination.id) {
+    if (!destination._id.includes(".")) {
         const project = data.find(p => p._id === destination._id)
         return `/Project/${project._id}`
     }
     else if (destination.page === true) {
-        const project = data.find(p => p._id === projectId(destination.id))
+
+        const project = data.find(p => p._id === projectId(destination._id))
         const activity = project.activities.find(a => a._id === destination._id)
         return `/Activity/${project._id}/${activity.id}`
     }
     else {
-        const project = data.find(p => p._id === projectId(destination.id))
-        return `/Activity/${project._id}`
+        const project = data.find(p => p._id === projectId(destination._id))
+        return `/Project/${project._id}`
     }
 }
 

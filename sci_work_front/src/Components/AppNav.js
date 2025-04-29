@@ -68,8 +68,7 @@ const AppNav = ({ data, state, isLoggedIn, organisationType, recentActivities, s
         <ul className="recent">
           <h4>Recent</h4>
           {data.map((project) => {
-
-            const projectRecentActivities = recentActivities.filter(recent => projectId(recent.id) === project._id)
+            const projectRecentActivities = recentActivities.filter(recent => projectId(recent._id) === project._id)
             
             if (projectRecentActivities.length > 0) {
 
@@ -79,7 +78,7 @@ const AppNav = ({ data, state, isLoggedIn, organisationType, recentActivities, s
                     <summary>{project.name}</summary>
                     <ul>
                       {project.activities.map((activity) => {
-                        const recentActivity = recentActivities.filter(recent => recent.id === activity.id)
+                        const recentActivity = recentActivities.filter(recent => recent._id === activity._id)
                         if (recentActivity.length > 0) {
                           return getLi(activity)
                         }

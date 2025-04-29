@@ -380,7 +380,7 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
                     // event data to display
                     let content = ``
                     if (group[i].type === 'activity') {
-                        content += `${data.find(p => p._id === projectId(group[0].id)).name}: `
+                        content += `${data.find(p => p._id === projectId(group[0]._id)).name}: `
                     }
                     
                     if (currentScale === 'week') {
@@ -401,7 +401,7 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
                 let content = ``;
                 if (group.length === 1) {//event
                     if (group[0].type === 'activity') {
-                        content += `${data.find(p => p._id === projectId(group[0].id)).name}: `
+                        content += `${data.find(p => p._id === projectId(group[0]._id)).name}: `
                     }
                     
                     if (currentScale === 'week') {
@@ -414,7 +414,7 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
                 else {//joint block
                     group.forEach((event, i) => {
                         if (event.type === 'activity') {
-                            content += `${data.find(p => p._id === projectId(event.id)).name}: `
+                            content += `${data.find(p => p._id === projectId(event._id)).name}: `
                         }
                         content += `${event.name}\n`
                     })

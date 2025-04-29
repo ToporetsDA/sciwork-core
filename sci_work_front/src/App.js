@@ -134,13 +134,7 @@ const App = () => {
   }
 
   //notifications
-  const setNotifications = (notifications) => {
-    setIsUserUpdatingUserData(true)
-    setUserData((prevData) => ({
-      ...prevData,
-      notifications
-    }))
-  }
+  const [notifications, setNotifications] = useState([])
   
   //Html
   return (
@@ -152,7 +146,7 @@ const App = () => {
           userData={userData}
           isLoggedIn={isLoggedIn}
           setLoggedIn={setLoggedIn}
-          notifications={userData.notifications}
+          notifications={notifications}
           setNotifications={setNotifications}
           organisationType={isCompany}
         />
@@ -180,7 +174,7 @@ const App = () => {
                 itemStructure={defaultItemStructure}
                 defaultStructure={defaultStructure}
                 isCompany={isCompany}
-                notifications={userData.notifications}
+                notifications={notifications}
                 setNotifications={setNotifications}
                 recentActivities={recentActivities}
                 setRecentActivities={setRecentActivities}
