@@ -10,12 +10,11 @@ const LinkList = ({ data, state, setState, list, setList, setRecentActivities })
     const goTo = Shared.GoTo
 
     const projectId = (id) => {
-        if (id.includes('.')) {
-            return id.split('.')[0]
-        }
-        else {
-            return id.split('.')[1]
-        }
+        return id.split('.')[0]
+    }
+
+    const findEl = (id, array) => {
+        return array.find(el => el._id === id)
     }
 
     const items = useMemo(() => {
@@ -38,14 +37,15 @@ const LinkList = ({ data, state, setState, list, setList, setRecentActivities })
                 )
             }
             case "Notifications": {
-                const tmpItem = (item._id < 1000000000) ? data.find(p => p._id === item._id) : data.find(p => p._id === projectId(item._id)).activities.find(a => a._id === item._id)
+
+                const tmpItem = (item._id.includes(".")) ? findEl(data, item._id) : findEl(findEl(data,  projectId(item._id)).activities, item._id)
                 
-                const projectName = data.find(p => p._id === projectId(item._id)).name
-                const activityName = (item._id > 1000000000) ? data.find(p => p._id === projectId(item._id)).activities.find(a => a._id === item._id).name : undefined
+                const projectName = findEl(data, projectId(item._id)).name
+                const activityName = (item._id.includes(".")) ? findEl(findEl(data,  projectId(item._id)).activities, item._id).name : undefined
                 
                 return (
                     <div
-                        key={item.notificationId}
+                        key={i}
                         className={`item ${item.state}`}
                         onClick={
                             () => {
@@ -53,8 +53,8 @@ const LinkList = ({ data, state, setState, list, setList, setRecentActivities })
                                 const updatedItem = { ...item, state: 'read' }
             
                                 setList(
-                                    list.map((notification) =>
-                                        notification.notificationId === item.notificationId ? updatedItem : notification
+                                    list.map((notification, index) =>
+                                        index === i ? updatedItem : notification
                                     )
                                 )
                             }
@@ -62,7 +62,7 @@ const LinkList = ({ data, state, setState, list, setList, setRecentActivities })
                         >
                         <div className='content'>
                             <p>{projectName}</p>
-                            {(item._id > 1000000000) &&
+                            {(item._id.includes(".")) &&
                                 <p>{activityName}</p>
                             }
                             <p>{item.content}</p>
@@ -72,11 +72,10 @@ const LinkList = ({ data, state, setState, list, setList, setRecentActivities })
                             <span className="notification-circle"></span>
                         }
                     </div>
-                );
+                )
             }
             default: return <></>
             }
-            
         })
     }, [data, state, list, goTo, navigate, setList, setRecentActivities])
 

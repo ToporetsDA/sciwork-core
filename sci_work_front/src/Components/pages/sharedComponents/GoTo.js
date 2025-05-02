@@ -1,5 +1,3 @@
-import '../../../css/pages/sharedComponents/GoTo.css'
-
 //item here is either Activity or Project Object
 
 const GoTo = (destination, data, recentActivities, setRecentActivities) => {
