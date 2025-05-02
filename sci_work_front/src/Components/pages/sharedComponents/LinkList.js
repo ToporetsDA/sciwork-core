@@ -4,7 +4,7 @@ import '../../../css/pages/sharedComponents/LinkList.css'
 import '../../../css/pages/Notifications.css'
 import * as Shared from './index'
 
-const LinkList = ({ data, state, setState, list, setList, setRecentActivities }) => {
+const LinkList = ({ data, state, setState, list, setList, RecentActivities, setRecentActivities }) => {
 
     const navigate = useNavigate()
     const goTo = Shared.GoTo
@@ -13,7 +13,7 @@ const LinkList = ({ data, state, setState, list, setList, setRecentActivities })
         return id.split('.')[0]
     }
 
-    const findEl = (id, array) => {
+    const findEl = (array, id) => {
         return array.find(el => el._id === id)
     }
 
@@ -38,7 +38,7 @@ const LinkList = ({ data, state, setState, list, setList, setRecentActivities })
             }
             case "Notifications": {
 
-                const tmpItem = (item._id.includes(".")) ? findEl(data, item._id) : findEl(findEl(data,  projectId(item._id)).activities, item._id)
+                const tmpItem = (!item._id.includes(".")) ? findEl(data, item._id) : findEl(findEl(data,  projectId(item._id)).activities, item._id)
                 
                 const projectName = findEl(data, projectId(item._id)).name
                 const activityName = (item._id.includes(".")) ? findEl(findEl(data,  projectId(item._id)).activities, item._id).name : undefined
@@ -49,7 +49,7 @@ const LinkList = ({ data, state, setState, list, setList, setRecentActivities })
                         className={`item ${item.state}`}
                         onClick={
                             () => {
-                                navigate(goTo(tmpItem, data, setRecentActivities))
+                                navigate(goTo(tmpItem, data, RecentActivities, setRecentActivities))
                                 const updatedItem = { ...item, state: 'read' }
             
                                 setList(

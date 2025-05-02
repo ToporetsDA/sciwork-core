@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
 
-const Timer = (period, event) => {
+const Timer = (event, period, delay) => {
 
     useEffect(() => {
         
         const runEvent = () => {
             const now = new Date()
-            console.log("Tick at:", now.toLocaleTimeString())
-            event(now, period)
+            console.log("Tick at:", now.toLocaleTimeString(), period, delay)
+            event(now, period, delay)
         }
   
         const now = new Date()

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
 
@@ -7,7 +7,7 @@ import AppHeader from './Components/AppHeader'
 import AppNav from './Components/AppNav'
 import AppDynamicContent from './Components/AppDynamicContent'
 
-import * as Shared from 'Components/pages/sharedComponents'
+import * as Shared from './Components/pages/sharedComponents'
 
 const App = () => {
 
@@ -24,7 +24,7 @@ const App = () => {
   //user
   
   //genStatus: 0 - item creator/organisation owner, 1 - manager (add/edit items), 2 - supervisor, 3 - user
-  const [userData, setUserData] = useState({ genStatus: -1, notificationsPeriod: 5})
+  const [userData, setUserData] = useState({ genStatus: -1, notificationsPeriod: 5, notificationsDelay: 15})
 
   const [rights, setRights] = useState()
 
@@ -137,9 +137,10 @@ const App = () => {
 
   //notifications
   const [notifications, setNotifications] = useState([])
+  const notificationsRef = useRef([])
 
-  const checkActivities = useCallback((now, period) => {
-    
+  const checkActivities = useCallback((now, period, delay) => {
+    const updated = [...notificationsRef.current]
     // Loop through users and their activities
     data.forEach((project) => {
       project.activities?.forEach((activity) => {
@@ -148,63 +149,68 @@ const App = () => {
 
         // Get the difference in minutes
         const diffMins = (activityStartTime.getMinutes() - now.getMinutes()) / (1000 * 60)
-
-        if (diffMins > 0 && diffMins <= 15 - period) {
+        if (diffMins > delay - period && diffMins <= delay) {
           
-          const itemId = `${project._id}.${activity._id}`
-          const alreadyNotified = notifications.some(n => n.itemId === itemId)
+          const _id = `${activity._id}`
+          const alreadyNotified = updated.some(n => n._id === _id)
 
           if (!alreadyNotified) {
-            const notification = {
-              _id: itemId,
+            updated.push({
+              _id,
               state: "unseen",
               page: activity.page || false,
               content: "Starts soon",
               generationDate: now.toISOString().slice(0, 10),
               generationTime: now.toTimeString().slice(0, 5)
-            }
-
-            setNotifications(prev => [...prev, notification])
+            })
           }
         }
       })
     })
-  }, [data, notifications])
 
-  //load existing messages on App mount
+    if (updated.length !== notificationsRef.current.length) {
+      setNotifications(updated)
+    }
+  }, [data])
+
+  //load existing messages on log in
   useEffect(() => {
+    if (isLoggedIn !== true) {
+      return
+    }
+
     const saved = localStorage.getItem("notifications")
+    let loaded = []
+
     if (saved) {
       try {
         const parsed = JSON.parse(saved)
-
-        //delete old notifications
-        const now = new Date()
-        const recentNotifications = parsed.filter(notification => {
-          const [year, month, day] = notification.generationDate.split("-").map(Number)
-          const [hours, minutes] = notification.generationTime.split(":").map(Number)
-          const notifDate = new Date(year, month - 1, day, hours, minutes)
-
-          const timeDiff = now - notifDate
-          return (timeDiff <= 24 * 60 * 60 * 1000) // 24 hours in milliseconds
-        })
-
-        setNotifications(JSON.parse(recentNotifications))
-        checkActivities(now, 15)
+        loaded = Array.isArray(parsed) ? parsed : []
       } catch (err) {
         console.error("Invalid localStorage data:", err)
       }
+
+      //delete old notifications
+      const now = new Date()
+      const recentNotifications = loaded.filter(notification => {
+        return Shared.DaysTillEvent(1, notification.generationDate, notification.generationTime)
+      })
+      setNotifications(recentNotifications)
+      checkActivities(now, 15, userData.notificationsDelay)
     }
-  }, [checkActivities])
+  }, [checkActivities, userData.notificationsDelay, isLoggedIn])
   
   //save existing messages to storage on each change
   useEffect(() => {
+    if (isLoggedIn !== true) {
+      return
+    }
+    notificationsRef.current = notifications
     localStorage.setItem("notifications", JSON.stringify(notifications))
-  }, [notifications])
+  }, [notifications, isLoggedIn])
   
-
   // Run the timer hook every set minutes
-  Shared.useTimer(userData.notificationsPeriod, checkActivities)
+  Shared.Timer(checkActivities, userData.notificationsPeriod, userData.notificationsDelay)
   
   //Html
   return (
