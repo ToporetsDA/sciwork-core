@@ -4,7 +4,7 @@ import '../../../css/pages/sharedComponents/LinkList.css'
 import '../../../css/pages/Notifications.css'
 import * as Shared from './index'
 
-const LinkList = ({ data, state, setState, list, setList, RecentActivities, setRecentActivities }) => {
+const LinkList = ({ data, state, setState, list, setList, recentActivities, setRecentActivities }) => {
 
     const navigate = useNavigate()
     const goTo = Shared.GoTo
@@ -49,7 +49,7 @@ const LinkList = ({ data, state, setState, list, setList, RecentActivities, setR
                         className={`item ${item.state}`}
                         onClick={
                             () => {
-                                navigate(goTo(tmpItem, data, RecentActivities, setRecentActivities))
+                                navigate(goTo(tmpItem, data, recentActivities, setRecentActivities))
                                 const updatedItem = { ...item, state: 'read' }
             
                                 setList(
@@ -77,7 +77,7 @@ const LinkList = ({ data, state, setState, list, setList, RecentActivities, setR
             default: return <></>
             }
         })
-    }, [data, state, list, goTo, navigate, setList, setRecentActivities])
+    }, [data, state, list, goTo, navigate, setList, recentActivities, setRecentActivities])
 
     return (
         <div className='list'>

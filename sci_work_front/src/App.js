@@ -148,12 +148,11 @@ const App = () => {
         const activityStartTime = new Date(`${activity.startDate}T${activity.startTime}:00`)
 
         // Get the difference in minutes
-        const diffMins = (activityStartTime.getMinutes() - now.getMinutes()) / (1000 * 60)
-        if (diffMins > delay - period && diffMins <= delay) {
-          
-          const _id = `${activity._id}`
-          const alreadyNotified = updated.some(n => n._id === _id)
+        const diffMins = (activityStartTime.getHours() - now.getHours()) * 60 + activityStartTime.getMinutes() - now.getMinutes()
+        const _id = `${activity._id}`
 
+        if (diffMins > delay - period && diffMins <= delay) {
+          const alreadyNotified = updated.find(n => n._id === _id)
           if (!alreadyNotified) {
             updated.push({
               _id,
@@ -164,6 +163,12 @@ const App = () => {
               generationTime: now.toTimeString().slice(0, 5)
             })
           }
+        }
+        if (diffMins > delay) {
+          const alreadyNotified = updated.find(n => n._id === _id)
+          const falselyNotified = updated.findIndex(n => n._id === _id)
+          console.log("wrong: ", alreadyNotified, falselyNotified)
+          if (falselyNotified !== -1) updated.splice(falselyNotified, 1)
         }
       })
     })

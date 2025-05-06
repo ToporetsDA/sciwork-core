@@ -16,21 +16,21 @@ const Timer = (event, period, delay) => {
         const milliseconds = now.getMilliseconds()
   
         const minutesToNextMark = period - (minutes % period)
-        const delay = minutesToNextMark * 60 * 1000 - (seconds * 1000 + milliseconds)
+        const delayMin = minutesToNextMark * 60 * 1000 - (seconds * 1000 + milliseconds)
   
         let intervalId
   
         const timeoutId = setTimeout(() => {
             runEvent() // First call on the clean time
             intervalId = setInterval(runEvent, period * 60 * 1000)
-        }, delay)
+        }, delayMin)
   
         // Proper cleanup
         return () => {
             clearTimeout(timeoutId)
             if (intervalId) clearInterval(intervalId)
         }
-    }, [event, period])
+    }, [event, period, delay])
 }
 
 export default Timer

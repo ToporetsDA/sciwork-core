@@ -3,7 +3,7 @@ import '../../css/pages/Notifications.css'
 
 import * as Shared from './sharedComponents/index'
 
-const Notifications = ({data, setData, state, setState, notifications, setNotifications, RecentActivities, setRecentActivities}) => {
+const Notifications = ({data, setData, state, setState, notifications, setNotifications, recentActivities, setRecentActivities}) => {
 
     const ItemList = Shared.LinkList
 
@@ -15,7 +15,7 @@ const Notifications = ({data, setData, state, setState, notifications, setNotifi
                 setState={setState}
                 list={notifications}
                 setList={setNotifications}
-                RecentActivities={RecentActivities}
+                recentActivities={recentActivities}
                 setRecentActivities={setRecentActivities}
             />
         </div>
