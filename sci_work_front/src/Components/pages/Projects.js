@@ -41,6 +41,7 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
                         return activity._id === (itemToDelete._id) ? { ...activity, deleted: true } : activity
                     })
                 }
+                console.log("deleted", project.activities.find((activity) => activity._id === itemToDelete._id))
                 navigate(`/Projects/${updatedProject.name}`)
             }
         })

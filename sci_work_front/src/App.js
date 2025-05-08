@@ -136,7 +136,7 @@ const App = () => {
   }
 
   //notifications
-  const [notifications, setNotifications] = useState([])
+  const [notifications, setNotifications] = useState([]) // [{userId, notifications[obj, ...]}, ...]
   const notificationsRef = useRef([])
 
   const checkActivities = useCallback((now, period, delay) => {
@@ -144,7 +144,6 @@ const App = () => {
     // Loop through users and their activities
     data.forEach((project) => {
       project.activities?.forEach((activity) => {
-
         const activityStartTime = new Date(`${activity.startDate}T${activity.startTime}:00`)
 
         // Get the difference in minutes
@@ -153,7 +152,7 @@ const App = () => {
 
         if (diffMins > delay - period && diffMins <= delay) {
           const alreadyNotified = updated.find(n => n._id === _id)
-          if (!alreadyNotified) {
+          if (!alreadyNotified && activity.deleted !== true) {
             updated.push({
               _id,
               state: "unseen",
@@ -164,16 +163,24 @@ const App = () => {
             })
           }
         }
-        if (diffMins > delay) {
-          const alreadyNotified = updated.find(n => n._id === _id)
+        if (diffMins > delay || activity.deleted === true) {
           const falselyNotified = updated.findIndex(n => n._id === _id)
-          console.log("wrong: ", alreadyNotified, falselyNotified)
-          if (falselyNotified !== -1) updated.splice(falselyNotified, 1)
+          if (falselyNotified !== -1) {
+            updated.splice(falselyNotified, 1)
+          }
         }
       })
     })
 
-    if (updated.length !== notificationsRef.current.length) {
+    const isSameArray = (a, b) => {
+      if (a.length !== b.length) return false
+      for (let i = 0; i < a.length; i++) {
+        if (a[i].state !== b[i].state) return false
+      }
+      return true
+    }
+
+    if (!isSameArray(updated, notificationsRef.current)) {
       setNotifications(updated)
     }
   }, [data])
@@ -184,39 +191,41 @@ const App = () => {
       return
     }
 
-    const saved = localStorage.getItem("notifications")
-    let loaded = []
-
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        loaded = Array.isArray(parsed) ? parsed : []
-      } catch (err) {
-        console.error("Invalid localStorage data:", err)
-      }
+    const loaded = Shared.LocalStorage(true, "SciWork notifications", userData._id, null)
+    if (loaded) {
 
       //delete old notifications
-      const now = new Date()
       const recentNotifications = loaded.filter(notification => {
         return Shared.DaysTillEvent(1, notification.generationDate, notification.generationTime)
       })
+      notificationsRef.current = recentNotifications
       setNotifications(recentNotifications)
-      checkActivities(now, 15, userData.notificationsDelay)
+      checkActivities(new Date(), 15, userData.notificationsDelay)
     }
-  }, [checkActivities, userData.notificationsDelay, isLoggedIn])
+  }, [checkActivities, userData.notificationsDelay, userData._id, isLoggedIn])
   
   //save existing messages to storage on each change
   useEffect(() => {
     if (isLoggedIn !== true) {
       return
     }
+
     notificationsRef.current = notifications
-    localStorage.setItem("notifications", JSON.stringify(notifications))
-  }, [notifications, isLoggedIn])
+
+    const parsed = Shared.LocalStorage(true, "SciWork notifications", null, null)
+    const updated = parsed.filter(entry => entry.userId !== userData._id)
+
+    // Add fresh data
+    updated.push({
+      userId: userData._id,
+      data: notifications
+    })
+    Shared.LocalStorage(false, "SciWork notifications", null, updated)
+  }, [notifications, isLoggedIn, userData._id])
   
   // Run the timer hook every set minutes
   Shared.Timer(checkActivities, userData.notificationsPeriod, userData.notificationsDelay)
-  
+
   //Html
   return (
     <Router>
@@ -225,6 +234,7 @@ const App = () => {
           state={state}
           setState={setState}
           userData={userData}
+          setUserData={setUserData}
           isLoggedIn={isLoggedIn}
           setLoggedIn={setLoggedIn}
           notifications={notifications}

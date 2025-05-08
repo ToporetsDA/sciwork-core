@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 
 // Project schema
 const projectSchema = new mongoose.Schema({
-  _id: { type: String, auto: true }, // Ensures proper ObjectId creation
+  _id: { type: String, auto: true },
   name: { type: String, required: true },
   startDate: { type: String, required: true },
   endDate: { type: String, required: true },
@@ -17,7 +17,7 @@ const projectSchema = new mongoose.Schema({
       endTime: { type: String, default: "" },
       page: { type: Boolean, default: false },
       repeat: { type: Boolean, default: false },
-      days: { type: [String], default: [] }, // Array of days
+      days: { type: [String], default: [] },
       thirdParty: { type: Boolean, default: false },
       serviceName: { type: String, default: null }
     }

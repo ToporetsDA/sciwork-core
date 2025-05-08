@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import '../css/AppHeader.css'
 import logo from "../logo.svg"
 
-const AppHeader = ({ state, setState, userData, isLoggedIn, setLoggedIn, notifications, setNotifications, organisationType}) => {
+const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLoggedIn, notifications, setNotifications, organisationType}) => {
 
     const navigate = useNavigate()
 
