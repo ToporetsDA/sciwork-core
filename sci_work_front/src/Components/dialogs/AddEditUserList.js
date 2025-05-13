@@ -1,6 +1,6 @@
 import { useCallback, useMemo }  from 'react'
-import '../../../css/dialogs/AddEditUserList.css'
-import '../../../css/dialogs/dialog.css'
+import '../../css/dialogs/AddEditUserList.css'
+import '../../css/dialogs/dialog.css'
 
 const AddEditUserList = ({ userData, setUserData, data, setData, state, setState, rights, users, itemStructure, defaultStructure, isCompany }) => {
 

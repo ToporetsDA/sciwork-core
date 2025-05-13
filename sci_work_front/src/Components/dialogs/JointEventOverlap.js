@@ -1,8 +1,8 @@
 import React from 'react'
-import '../../../css/dialogs/JointEventOverlap.css'
-import '../../../css/dialogs/dialog.css'
+import '../../css/dialogs/JointEventOverlap.css'
+import '../../css/dialogs/dialog.css'
 
-import * as Shared from '../sharedComponents'
+import * as Shared from '../pages/sharedComponents'
 
 const JointEventOverlapDialog = ({ data, setData, state, setState }) => {
 

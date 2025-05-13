@@ -16,33 +16,14 @@ const userSchema = new mongoose.Schema({
   currentSettings: {
     sortFilter: { type: String, default: "A-Z" },
     statusFilter: { type: String, default: "all" },
+    displayProjects: { type: String, default: "grid" },
+    notificationsPeriod: {type: Number, default: 5},
+    notificationsDelay: {type: Number, default: 15}
   },
   login: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  _id: { type: String, auto: true },
-  notificationsPeriod: {type: Number, default: 5},
-  notificationsDelay: {type: Number, default: 15}
+  _id: { type: String, auto: true }
 })
-
-// Validation schema with Joi
-/*const userValidationSchema = Joi.object({
-  name:             Joi.string().required(),
-  middleName:       Joi.string().allow(""),
-  surName:          Joi.string().required(),
-  patronimic:       Joi.string().allow(""),
-  statusName:       Joi.string().required(),
-  genStatus:        Joi.number().integer().required(),
-  mail:             Joi.string().email().required(),
-  safetyMail:       Joi.string().email().allow(""),
-  phone:            Joi.string().allow(""),
-  safetyPhone:      Joi.string().allow(""),
-  currentSettings:  Joi.object({
-    sortFilter:     Joi.string().default("A-Z"),
-    statusFilter:   Joi.string().default("all"),
-  }).default(),
-  login:            Joi.string().required(),
-  password:         Joi.string().required(),
-});*/
 
 // Export the user model
 const User = mongoose.model("User", userSchema, "users")

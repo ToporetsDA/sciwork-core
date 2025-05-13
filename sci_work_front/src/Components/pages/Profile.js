@@ -29,7 +29,7 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
             alert("Please fill out all required fields.")
             return
         }
-        setUserData({...userData, ...tmpUserData})
+        setUserData({...userData, ...tmpUserData}, false)
         setEditMode(false)
     }
     

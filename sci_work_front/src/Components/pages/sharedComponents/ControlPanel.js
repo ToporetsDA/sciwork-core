@@ -8,12 +8,17 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
         state: ["all", "expired", "expiring"]
     }
 
+    //to display combobox options
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false)
     const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false)
+    //current combobox values
     const [currentSortOption, setCurrentSortOption] = useState(userData.currentSettings.sortFilter)
     const [currentStateOption, setCurrentStateOption] = useState(userData.currentSettings.stateFilter)
+    //toggle switch(s)
+    const [currentDisplayOption, setCurrentDisplayOption] = useState(userData.currentSettings.displayProjects)
+    const displayOptions = ["grid", "list", "table"]
+    //search
     const [searchQuery, setSearchQuery] = useState("")
-    const [displayProjects, setDisplayProjects] = useState(userData.currentSettings.displayProjects || "grid")
 
     const sortDropdownRef = useRef(null)
     const stateDropdownRef = useRef(null)
@@ -32,17 +37,24 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
         if (userData) {
             setCurrentSortOption(userData.currentSettings.sortFilter)
             setCurrentStateOption(userData.currentSettings.statusFilter)
+            setCurrentDisplayOption(userData.currentSettings.displayProjects)
         }
     }, [userData])
 
     const handleSortOptionSelect = (option) => {
-        setUserData(prevData => ({ ...prevData, currentSettings: {...prevData.currentSettings, sortFilter: option} }))
+        setUserData({ sortFilter: option }, true)
         setIsSortDropdownOpen(false)
     }
 
     const handleStateOptionSelect = (option) => {
-        setUserData(prevData => ({ ...prevData, currentSettings: {...prevData.currentSettings, statusFilter: option} }))
+        setUserData({statusFilter: option}, true)
         setIsStateDropdownOpen(false)
+    }
+
+    //change display type
+
+    const handleDisplayOptionSelect = (option) => {
+        setUserData({ displayProjects: option}, true)
     }
 
     //close filter option lists on click outside
@@ -226,8 +238,16 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
                             </div>
                         )}
                     </div>
-                    <div className='display'>
-                        
+                    <div className='displayProjects'>
+                        {displayOptions.map((option) => (
+                            <button
+                            key={option}
+                            className={`toggle-btn ${currentDisplayOption === option ? 'active' : ''}`}
+                            onClick={() => handleDisplayOptionSelect(option)}
+                            >
+                            {option}
+                            </button>
+                        ))}
                     </div>
                 </>
             }

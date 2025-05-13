@@ -138,9 +138,8 @@ const startWebSocketServer = (port) => {
             break
           }
           case "goTo": {
-            admins.get(sessionToken).projectId = parsedMessage.data
-
-            getData("activities", parsedMessage.data.login, ws, sessionToken)
+            const {page, isId} = parsedMessage.data
+            clients.get(sessionToken).projectId = parsedMessage.data
             break
           }
           case "addEditData": {
@@ -205,9 +204,11 @@ const startWebSocketServer = (port) => {
           case "addEditUser": {
             const updatedUserData = parsedMessage.data
             const userId = updatedUserData._id
+            console.log(updatedUserData, userId)
         
             User.findByIdAndUpdate(userId, updatedUserData, { new: true })
             .then((user) => {
+              console.log("found", user)
               if (user) {
                 console.error(`Failed to update user with ID ${userId}.`)
                 return

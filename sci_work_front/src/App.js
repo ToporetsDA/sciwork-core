@@ -26,7 +26,16 @@ const App = () => {
   //user
   
   //genStatus: 0 - item creator/organisation owner, 1 - manager (add/edit items), 2 - supervisor, 3 - user
-  const [userData, setUserData] = useState({ genStatus: -1, currentSettings: { notificationsPeriod: 5, notificationsDelay: 15}})
+  const [userData, setUserData] = useState(
+    {
+      genStatus: -1,
+      currentSettings: {
+        notificationsPeriod: 5,
+        notificationsDelay: 15,
+        displayProjects: "grid"
+      }
+    }
+  )
 
   const [rights, setRights] = useState()
 
@@ -129,21 +138,34 @@ const App = () => {
     console.log("from updateData: ", data)
   }
 
-  const updateUser = (newData) => {
+  const updateUser = (newData, currentSettingsEdit) => {
     setIsUserUpdatingUserData(true)
-    setUserData((prevUserData) => ({
-        ...prevUserData,
-        ...newData,
-    }))
+    if (currentSettingsEdit) {
+      setUserData((prevUserData) => ({
+          ...prevUserData,
+          currentSettings: {
+              ...prevUserData.currentSettings,
+              ...newData
+          }
+      }))
+    }
+    else {
+      setUserData((prevUserData) => ({
+          ...prevUserData,
+          ...newData,
+      }))
+    }
   }
 
   //notifications
   const [notifications, setNotifications] = useState([]) // [{userId, notifications[obj, ...]}, ...]
   const notificationsRef = useRef([])
 
+  const period = useMemo(() => userData.currentSettings.notificationsPeriod, [userData])
+  const delay = useMemo(() => userData.currentSettings.notificationsDelay, [userData])
+
   const checkActivities = useCallback((now, period, delay) => {
 
-    console.log(now, period, delay)
     const updated = [...notificationsRef.current]
     // Loop through users and their activities
     data.forEach((project) => {
@@ -209,9 +231,9 @@ const App = () => {
       })
       notificationsRef.current = recentNotifications
       setNotifications(recentNotifications)
-      checkActivities(new Date(), 15, userData.currentSettings.notificationsDelay)
+      checkActivities(new Date(), 15, delay)
     }
-  }, [checkActivities, userData.currentSettings.notificationsDelay, userData._id, isLoggedIn])
+  }, [checkActivities, delay, userData._id, isLoggedIn])
   
   //save existing messages to storage on each change
   useEffect(() => {
@@ -233,7 +255,7 @@ const App = () => {
   }, [notifications, isLoggedIn, userData._id])
   
   // Run the timer hook every set minutes
-  useTimer(checkActivities, userData.currentSettings.notificationsPeriod, userData.currentSettings.notificationsDelay, isLoggedIn)
+  useTimer(checkActivities, period, delay, isLoggedIn)
 
   //Html
   return (

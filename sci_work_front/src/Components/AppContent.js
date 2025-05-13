@@ -1,7 +1,7 @@
 import React, { useState, Suspense } from 'react'
 import '../css/AppContent.css'
 import * as Pages from './pages'
-import * as Dialogs from './pages/dialogs'
+import * as Dialogs from './dialogs'
 
 const AppContent = ({userData, setUserData, profileData, state, setState, data, setData, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
 

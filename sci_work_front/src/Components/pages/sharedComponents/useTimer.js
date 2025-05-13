@@ -3,7 +3,8 @@ import { useEffect } from 'react'
 const useTimer = (event, period, delay, isLoggedIn) => {
 
     useEffect(() => {
-        if (isLoggedIn !== true) {
+        if (!isLoggedIn || typeof event !== "function" || typeof period !== "number" || typeof delay !== "number") {
+            console.log("Timer not started: invalid args", { isLoggedIn, event, period, delay })
             return
         }
 

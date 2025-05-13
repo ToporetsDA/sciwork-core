@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import useWebSocket from 'react-use-websocket'
-import LogIn from './pages/dialogs/LogIn'
+import LogIn from './dialogs/LogIn'
 
 import * as Shared from './pages/sharedComponents'
 
@@ -171,13 +171,14 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
         }
     }, [data, setData, setLoggedIn, setRights, setUsers, setUserData])
 
-    //send update ONLY when project value changes
+    //send update ONLY when page changes
     const lastSentProject = useRef(null)
     useEffect(() => {
         if (lastSentProject.current === state.currentPage || !isLoggedIn) return
-            sendMsg("goTo", format(state.currentPage))
+            const location = state.currentActivity?._id || state.currentProject?._id || state.currentPage
+            sendMsg("goTo", format(location))
         lastSentProject.current = state.currentPage
-    }, [sendMsg, state.currentPage, isLoggedIn])
+    }, [sendMsg, state.currentPage, state.currentProject, state.currentActivity, isLoggedIn])
 
     // Track user-initiated changes to `data`
     const updateItem = useCallback((item) => {

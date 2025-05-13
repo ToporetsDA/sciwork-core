@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useNavigate } from "react-router-dom"
-import '../../../css/pages/pageComponents/ScheduleBoard.css'
+import '../../../css/pages/specificComponents/ScheduleBoard.css'
 
 import * as Shared from '../sharedComponents'
 

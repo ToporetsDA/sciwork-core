@@ -1,6 +1,6 @@
 import { useState, useMemo }  from 'react'
-import '../../../css/dialogs/AddEditItem.css'
-import '../../../css/dialogs/dialog.css'
+import '../../css/dialogs/AddEditItem.css'
+import '../../css/dialogs/dialog.css'
 
 const AddEditItem = ({ userData, setUserData, data, setData, state, setState, rights, itemStructure, defaultStructure, isCompany }) => {
 

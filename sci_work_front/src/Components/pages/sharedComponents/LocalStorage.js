@@ -6,7 +6,6 @@ const LocalStorage = (get, name, _id, val) => {
         if (saved) {
             try {
             const parsed = JSON.parse(saved)
-            console.log("from local storage", parsed)
                 if (_id) {
                 const userDataBlock = Array.isArray(parsed) ? parsed.find(entry => entry.userId === _id) : null
                 return userDataBlock?.data || []
