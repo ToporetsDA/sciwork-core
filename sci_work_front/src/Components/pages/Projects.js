@@ -1,4 +1,4 @@
-import React, { Suspense }  from 'react'
+import { Suspense }  from 'react'
 import { useNavigate } from "react-router-dom"
 import '../../css/pages/Projects.css'
 import ControlPanel from './sharedComponents/ControlPanel'
@@ -14,39 +14,6 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
 
     const getAccess = (item) => {
         return item.userList.find(item => item.id === userData._id).access
-    }
-
-    // Delete item
-    const handleDelete = (itemToDelete) => {
-        let updatedProject
-
-        data.forEach(project => {
-            if (project._id === itemToDelete._id) {
-
-                // Update project
-                updatedProject = {
-                    ...project,
-                    activities: project.activities.map((activity) => {
-                        return { ...activity, deleted: true }
-                    }),
-                    deleted: true
-                }
-            }
-            else if (project._id === state.currentProject?._id) {
-
-                // Update activity
-                updatedProject = {
-                    ...project,
-                    activities: project.activities.map((activity) => {
-                        return activity._id === (itemToDelete._id) ? { ...activity, deleted: true } : activity
-                    })
-                }
-                console.log("deleted", project.activities.find((activity) => activity._id === itemToDelete._id))
-                navigate(`/Projects/${updatedProject.name}`)
-            }
-        })
-
-        setData({ action: "edit", item: updatedProject })
     }
 
     return (
@@ -86,13 +53,13 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
                                         <button
                                             className='gearButton'
                                             onClick={(e) => {
-                                                e.stopPropagation();
+                                                e.stopPropagation()
                                                 setState((prevState) => ({
                                                     ...prevState,
                                                     currentDialog: {
                                                         name: 'AddEditItem',
                                                         params: [project]},
-                                                }));
+                                                }))
                                             }}
                                         >
                                             ⚙️
@@ -100,8 +67,8 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
                                         <button
                                             className='deleteButton'
                                             onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDelete(project);
+                                                e.stopPropagation()
+                                                Shared.deleteItem(data, setData, project._id)
                                             }}
                                         >
                                             🗑️
@@ -138,13 +105,13 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
                                         <button
                                             className='gearButton'
                                             onClick={(e) => {
-                                                e.stopPropagation();
+                                                e.stopPropagation()
                                                 setState((prevState) => ({
                                                     ...prevState,
                                                     currentDialog: {
                                                         name: 'AddEditItem',
                                                         params: [activity]},
-                                                }));
+                                                }))
                                             }}
                                         >
                                             ⚙️
@@ -152,8 +119,8 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
                                         <button
                                             className='deleteButton'
                                             onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDelete(activity)
+                                                e.stopPropagation()
+                                                Shared.deleteItem(data, setData, activity._id)
                                             }}
                                         >
                                             🗑️

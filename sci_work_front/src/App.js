@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
+
+import { useTimer } from './Components/pages/sharedComponents'
 
 import AppConnection from './Components/AppConnection'
 import AppHeader from './Components/AppHeader'
@@ -24,7 +26,7 @@ const App = () => {
   //user
   
   //genStatus: 0 - item creator/organisation owner, 1 - manager (add/edit items), 2 - supervisor, 3 - user
-  const [userData, setUserData] = useState({ genStatus: -1, notificationsPeriod: 5, notificationsDelay: 15})
+  const [userData, setUserData] = useState({ genStatus: -1, currentSettings: { notificationsPeriod: 5, notificationsDelay: 15}})
 
   const [rights, setRights] = useState()
 
@@ -140,17 +142,24 @@ const App = () => {
   const notificationsRef = useRef([])
 
   const checkActivities = useCallback((now, period, delay) => {
+
+    console.log(now, period, delay)
     const updated = [...notificationsRef.current]
     // Loop through users and their activities
     data.forEach((project) => {
       project.activities?.forEach((activity) => {
         const activityStartTime = new Date(`${activity.startDate}T${activity.startTime}:00`)
 
+        const isWithinDateRange = now >= new Date(activity.startDate) && now <= new Date(activity.endDate)
+
         // Get the difference in minutes
         const diffMins = (activityStartTime.getHours() - now.getHours()) * 60 + activityStartTime.getMinutes() - now.getMinutes()
         const _id = `${activity._id}`
 
-        if (diffMins > delay - period && diffMins <= delay) {
+        const add    = diffMins > delay - period && diffMins <= delay         && isWithinDateRange
+        const remove = diffMins > delay          || activity.deleted === true || !isWithinDateRange
+
+        if (add) {
           const alreadyNotified = updated.find(n => n._id === _id)
           if (!alreadyNotified && activity.deleted !== true) {
             updated.push({
@@ -163,7 +172,7 @@ const App = () => {
             })
           }
         }
-        if (diffMins > delay || activity.deleted === true) {
+        if (remove) {
           const falselyNotified = updated.findIndex(n => n._id === _id)
           if (falselyNotified !== -1) {
             updated.splice(falselyNotified, 1)
@@ -200,9 +209,9 @@ const App = () => {
       })
       notificationsRef.current = recentNotifications
       setNotifications(recentNotifications)
-      checkActivities(new Date(), 15, userData.notificationsDelay)
+      checkActivities(new Date(), 15, userData.currentSettings.notificationsDelay)
     }
-  }, [checkActivities, userData.notificationsDelay, userData._id, isLoggedIn])
+  }, [checkActivities, userData.currentSettings.notificationsDelay, userData._id, isLoggedIn])
   
   //save existing messages to storage on each change
   useEffect(() => {
@@ -224,7 +233,7 @@ const App = () => {
   }, [notifications, isLoggedIn, userData._id])
   
   // Run the timer hook every set minutes
-  Shared.Timer(checkActivities, userData.notificationsPeriod, userData.notificationsDelay)
+  useTimer(checkActivities, userData.currentSettings.notificationsPeriod, userData.currentSettings.notificationsDelay, isLoggedIn)
 
   //Html
   return (

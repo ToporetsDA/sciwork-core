@@ -1,6 +1,6 @@
 import React from 'react'
-import '../../../css/pages/dialogs/JointEventOverlap.css'
-import '../../../css/pages/dialogs/dialog.css'
+import '../../../css/dialogs/JointEventOverlap.css'
+import '../../../css/dialogs/dialog.css'
 
 import * as Shared from '../sharedComponents'
 

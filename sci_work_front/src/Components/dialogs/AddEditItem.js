@@ -1,6 +1,6 @@
-import React, { useState, useMemo }  from 'react'
-import '../../../css/pages/dialogs/AddEditItem.css'
-import '../../../css/pages/dialogs/dialog.css'
+import { useState, useMemo }  from 'react'
+import '../../../css/dialogs/AddEditItem.css'
+import '../../../css/dialogs/dialog.css'
 
 const AddEditItem = ({ userData, setUserData, data, setData, state, setState, rights, itemStructure, defaultStructure, isCompany }) => {
 

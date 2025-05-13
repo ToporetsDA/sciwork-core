@@ -7,7 +7,7 @@ const Organisation = require("../models/Organisation")
 const Activity = require("../models/Activity")
 
 // Map to store WebSocket connections by session token
-const clients = new Map(); // This will store WebSocket connections keyed by session token
+const clients = new Map() // This will store WebSocket connections keyed by session token
 
 const send = (ws, message, sessionToken, type, data) => {
   ws.send(JSON.stringify({ message, sessionToken, data: { type, data } }))
@@ -15,7 +15,7 @@ const send = (ws, message, sessionToken, type, data) => {
 
 const getData = async (type, login, ws, sessionToken) => {
 
-  let data;
+  let data
 
   switch (type) {
     case "all": {
@@ -106,10 +106,10 @@ const getData = async (type, login, ws, sessionToken) => {
 
 // start the WebSocket server
 const startWebSocketServer = (port) => {
-  const wss = new WebSocket.Server({ port });
+  const wss = new WebSocket.Server({ port })
 
   wss.on("connection", (ws, req) => {
-    console.log("New WebSocket connection established.");
+    console.log("New WebSocket connection established.")
     let sessionToken = null
 
     // When the WebSocket receives a message
@@ -143,7 +143,7 @@ const startWebSocketServer = (port) => {
             getData("activities", parsedMessage.data.login, ws, sessionToken)
             break
           }
-          case "addEditProject": {
+          case "addEditData": {
             const updatedProject = parsedMessage.data
             const projectId = updatedProject._id || new mongoose.Types.ObjectId()
             
@@ -243,7 +243,7 @@ const startWebSocketServer = (port) => {
     ws.on('close', () => {
       if (sessionToken) {
         console.log(`WebSocket for session token ${sessionToken} disconnected.`)
-        clients.delete(sessionToken);  // Remove from the clients map when the connection closes
+        clients.delete(sessionToken)  // Remove from the clients map when the connection closes
       }
     })
   })

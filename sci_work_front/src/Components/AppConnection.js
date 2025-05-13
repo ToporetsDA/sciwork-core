@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import useWebSocket from 'react-use-websocket'
 import LogIn from './pages/dialogs/LogIn'
 
+import * as Shared from './pages/sharedComponents'
+
 const Connection = ({ state, setState, userData, setUserData, data, setData, isLoggedIn, setLoggedIn, setRights, setUsers, isUserUpdatingData, setIsUserUpdatingData, isUserUpdatingUserData, setIsUserUpdatingUserData }) => {
 
     const [servers, setServers] = useState([])
@@ -71,6 +73,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
         console.log("from handleResponse: ")
         try {
             const response = JSON.parse(event.data)
+            const currentData = data
             console.log(response) // This will log the entire response
         
             // Now, you can access specific parts of the response
@@ -99,16 +102,26 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
                     setData(data)
                     break
                 }
+                case "project": {
+                    const updatedData = currentData.map(item =>
+                        item._id === data._id ? data : item
+                    )
+                    setData(updatedData)
+                    break
+                }
+                case "activity": {//add along with activity templates
+                    break
+                }
+                case "delete": {//just _id
+                    Shared.deleteItem(currentData, setData, data._id)
+                    break
+                }
                 case "organisation": {
                     setRights(data.organisation.rights)
                     break
                 }
                 case "users": {
                     setUsers(data)
-                    break
-                }
-                case "notifications": {
-                    
                     break
                 }
                 default: {

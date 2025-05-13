@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import '../../css/pages/Schedule.css'
 import ControlPanel from './sharedComponents/ControlPanel'
-import ScheduleBoard from './pageComponents/ScheduleBoard'
+import ScheduleBoard from './specificComponents/ScheduleBoard'
 
 const Schedule = ({ userData, setUserData, state, setState, data, setData, itemsToDisplay, setItemsToDisplay, rights, recentActivities, setRecentActivities }) => {
     

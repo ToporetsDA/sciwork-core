@@ -20,31 +20,40 @@ const AppDynamicContent = ({userData, setUserData, profileData, state, setState,
       }))
     }
 
+    let page = state.currentPage
+    let pr = state.currentProject
+    let act = state.currentActivity
+
     switch (pathParts.length) {
       case 0: {
-        navigate(`/HomePage`)
-        break
+        navigate('/HomePage', { replace: true })
+        return
       }
       case 1: {
-        if (state.currentPage === pathParts[0]) return
-        updateState(pathParts[0], undefined, undefined)
+        if (state.currentPage === pathParts[0]) {
+          return
+        }
+        page = pathParts[0]
+        pr = undefined
+        act = undefined
         break
       }
       case 2:
       case 3: {
         const project = data.find(project => project._id === pathParts[1]) || undefined
-        let activity = undefined
-        if (project) {
-          activity = project.activities.find(activity => activity.id === pathParts[2]) || undefined
-        }
+        const activity = (project) ? project.activities.find(activity => activity.id === pathParts[2]) || undefined : undefined
 
         if (state.currentProject !== project) {
-          updateState(pathParts[0], project, activity)
+          page = pathParts[0]
+          pr = project
+          act = activity
         }
         break
       }
       default: {}
     }
+
+    updateState(page, pr, act)
 
   }, [location.pathname, state, setState, data, navigate])
   

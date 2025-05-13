@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback }  from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback }  from 'react'
 import '../../../css/pages/sharedComponents/ControlPanel.css'
 
 const ControlPanel = ({ userData, setUserData, state, setState, data, rights, setItemsToDisplay, currentScale, setCurrentScale, editIntervalAnchor }) => {
@@ -13,6 +13,7 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
     const [currentSortOption, setCurrentSortOption] = useState(userData.currentSettings.sortFilter)
     const [currentStateOption, setCurrentStateOption] = useState(userData.currentSettings.stateFilter)
     const [searchQuery, setSearchQuery] = useState("")
+    const [displayProjects, setDisplayProjects] = useState(userData.currentSettings.displayProjects || "grid")
 
     const sortDropdownRef = useRef(null)
     const stateDropdownRef = useRef(null)
@@ -170,60 +171,65 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
                 </div>
             }
             {(state.currentPage === "Projects" || state.currentPage === "Project"  || state.currentPage === "Activity") &&
-                <div className='sortAndFilter'>
-                    <div>
-                        <button
-                            className="filterButton"
-                            onClick={() => {setIsSortDropdownOpen(!isSortDropdownOpen)}}
-                            ref={sortDropdownRef}
-                        >
-                            {currentSortOption}
-                        </button>
-                        {isSortDropdownOpen && (
-                            <ul className="dropdown">
-                                {filterOptions.sort.map((option, index) => (
-                                    <li key={index} onClick={() => { handleSortOptionSelect(option)}}>
-                                        {option}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                    <div>
-                        <button
-                            className="filterButton"
-                            onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
-                            ref={stateDropdownRef}
-                        >
-                            {currentStateOption}
-                        </button>
-                        {isStateDropdownOpen && (
-                            <ul className="dropdown">
-                                {filterOptions.state.map((option, index) => (
-                                    <li key={index} onClick={() => handleStateOptionSelect(option)}>
-                                        {option}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                    {((state.currentPage !== "Projects")
-                    && ((state.currentProject) ? rights.edit.includes(getAccess(state.currentProject)) : false))
-                    && (
+                <>
+                    <div className='sortAndFilter'>
                         <div>
-                        <button className="addItem" onClick={() => {
-                            setState((prevState) => ({
-                                ...prevState,
-                                currentDialog: {
-                                    name: 'AddEditUserList',
-                                    params: [true]},
-                            }));
-                        }}>
-                            Add/Edit users
-                        </button>
+                            <button
+                                className="filterButton"
+                                onClick={() => {setIsSortDropdownOpen(!isSortDropdownOpen)}}
+                                ref={sortDropdownRef}
+                            >
+                                {currentSortOption}
+                            </button>
+                            {isSortDropdownOpen && (
+                                <ul className="dropdown">
+                                    {filterOptions.sort.map((option, index) => (
+                                        <li key={index} onClick={() => { handleSortOptionSelect(option)}}>
+                                            {option}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
-                    )}
-                </div>
+                        <div>
+                            <button
+                                className="filterButton"
+                                onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
+                                ref={stateDropdownRef}
+                            >
+                                {currentStateOption}
+                            </button>
+                            {isStateDropdownOpen && (
+                                <ul className="dropdown">
+                                    {filterOptions.state.map((option, index) => (
+                                        <li key={index} onClick={() => handleStateOptionSelect(option)}>
+                                            {option}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                        {((state.currentPage !== "Projects")
+                        && ((state.currentProject) ? rights.edit.includes(getAccess(state.currentProject)) : false))
+                        && (
+                            <div>
+                            <button className="addItem" onClick={() => {
+                                setState((prevState) => ({
+                                    ...prevState,
+                                    currentDialog: {
+                                        name: 'AddEditUserList',
+                                        params: [true]},
+                                }));
+                            }}>
+                                Add/Edit users
+                            </button>
+                            </div>
+                        )}
+                    </div>
+                    <div className='display'>
+                        
+                    </div>
+                </>
             }
             {(((rights.edit.includes(userData.genStatus)
             && (state.currentProject) ? rights.edit.includes(getAccess(state.currentProject)) : true)))

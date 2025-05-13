@@ -1,9 +1,12 @@
 import { useEffect } from 'react'
 
-const Timer = (event, period, delay) => {
+const useTimer = (event, period, delay, isLoggedIn) => {
 
     useEffect(() => {
-        
+        if (isLoggedIn !== true) {
+            return
+        }
+
         const runEvent = () => {
             const now = new Date()
             console.log("Tick at:", now.toLocaleTimeString(), period, delay)
@@ -30,7 +33,7 @@ const Timer = (event, period, delay) => {
             clearTimeout(timeoutId)
             if (intervalId) clearInterval(intervalId)
         }
-    }, [event, period, delay])
+    }, [event, period, delay, isLoggedIn])
 }
 
-export default Timer
+export default useTimer

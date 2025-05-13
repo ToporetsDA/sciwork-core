@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import '../../../css/pages/dialogs/LogIn.css'
-import '../../../css/pages/dialogs/dialog.css'
+import { useState } from 'react'
+import '../../../css/dialogs/LogIn.css'
+import '../../../css/dialogs/dialog.css'
 
 
 const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {

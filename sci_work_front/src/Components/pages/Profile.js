@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import '../../css/pages/Profile.css'
 
 const Profile = ({ userData, setUserData, profileData, rights }) => {
