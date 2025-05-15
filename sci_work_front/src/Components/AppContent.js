@@ -16,7 +16,16 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
     // pages
     
     const loadPageComponent = (pageName) => {
-        const formattedPageName = (pageName === 'Subjects' || pageName === 'Project' || pageName === 'Activity') ? 'Projects' : pageName
+        let formattedPageName
+        switch(pageName) {
+            case"Subjects":
+            case"Project":
+            case"Activity": {
+                formattedPageName = "Projects"
+                break
+            }
+            default: {formattedPageName = pageName}
+        }
         console.log(pageName)
         return Pages[formattedPageName.replace(/\s+/g, '')]
     }

@@ -12,6 +12,9 @@ const AppDynamicContent = ({userData, setUserData, profileData, state, setState,
     const pathParts = location.pathname.split('/').filter(Boolean)
 
     const updateState = (page, project, activity) => {
+      if (state.currentPage === page && state.currentProject === project && state.currentActivity === activity) {
+        return
+      }
       setState((prevState) => ({
         ...prevState,
         currentPage: page,
@@ -38,7 +41,16 @@ const AppDynamicContent = ({userData, setUserData, profileData, state, setState,
         act = undefined
         break
       }
-      case 2:
+      case 2: {
+        const project = data.find(project => project._id === pathParts[1]) || undefined
+
+        if (state.currentProject !== project) {
+          page = pathParts[0]
+          pr = project
+          act = undefined
+        }
+        break
+      }
       case 3: {
         const project = data.find(project => project._id === pathParts[1]) || undefined
         const activity = (project) ? project.activities.find(activity => activity.id === pathParts[2]) || undefined : undefined

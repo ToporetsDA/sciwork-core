@@ -1,6 +1,9 @@
 //components
 export { default as ControlPanel } from './ControlPanel.js'
 export { default as LinkList } from './LinkList.js'
+export { default as ItemTiles } from './ItemTiles.js'
+export { default as ItemTable } from './ItemTable.js'
+export { default as ToggleButton } from './ToggleButton.js'
 //hooks
 export { default as useTimer } from './useTimer.js'
 //methods

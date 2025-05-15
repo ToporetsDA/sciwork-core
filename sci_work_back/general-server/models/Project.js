@@ -22,12 +22,6 @@ const projectSchema = new mongoose.Schema({
       serviceName: { type: String, default: null }
     }
   ],
-  notifications: [
-    {
-      _id: { type: String, required: true },
-      name: { type: String, required: true }
-    }
-  ],
   userList: [
     {
       id: { type: String, required: true },

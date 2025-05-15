@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useMemo, useCallback }  from 'react'
 import '../../../css/pages/sharedComponents/ControlPanel.css'
 
+import * as Shared from './'
+
 const ControlPanel = ({ userData, setUserData, state, setState, data, rights, setItemsToDisplay, currentScale, setCurrentScale, editIntervalAnchor }) => {
 
     const filterOptions = {
@@ -15,8 +17,7 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
     const [currentSortOption, setCurrentSortOption] = useState(userData.currentSettings.sortFilter)
     const [currentStateOption, setCurrentStateOption] = useState(userData.currentSettings.stateFilter)
     //toggle switch(s)
-    const [currentDisplayOption, setCurrentDisplayOption] = useState(userData.currentSettings.displayProjects)
-    const displayOptions = ["grid", "list", "table"]
+    const displayOptions = ["tiles", "list", "table"]
     //search
     const [searchQuery, setSearchQuery] = useState("")
 
@@ -37,7 +38,6 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
         if (userData) {
             setCurrentSortOption(userData.currentSettings.sortFilter)
             setCurrentStateOption(userData.currentSettings.statusFilter)
-            setCurrentDisplayOption(userData.currentSettings.displayProjects)
         }
     }, [userData])
 
@@ -49,12 +49,6 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
     const handleStateOptionSelect = (option) => {
         setUserData({statusFilter: option}, true)
         setIsStateDropdownOpen(false)
-    }
-
-    //change display type
-
-    const handleDisplayOptionSelect = (option) => {
-        setUserData({ displayProjects: option}, true)
     }
 
     //close filter option lists on click outside
@@ -80,6 +74,9 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
     //sort items
 
     const sortItems = useCallback((items) => {
+        if (items.length === 0) {
+            return []
+        }
         return items.sort((a, b) => {
             if (currentSortOption === "A-Z") {
                 return a.name.localeCompare(b.name)
@@ -136,12 +133,13 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
     const projectsToDisplay = useMemo(() => {
         return data ? filterItems(sortItems([...data])) : []
     }, [data, filterItems, sortItems])
-    
+
     const activitiesToDisplay = useMemo(() => {
-        return state.currentProject?.activities
-            ? filterItems(sortItems(state.currentProject.activities))
+        const activities = state.currentProject?.activities
+        return Array.isArray(activities)
+            ? filterItems(sortItems([...activities]))
             : []
-    }, [state.currentProject, filterItems, sortItems]);
+    }, [state.currentProject, filterItems, sortItems])
 
     //return data to display it
     useEffect(() => {
@@ -231,25 +229,21 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
                                     currentDialog: {
                                         name: 'AddEditUserList',
                                         params: [true]},
-                                }));
+                                }))
                             }}>
                                 Add/Edit users
                             </button>
                             </div>
                         )}
                     </div>
-                    <div className='displayProjects'>
-                        {displayOptions.map((option) => (
-                            <button
-                            key={option}
-                            className={`toggle-btn ${currentDisplayOption === option ? 'active' : ''}`}
-                            onClick={() => handleDisplayOptionSelect(option)}
-                            >
-                            {option}
-                            </button>
-                        ))}
-                    </div>
                 </>
+            }
+            {(state.currentPage === "Projects") &&
+                <Shared.ToggleButton
+                    userData={userData}
+                    setUserData={setUserData}
+                    displayOptions={displayOptions}
+                />
             }
             {(((rights.edit.includes(userData.genStatus)
             && (state.currentProject) ? rights.edit.includes(getAccess(state.currentProject)) : true)))
@@ -260,7 +254,7 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
                         currentDialog: {
                             name: 'AddEditItem',
                             params: [true]},
-                    }));
+                    }))
                 }}>
                     Add item
                 </button>
