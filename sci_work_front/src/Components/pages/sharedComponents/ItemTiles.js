@@ -38,39 +38,42 @@ const ItemTiles = ({userData, data, setData, state, setState, itemsToDisplay, se
                 {...provided.draggableProps}
                 className={`draggable-wrapper ${snapshot.isDragging ? 'dragging' : ''}`}
                 >
-                <div className="drag-and-item">
-                    {/* 🔘 DRAG HANDLE (6-dots) */}
-                    <div
-                    className="drag-handle"
-                    {...provided.dragHandleProps}
-                    onClick={(e) => e.stopPropagation()}
-                    >
-                    ⋮⋮
+                    <div className="hover-wrapper">
+                        <div className="drag-and-item">
+                            {/* ➕ Add below button */}
+                            <button
+                                className="add-button"
+                                onClick={(e) => {
+                                e.stopPropagation()
+                                handleAddAfter(index)
+                                }}
+                            >
+                                ➕ Add Below
+                            </button>
+                            {/* 🔘 DRAG HANDLE (6-dots) */}
+                            <div
+                            className="drag-handle"
+                            {...provided.dragHandleProps}
+                            onClick={(e) => e.stopPropagation()}
+                            >
+                                ⋮⋮
+                            </div>
+
+                            {/* 🧩 Your actual item */}
+                            <ItemComponent
+                            userData={userData}
+                            data={data}
+                            setData={setData}
+                            state={state}
+                            setState={setState}
+                            item={item}
+                            index={index}
+                            rights={rights}
+                            recentActivities={recentActivities}
+                            setRecentActivities={setRecentActivities}
+                            />
+                        </div>
                     </div>
-
-                    {/* 🧩 Your actual item */}
-                    <ItemComponent
-                    userData={userData}
-                    data={data}
-                    setData={setData}
-                    state={state}
-                    setState={setState}
-                    item={item}
-                    index={index}
-                    rights={rights}
-                    recentActivities={recentActivities}
-                    setRecentActivities={setRecentActivities}
-                    />
-                </div>
-
-                {/* ➕ Add below button */}
-                <button
-                    className="add-button"
-                    onClick={(e) => {
-                    e.stopPropagation()
-                    handleAddAfter(index)
-                    }}
-                >➕ Add Below</button>
                 </div>
             )}
             </Draggable>
