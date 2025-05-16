@@ -3,13 +3,19 @@ import { useLocation, useNavigate } from "react-router-dom"
 
 import AppContent from './AppContent'
 
-const AppDynamicContent = ({userData, setUserData, profileData, state, setState, data, setData, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
+const AppDynamicContent = ({userData, setUserData, profileData, state, setState, isLoggedIn, data, setData, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
     
   const location = useLocation()
   const navigate = useNavigate()
   
   useEffect(() => {
     const pathParts = location.pathname.split('/').filter(Boolean)
+
+    console.log("from dynamicContent", state, pathParts)
+
+    if (!isLoggedIn && pathParts[0] !== "HomePage") {
+      navigate('/HomePage', { replace: true })
+    }
 
     const updateState = (page, project, activity) => {
       if (state.currentPage === page && state.currentProject === project && state.currentActivity === activity) {
@@ -43,12 +49,9 @@ const AppDynamicContent = ({userData, setUserData, profileData, state, setState,
       }
       case 2: {
         const project = data.find(project => project._id === pathParts[1]) || undefined
-
-        if (state.currentProject !== project) {
-          page = pathParts[0]
-          pr = project
-          act = undefined
-        }
+        page = pathParts[0]
+        pr = project
+        act = undefined
         break
       }
       case 3: {
@@ -67,7 +70,7 @@ const AppDynamicContent = ({userData, setUserData, profileData, state, setState,
 
     updateState(page, pr, act)
 
-  }, [location.pathname, state, setState, data, navigate])
+  }, [location.pathname, state, setState, data, isLoggedIn, navigate])
   
   return (
     <AppContent

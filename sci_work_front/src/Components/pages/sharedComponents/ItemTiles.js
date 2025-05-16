@@ -1,66 +1,121 @@
-import { useNavigate } from "react-router-dom"
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import '../../../css/pages/sharedComponents/ItemTable.css'
 
-import * as Shared from './'
+import * as Items from '../../Items'
 
-const ItemTiles = ({userData, data, setData, setState, itemsToDisplay, rights, recentActivities, setRecentActivities}) => {
+//!!! setItemsToDisplay DOESNT EXIST YET !!!
+// need to implement storage for items order
+const ItemTiles = ({userData, data, setData, state, setState, itemsToDisplay, setItemsToDisplay, rights, recentActivities, setRecentActivities}) => {
 
-    const navigate = useNavigate()
+    const handleDragEnd = (result) => {
+        if (!result.destination) return
 
-    //open project
-    const goTo = Shared.GoTo
+        const updatedItems = Array.from(itemsToDisplay)
+        const [movedItem] = updatedItems.splice(result.source.index, 1)
+        updatedItems.splice(result.destination.index, 0, movedItem)
 
-    const getAccess = (item) => {
-        return item.userList?.find(user => user.id === userData._id)?.access || 0
+        setItemsToDisplay(updatedItems)
+    }
+
+    const handleAddAfter = (index) => {
+        setState(prev => ({
+            ...prev,
+            currentDialog: {
+                name: 'AddEditItem',
+                params: [true, index + 1] // You’ll need to support this index in the dialog
+            }
+        }))
+    }
+
+    const createDraggableItem = (item, index) => {
+        const ItemComponent = Items[item._id.includes(".") ? item.type : "Project"]
+
+        return (
+            <Draggable key={item._id} draggableId={item._id} index={index}>
+            {(provided, snapshot) => (
+                <div
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                className={`draggable-wrapper ${snapshot.isDragging ? 'dragging' : ''}`}
+                >
+                <div className="drag-and-item">
+                    {/* 🔘 DRAG HANDLE (6-dots) */}
+                    <div
+                    className="drag-handle"
+                    {...provided.dragHandleProps}
+                    onClick={(e) => e.stopPropagation()}
+                    >
+                    ⋮⋮
+                    </div>
+
+                    {/* 🧩 Your actual item */}
+                    <ItemComponent
+                    userData={userData}
+                    data={data}
+                    setData={setData}
+                    state={state}
+                    setState={setState}
+                    item={item}
+                    index={index}
+                    rights={rights}
+                    recentActivities={recentActivities}
+                    setRecentActivities={setRecentActivities}
+                    />
+                </div>
+
+                {/* ➕ Add below button */}
+                <button
+                    className="add-button"
+                    onClick={(e) => {
+                    e.stopPropagation()
+                    handleAddAfter(index)
+                    }}
+                >➕ Add Below</button>
+                </div>
+            )}
+            </Draggable>
+        )
     }
 
     return (
         <>
-            {itemsToDisplay.map((project, index) => (
-                <div
-                    key={index}
-                    className={`
-                    card
-                    ${(new Date(project.endDate) - new Date()) / (24 * 60 * 60 * 1000) < 30 ? 'expiring' : ''}
-                    ${(new Date(project.endDate) < new Date()) ? 'expired' : ''}
-                    `}
-                    onClick={() => {
-                    navigate(goTo(project, data, recentActivities, setRecentActivities))
-                    }}
-                >
-                    <h3 className="name">{project.name}</h3>
-                    <p className="timeLimit">
-                    {project.startDate ? project.startDate : 'N/A'} - {project.endDate}
-                    </p>
-                    {!project.deleted && rights.edit.includes(getAccess(project)) && (
-                    <div className="actions">
-                        <button
-                        className="gearButton"
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            setState((prevState) => ({
-                            ...prevState,
-                            currentDialog: {
-                                name: 'AddEditItem',
-                                params: [project],
-                            },
-                            }))
-                        }}
-                        >
-                        ⚙️
-                        </button>
-                        <button
-                        className="deleteButton"
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            Shared.deleteItem(data, setData, project._id)
-                        }}
-                        >
-                        🗑️
-                        </button>
-                    </div>
-                    )}
-                </div>
-            ))}
+            {(state.currentPage === "Projects") ?
+                (
+                    <>
+                        {itemsToDisplay.map((item, index) => {
+                            const ItemComponent = Items[(item._id.includes(".")) ? item.type : "Project"]
+                            return (
+                                <ItemComponent
+                                    key={item._id}
+                                    userData={userData}
+                                    data={data}
+                                    setData={setData}
+                                    state={state}
+                                    setState={setState}
+                                    item={item}
+                                    index={index}
+                                    rights={rights}
+                                    recentActivities={recentActivities}
+                                    setRecentActivities={setRecentActivities}
+                                />
+                            )
+                        })}
+                    </>
+                ) : (
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                        <Droppable droppableId="itemTiles">
+                            {(provided) => (
+                                <div ref={provided.innerRef} {...provided.droppableProps} className="item-tiles">
+                                    {itemsToDisplay.map((item, index) => {
+                                        return createDraggableItem(item, index)
+                                    })}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </DragDropContext>
+                )
+            }
         </>
     )
 }

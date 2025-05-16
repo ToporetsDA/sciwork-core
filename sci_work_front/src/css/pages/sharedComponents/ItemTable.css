@@ -1,0 +1,16 @@
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+.project-table th, .project-table td {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/*# sourceMappingURL=ItemTable.css.map */

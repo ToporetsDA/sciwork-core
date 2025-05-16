@@ -2,10 +2,17 @@ const mongoose = require("mongoose")
 
 // Project schema
 const projectSchema = new mongoose.Schema({
-    _id: { type: String, auto: true },
+    _id: { type: String },
     name: { type: String, required: true },
+    type: {type: String, default: "Dev"},
     template: { type: String, default: "none" },
-    content: { type: String, required: false }
+    content: { type: mongoose.Schema.Types.Mixed, required: false },
+    userList: [
+        {
+            id: { type: String, required: true },
+            access: { type: Number, required: true }
+        }
+    ]
 })
 
 // Export the Activity model

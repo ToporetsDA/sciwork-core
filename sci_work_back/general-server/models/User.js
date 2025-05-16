@@ -3,6 +3,7 @@ const Joi = require("joi") // Validation schema
 
 // Full user schema to match your expected structure
 const userSchema = new mongoose.Schema({
+  _id: { type: String },
   name: { type: String, required: true },
   middleName: { type: String, default: "" },
   surName: { type: String, required: true },
@@ -21,8 +22,7 @@ const userSchema = new mongoose.Schema({
     notificationsDelay: {type: Number, default: 15}
   },
   login: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  _id: { type: String, auto: true }
+  password: { type: String, required: true }
 })
 
 // Export the user model

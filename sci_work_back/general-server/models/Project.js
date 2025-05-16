@@ -2,12 +2,11 @@ const mongoose = require("mongoose")
 
 // Project schema
 const projectSchema = new mongoose.Schema({
-  _id: { type: String, auto: true },
+  _id: { type: String },
   name: { type: String, required: true },
   startDate: { type: String, required: true },
   endDate: { type: String, required: true },
   access: { type: Number, required: true },
-  name: { type: String, required: true },
   activities: [
     {
       _id: { type: String, auto: true },

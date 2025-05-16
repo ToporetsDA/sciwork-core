@@ -6,13 +6,6 @@ const ItemTable = ({userData, data, setData, setState, itemsToDisplay, rights, r
 
     const navigate = useNavigate()
 
-    //open project
-    const goTo = Shared.GoTo
-
-    const getAccess = (item) => {
-        return item.userList?.find(user => user.id === userData._id)?.access || 0
-    }
-
     const sampleItem = itemsToDisplay[0] || {}
 
     // extract keys from project and filter out _id and arrays
@@ -43,7 +36,7 @@ const ItemTable = ({userData, data, setData, setState, itemsToDisplay, rights, r
                     <tr
                     key={index}
                     className={`${isExpiring ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}
-                    onClick={() => navigate(goTo(item, data, recentActivities, setRecentActivities))}
+                    onClick={() => navigate(Shared.GoTo(item, data, recentActivities, setRecentActivities))}
                     >
                     {itemKeys.map((key) => (
                         <td key={key}>
@@ -52,31 +45,14 @@ const ItemTable = ({userData, data, setData, setState, itemsToDisplay, rights, r
                     ))}
                     <td>{status}</td>
                     <td onClick={(e) => e.stopPropagation()}>
-                        {!item.deleted && rights.edit.includes(getAccess(item)) && (
-                        <>
-                            <button
-                            className="gearButton"
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                setState((prevState) => ({
-                                ...prevState,
-                                currentDialog: { name: 'AddEditItem', params: [item] },
-                                }))
-                            }}
-                            >
-                            ⚙️
-                            </button>
-                            <button
-                            className="deleteButton"
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                Shared.deleteItem(data, setData, item._id)
-                            }}
-                            >
-                            🗑️
-                            </button>
-                        </>
-                        )}
+                        <Shared.ItemActions
+                            userData={userData}
+                            data={data}
+                            setData={setData}
+                            setState={setState}
+                            item={item}
+                            rights={rights}
+                        />
                     </td>
                     </tr>
                 )

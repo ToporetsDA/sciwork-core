@@ -289,6 +289,7 @@ const App = () => {
                 profileData={defaultProfileData}
                 state={state}
                 setState={setState}
+                isLoggedIn={isLoggedIn}
                 data={data}
                 setData={updateData}
                 rights={rights}

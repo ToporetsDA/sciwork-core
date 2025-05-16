@@ -1,7 +1,7 @@
 //item here is either Activity or Project Object
 
 const GoTo = (destination, data, recentActivities, setRecentActivities) => {
-
+    
     const projectId = (id) => {
         return id.split('.')[0]
     }

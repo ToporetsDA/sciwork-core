@@ -5,7 +5,7 @@ import '../../css/dialogs/dialog.css'
 const AddEditItem = ({ userData, setUserData, data, setData, state, setState, rights, itemStructure, defaultStructure, isCompany }) => {
 
     const currentItem = state.currentDialog.params[0]
-    const [selectedType, setSelectedType] = useState(state.currentProject ? "Activity" : "Project") // Default to "Project"
+    const selectedType = ["Activity", "Project"].includes(state.currentPage) ? state.currentPage : "Project"
 
     // Initialize form values based on default type
 
@@ -31,13 +31,6 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
     })
 
     // Reset form values for the new type
-
-    const handleTypeChange = (e) => {
-        const type = e.target.value
-        setSelectedType(type)
-        setFormValues(initializeFormValues(defaultStructure[type.toLowerCase()], itemStructure[selectedType.toLowerCase()]))
-        setErrors({})
-    }
 
     const handleInputChange = (e) => {
         const { name, type, checked, value } = e.target
@@ -248,10 +241,6 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
                 <form onSubmit={handleSubmit}>
                     {currentItem === true && state.currentPage === 'Schedule' &&
                     <>
-                        <select id="itemType" value={selectedType} onChange={handleTypeChange}>
-                            <option value="Project">{isCompany ? 'Project' : 'Subject'}</option>
-                            <option value="Activity">Activity</option>
-                        </select>
                         {selectedType === 'Activity' &&
                             <select
                                 id="projectList"

@@ -2,6 +2,11 @@
   display: flex;
   height: 4vh;
 }
+.controlPanel .dropdown li {
+  min-width: 100px;
+  min-height: 20px;
+  background-color: green;
+}
 .controlPanel .sortAndFilter {
   display: flex;
   z-index: 2;

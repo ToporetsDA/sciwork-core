@@ -245,8 +245,8 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
                     displayOptions={displayOptions}
                 />
             }
-            {(((rights.edit.includes(userData.genStatus)
-            && (state.currentProject) ? rights.edit.includes(getAccess(state.currentProject)) : true)))
+            {(rights.edit.includes(userData.genStatus)
+            && !["Activity", "Project"].includes(state.currentPage))
             && (
                 <button className="addItem" onClick={() => {
                     setState((prevState) => ({
@@ -256,7 +256,7 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
                             params: [true]},
                     }))
                 }}>
-                    Add item
+                    New Project
                 </button>
             )}
         </div>

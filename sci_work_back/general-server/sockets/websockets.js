@@ -208,8 +208,7 @@ const startWebSocketServer = (port) => {
         
             User.findByIdAndUpdate(userId, updatedUserData, { new: true })
             .then((user) => {
-              console.log("found", user)
-              if (user) {
+              if (!user) {
                 console.error(`Failed to update user with ID ${userId}.`)
                 return
               }

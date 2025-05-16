@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import '../css/AppContent.css'
 import * as Pages from './pages'
 import * as Dialogs from './dialogs'
@@ -19,14 +19,12 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
         let formattedPageName
         switch(pageName) {
             case"Subjects":
-            case"Project":
-            case"Activity": {
+            case"Project": {
                 formattedPageName = "Projects"
                 break
             }
             default: {formattedPageName = pageName}
         }
-        console.log(pageName)
         return Pages[formattedPageName.replace(/\s+/g, '')]
     }
 
