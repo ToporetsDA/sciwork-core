@@ -1,0 +1,38 @@
+.activity-item {
+  display: flex;
+  justify-content: flex-start;
+  position: relative;
+  touch-action: none;
+}
+.activity-item:hover .drag-handle, .activity-item:hover .add-button {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drag-handle, .add-button {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.drag-handle {
+  cursor: grab;
+  padding: 0.3rem;
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+  color: #aaa;
+  display: inline-flex;
+  align-items: center;
+}
+
+.add-button {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: block;
+}
+
+/*# sourceMappingURL=Item.css.map */

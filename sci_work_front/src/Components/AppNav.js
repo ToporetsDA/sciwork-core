@@ -7,7 +7,6 @@ import * as Shared from '../Components/pages/sharedComponents'
 const AppNav = ({ data, state, isLoggedIn, organisationType, recentActivities, setRecentActivities }) => {
   
   const navigate = useNavigate()
-  const goTo = Shared.GoTo
 
   const projectId = (id) => {
     return id.split('.')[0]
@@ -22,7 +21,7 @@ const AppNav = ({ data, state, isLoggedIn, organisationType, recentActivities, s
     return (
       <li
         key={activity._id}
-        onClick={() => {navigate(goTo(activity, data, recentActivities, setRecentActivities))}}
+        onClick={() => {navigate(Shared.GoTo(activity, data, recentActivities, setRecentActivities))}}
         className={state.currentActivity === undefined ? 'active' : ''}
         style={{
           fontWeight: state.currentPage === undefined ? 'bold' : 'normal',

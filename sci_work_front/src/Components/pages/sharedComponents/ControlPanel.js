@@ -135,11 +135,11 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
     }, [data, filterItems, sortItems])
 
     const activitiesToDisplay = useMemo(() => {
-        const activities = state.currentProject?.activities
+        const activities = Shared.GetItemById(data, state.currentProject).activities
         return Array.isArray(activities)
             ? filterItems(sortItems([...activities]))
             : []
-    }, [state.currentProject, filterItems, sortItems])
+    }, [data, state.currentProject, filterItems, sortItems])
 
     //return data to display it
     useEffect(() => {
@@ -220,7 +220,7 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
                             )}
                         </div>
                         {((state.currentPage !== "Projects")
-                        && ((state.currentProject) ? rights.edit.includes(getAccess(state.currentProject)) : false))
+                        && ((state.currentProject) ? rights.edit.includes(getAccess(Shared.GetItemById(data, state.currentProject))) : false))
                         && (
                             <div>
                             <button className="addItem" onClick={() => {

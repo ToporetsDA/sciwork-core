@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 // Project schema
 const projectSchema = new mongoose.Schema({
   _id: { type: String },
+  dndCount: { type: Number, required: true },
   name: { type: String, required: true },
   startDate: { type: String, required: true },
   endDate: { type: String, required: true },
@@ -10,10 +11,13 @@ const projectSchema = new mongoose.Schema({
   activities: [
     {
       _id: { type: String, auto: true },
+      dnd: { type: Number, required: true },
+      name: { type: String, required: true },
       startDate: { type: String, required: true },
       endDate: { type: String, required: true },
       startTime: { type: String, default: "" },
       endTime: { type: String, default: "" },
+      type: { type: String, default: "Dev" },
       page: { type: Boolean, default: false },
       repeat: { type: Boolean, default: false },
       days: { type: [String], default: [] },

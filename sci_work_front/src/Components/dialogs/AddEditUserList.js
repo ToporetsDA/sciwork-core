@@ -2,6 +2,8 @@ import { useCallback, useMemo }  from 'react'
 import '../../css/dialogs/AddEditUserList.css'
 import '../../css/dialogs/dialog.css'
 
+import * as Shared from '../pages/sharedComponents'
+
 const AddEditUserList = ({ userData, setUserData, data, setData, state, setState, rights, users, itemStructure, defaultStructure, isCompany }) => {
 
     const getFullName = (user) => {
@@ -19,8 +21,8 @@ const AddEditUserList = ({ userData, setUserData, data, setData, state, setState
     }
 
     const userList = useMemo(() => {
-        return state.currentProject.userList || []
-    }, [state.currentProject])
+        return Shared.GetItemById(data, state.currentProject).userList || []
+    }, [data, state.currentProject])
 
     const getAccess = useCallback((user, userList) => {
         return userList.find(listItem => listItem.id === user._id)?.access
@@ -62,7 +64,7 @@ const AddEditUserList = ({ userData, setUserData, data, setData, state, setState
             const newState = {
                 ...prevState,
                 currentProject: {
-                    ...state.currentProject,
+                    ...Shared.GetItemById(data, state.currentProject),
                     userList: updatedUserList,
                 },
             }

@@ -1,4 +1,4 @@
-const deleteItem = (data, setData, _id) => {
+const DeleteItem = (data, setData, _id) => {
 
     const projectId = _id.split('.')[0]
     
@@ -29,4 +29,4 @@ const deleteItem = (data, setData, _id) => {
     setData({ action: "edit", item: updatedProject })
 }
 
-export default deleteItem
+export default DeleteItem

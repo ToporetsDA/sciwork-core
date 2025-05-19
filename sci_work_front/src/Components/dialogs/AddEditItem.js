@@ -2,6 +2,8 @@ import { useState, useMemo }  from 'react'
 import '../../css/dialogs/AddEditItem.css'
 import '../../css/dialogs/dialog.css'
 
+import * as Shared from '../pages/sharedComponents'
+
 const AddEditItem = ({ userData, setUserData, data, setData, state, setState, rights, itemStructure, defaultStructure, isCompany }) => {
 
     const currentItem = state.currentDialog.params[0]
@@ -27,7 +29,7 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
     }
 
     const [formValues, setFormValues] = useState(() => {
-        return initializeFormValues(defaultStructure[selectedType.toLowerCase()], itemStructure[selectedType.toLowerCase()]);
+        return initializeFormValues(defaultStructure[selectedType.toLowerCase()], itemStructure[selectedType.toLowerCase()])
     })
 
     // Reset form values for the new type
@@ -55,8 +57,8 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
     const showItemFields = useMemo(() => {
         return (state.currentPage !== 'Schedule' || selectedType === 'Project' ||
         (selectedType === 'Activity' && state.currentProject !== undefined)) &&
-        ((state.currentProject !== undefined) ? rights.edit.includes(state.currentProject.access) : true);
-    }, [state, selectedType, rights.edit])
+        ((state.currentProject !== undefined) ? rights.edit.includes(Shared.GetItemById(data, state.currentProject).access) : true)
+    }, [data, state, selectedType, rights.edit])
 
     //conditions for fields that should appear based on other fields values
     const fieldsChecks = useMemo(() => {
@@ -102,12 +104,14 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
                 errors.endDate = 'Trying to create expired project'
             }
 
+            const project = Shared.GetItemById(data, state.currentProject)
+
             if (selectedType === 'Activity') {
-                if (startDate < state.currentProject.startDate || startDate >= state.currentProject.endDate) {
+                if (startDate < project.startDate || startDate >= project.endDate) {
                     errors.startDate = "Start date must be within project's lifetime."
                 }
 
-                if (endDate < state.currentProject.startDate || endDate > state.currentProject.endDate) {
+                if (endDate < project.startDate || endDate > project.endDate) {
                     errors.startDate = "End date must be within project's lifetime."
                 }
             }
@@ -152,10 +156,12 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
             return
         }
 
+        const project = Shared.GetItemById(data, state.currentProject)
+
         let newItem = {
             ...formValues,
             ...(state.currentProject !== undefined && {
-                _id: currentItem?._id || (state.currentProject._id + (state.currentProject.activities.length + 1).toString())
+                _id: currentItem?._id || (project._id + (project.activities.length + 1).toString())
             }),
             userList: [{
                 id: userData._id,
@@ -174,13 +180,9 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
         let action = "edit"
         let item
 
-        let project
-
         const isActivity = selectedType === "Activity" && state.currentProject !== undefined
         
         if (isActivity) {
-
-            project = state.currentProject
             const existingActivity = project.activities?.find((item) => item._id === newItem._id)
 
             const updatedActivities = existingActivity
@@ -244,14 +246,14 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
                         {selectedType === 'Activity' &&
                             <select
                                 id="projectList"
-                                value={state.currentProject?._id || ""}
+                                value={Shared.GetItemById(data, state.currentProject)?._id || ""}
                                 onChange={(e) => {
-                                    const selectedProject = data.find((project) => String(project._id) === e.target.value);
+                                    const selectedProject = Shared.GetItemById(data, e.target.value)
                                     if (selectedProject) {
                                         setState((prevState) => ({
                                             ...prevState,
                                             currentProject: selectedProject,
-                                        }));
+                                        }))
                                     }
                                 }}
                             >

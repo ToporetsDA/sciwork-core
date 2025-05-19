@@ -113,7 +113,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
                     break
                 }
                 case "delete": {//just _id
-                    Shared.deleteItem(currentData, setData, data._id)
+                    Shared.DeleteItem(currentData, setData, data._id)
                     break
                 }
                 case "organisation": {
@@ -175,7 +175,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
     const lastSentProject = useRef(null)
     useEffect(() => {
         if (lastSentProject.current === state.currentPage || !isLoggedIn) return
-            const location = state.currentActivity?._id || state.currentProject?._id || state.currentPage
+            const location = state.currentActivity || state.currentProject || state.currentPage
             sendMsg("goTo", format(location))
         lastSentProject.current = state.currentPage
     }, [sendMsg, state.currentPage, state.currentProject, state.currentActivity, isLoggedIn])

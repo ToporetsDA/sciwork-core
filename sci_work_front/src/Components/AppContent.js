@@ -3,6 +3,8 @@ import '../css/AppContent.css'
 import * as Pages from './pages'
 import * as Dialogs from './dialogs'
 
+import * as Shared from '../Components/pages/sharedComponents'
+
 const AppContent = ({userData, setUserData, profileData, state, setState, data, setData, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
 
     // dialogs
@@ -32,9 +34,11 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
 
     // more for pages
 
+    const project = Shared.GetItemById(data, state.currentProject)
+
     const [itemsToDisplay, setItemsToDisplay] = useState({
         projects: data || [],
-        activities: state.currentProject?.activities ? state.currentProject.activities : []
+        activities: project?.activities ? project.activities : []
     }, [state.currentProject, data])
 
     return (

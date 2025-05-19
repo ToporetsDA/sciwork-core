@@ -4,7 +4,6 @@ const mongoose = require("mongoose")
 const projectSchema = new mongoose.Schema({
     _id: { type: String },
     name: { type: String, required: true },
-    type: {type: String, default: "Dev"},
     template: { type: String, default: "none" },
     content: { type: mongoose.Schema.Types.Mixed, required: false },
     userList: [

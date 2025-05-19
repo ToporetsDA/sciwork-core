@@ -3,15 +3,15 @@ import { useLocation, useNavigate } from "react-router-dom"
 
 import AppContent from './AppContent'
 
+import * as Shared from './pages/sharedComponents'
+
 const AppDynamicContent = ({userData, setUserData, profileData, state, setState, isLoggedIn, data, setData, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
-    
+
   const location = useLocation()
   const navigate = useNavigate()
   
   useEffect(() => {
     const pathParts = location.pathname.split('/').filter(Boolean)
-
-    console.log("from dynamicContent", state, pathParts)
 
     if (!isLoggedIn && pathParts[0] !== "HomePage") {
       navigate('/HomePage', { replace: true })
@@ -48,20 +48,20 @@ const AppDynamicContent = ({userData, setUserData, profileData, state, setState,
         break
       }
       case 2: {
-        const project = data.find(project => project._id === pathParts[1]) || undefined
+        const project = Shared.GetItemById(data, pathParts[1]) || undefined
         page = pathParts[0]
-        pr = project
+        pr = project._id
         act = undefined
         break
       }
       case 3: {
-        const project = data.find(project => project._id === pathParts[1]) || undefined
-        const activity = (project) ? project.activities.find(activity => activity.id === pathParts[2]) || undefined : undefined
+        const project = Shared.GetItemById(data, pathParts[1]) || undefined
+        const activity = (project) ? Shared.GetItemById(project.activities, pathParts[2]) || undefined : undefined
 
         if (state.currentProject !== project) {
           page = pathParts[0]
-          pr = project
-          act = activity
+          pr = project._id
+          act = activity._id
         }
         break
       }

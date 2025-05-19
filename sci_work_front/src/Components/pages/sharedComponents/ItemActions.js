@@ -29,7 +29,7 @@ const ItemActions = ({userData, data, setData, setState, item, rights}) => {
                 className="deleteButton"
                 onClick={(e) => {
                     e.stopPropagation()
-                    Shared.deleteItem(data, setData, item._id)
+                    Shared.DeleteItem(data, setData, item._id)
                 }}
                 >
                 🗑️

@@ -15,7 +15,7 @@ const App = () => {
 
   const [state, setState] = useState({
     currentPage: 'HomePage',   //string
-    currentProject: undefined,  //object
+    currentProject: undefined,  //string
     currentActivity: undefined, //string
     currentDialog: {
       name: undefined,  //string
@@ -121,7 +121,6 @@ const App = () => {
   const [users, setUsers] = useState()
 
   const updateData = (data) => {
-
     const { action, item } = data
     setIsUserUpdatingData(item._id)
 
