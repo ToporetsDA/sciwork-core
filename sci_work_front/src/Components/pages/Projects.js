@@ -13,49 +13,6 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
         ['table', 'table']
     ])
 
-    const updateItemAndChildrenIds = (item, newBaseId) => {
-        const updatedItem = {
-            ...item,
-            _id: newBaseId,
-        }
-
-        if (item.activities) {
-            updatedItem.activities = item.activities.map((child, i) =>
-                updateItemAndChildrenIds(child, `${newBaseId}.${i}`)
-            )
-        }
-
-        return updatedItem
-    }
-
-    const findItemWithParent = (items, targetDnd, parent) => {
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i]
-            if (item.dnd === targetDnd) {
-                return { item, parent, index: i }
-            }
-            if (item.activities) {
-                const result = findItemWithParent(item.activities, targetDnd, item)
-                if (result) return result
-            }
-        }
-        return null
-    }
-
-    const normalizeItemIds = (project) => {
-        const normalizedActivities = project.activities.map((item, index) => {
-            const newBaseId = `${state.currentProject}.${index}`
-            return updateItemAndChildrenIds(item, newBaseId)
-        })
-
-        const updatedProject = {
-            ...project,
-            activities: normalizedActivities
-        }
-
-        setData({ item: updatedProject, action: 'edit' })
-    }
-
     const handleDragEnd = (event) => {
         const { active, over } = event
         if (!over || active.id === over.id) return
@@ -64,7 +21,7 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
         const activities = project.activities
 
         // Step 1: Find the moved item and its parent
-        const fromInfo = findItemWithParent(activities, active.id, project)
+        const fromInfo = Shared.FindItemWithParent(activities, "dnd", active.id, project)
         if (!fromInfo) return
 
         const { item: movedItem, parent: fromParent, index: oldIndex } = fromInfo
@@ -74,7 +31,7 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
         fromArray.splice(oldIndex, 1)
 
         // Step 2: Find the drop target and its parent
-        const toInfo = findItemWithParent(activities, over.id, project)
+        const toInfo = Shared.FindItemWithParent(activities, "dnd", over.id, project)
         if (!toInfo) return
 
         console.log("fromTo", fromInfo, toInfo)
@@ -87,7 +44,7 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
         if (overItem.activities) {
             // Dropped over a container → insert as first child
             toArray = overItem.activities
-            insertIndex = 0
+            insertIndex = newIndexInTarget
         } else {
             // Dropped over sibling → insert next to it
             toArray = toParent.activities
@@ -111,7 +68,7 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
         }))
 
         // Step 5: Normalize all _id values
-        normalizeItemIds(project)
+        Shared.NormalizeItemIds(project, state, setData)
     }
 
     return (

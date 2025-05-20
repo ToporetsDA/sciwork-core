@@ -4,21 +4,6 @@ import '../../../css/pages/sharedComponents/Item.css'
 
 import * as Items from '../../Items'
 
-/*const handleAddAfter = (_id) => {
-
-    const parts = _id.split(".");
-    const itemId = Number(parts.pop()) + 1
-    const newId = [...parts, itemId.toString()].join(".")
-
-    setState(prev => ({
-        ...prev,
-        currentDialog: {
-            name: 'AddEditItem',
-            params: [true, newId] // You’ll need to support this index in the dialog
-        }
-    }))
-}*/
-
 const Item = ({userData, data, setData, state, setState, item, index, rights, recentActivities, setRecentActivities }) => {
     
     const ItemComponent = Items[item.type]
@@ -28,6 +13,21 @@ const Item = ({userData, data, setData, state, setState, item, index, rights, re
     const style = {
         transition,
         transform: CSS.Transform.toString(transform),
+    }
+
+    const handleAddAfter = (_id) => {
+
+        const parts = _id.split(".");
+        const itemId = Number(parts.pop()) + 1
+        const newId = [...parts, itemId.toString()].join(".")
+
+        setState(prev => ({
+            ...prev,
+            currentDialog: {
+                name: 'AddEditItem',
+                params: [true, newId]
+            }
+        }))
     }
 
     return (
@@ -43,7 +43,7 @@ const Item = ({userData, data, setData, state, setState, item, index, rights, re
                 className="add-button"
                 onClick={(e) => {
                 e.stopPropagation()
-                // handleAddAfter(item._id)
+                handleAddAfter(item._id)
                 }}
             >
                 ➕

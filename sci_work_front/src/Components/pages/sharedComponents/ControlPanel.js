@@ -253,7 +253,7 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
                         ...prevState,
                         currentDialog: {
                             name: 'AddEditItem',
-                            params: [true]},
+                            params: [true, false]},
                     }))
                 }}>
                     New Project

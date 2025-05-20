@@ -7,6 +7,7 @@ import * as Shared from '../pages/sharedComponents'
 const AddEditItem = ({ userData, setUserData, data, setData, state, setState, rights, itemStructure, defaultStructure, isCompany }) => {
 
     const currentItem = state.currentDialog.params[0]
+    const currentItemId = state.currentDialog.params[1] || false
     const selectedType = ["Activity", "Project"].includes(state.currentPage) ? state.currentPage : "Project"
 
     // Initialize form values based on default type
@@ -43,13 +44,18 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
     }
 
     // Update set of selected days
-    const toggleDaySelection = (day) => {
+    const toggleListSelection = (field, value, many) => {
         setFormValues((prev) => {
-            const currentDays = prev.days || []
-            const updatedDays = currentDays.includes(day)
-                ? currentDays.filter((d) => d !== day) // Remove the day if already selected
-                : [...currentDays, day] // Add the day if not selected
-            return { ...prev, days: updatedDays }
+            const currentList = prev[field] || []
+            const baseList = many ? currentList : currentList.filter((v) => v === value)
+            const updatedList = baseList.includes(value)
+                ? baseList.filter((v) => v !== value)
+                : [...baseList, value]
+            
+            return {
+            ...prev,
+            [field]: updatedList
+            }
         })
     }
 
@@ -78,8 +84,11 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
 
         //empty check
         Object.keys(formValues).forEach((key) => {
-            if (formValues[key] === '' && itemStructure[key] !== 'checkbox' && fieldsChecks[key] === true) {
+            if (formValues[key] === '' && itemStructure[key] !== 'checkbox' && itemStructure[key] !== 'list' && fieldsChecks[key] === true) {
                 errors[key] = 'This field is required.'
+            }
+            if (formValues[key].length === 0 && itemStructure[key] === 'list') {
+                errors[key] = 'Select an option(s).'
             }
         })
 
@@ -104,9 +113,9 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
                 errors.endDate = 'Trying to create expired project'
             }
 
-            const project = Shared.GetItemById(data, state.currentProject)
-
             if (selectedType === 'Activity') {
+                const project = Shared.GetItemById(data, Shared.GetItemById(data, state.currentProject))
+                
                 if (startDate < project.startDate || startDate >= project.endDate) {
                     errors.startDate = "Start date must be within project's lifetime."
                 }
@@ -161,16 +170,20 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
         let newItem = {
             ...formValues,
             ...(state.currentProject !== undefined && {
-                _id: currentItem?._id || (project._id + (project.activities.length + 1).toString())
+                _id: currentItemId ? currentItemId : Math.random().toString(36).slice(2, 10)
             }),
+            activities: [],
             userList: [{
                 id: userData._id,
                 access: 0
-            }]
+            }],
+            ...(selectedType === "Project"
+                ? { dndCount: 0 }
+                : { dnd: project.dndCount })
         }
 
-        if (selectedType === "Project") {
-            newItem.activities = []
+        if (selectedType !== "Project") {
+            project.dndCount += 1
         }
 
         console.log(newItem)
@@ -183,18 +196,11 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
         const isActivity = selectedType === "Activity" && state.currentProject !== undefined
         
         if (isActivity) {
-            const existingActivity = project.activities?.find((item) => item._id === newItem._id)
-
-            const updatedActivities = existingActivity
-                ? project.activities.map((item) => item._id === existingActivity._id ? newItem : item) // Update
-                : [...(project.activities || []), newItem] // Add
-
-            item = {
-                ...project,
-                activities: updatedActivities,
-            }
-        }
-        else {
+            const { parent: container } = Shared.FindItemWithParent(project.activities, "_id", currentItemId, project)
+            if (!container.activities) container.activities = []
+            container.activities.push(newItem)
+            Shared.NormalizeItemIds(container)
+        } else {
             const existingItem = data.find((item) => item._id === currentItem._id)
             if (existingItem) {
                 item = { ...existingItem, ...formValues }
@@ -243,7 +249,7 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
                 <form onSubmit={handleSubmit}>
                     {currentItem === true && state.currentPage === 'Schedule' &&
                     <>
-                        {selectedType === 'Activity' &&
+                        {/* {selectedType === 'Activity' &&
                             <select
                                 id="projectList"
                                 value={Shared.GetItemById(data, state.currentProject)?._id || ""}
@@ -266,32 +272,29 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
                                     </option>
                                 ))}
                             </select>
-                        }
+                        } */}
                     </>
                     }
                     {(showItemFields) && (
                         Object.keys(currentStructure).map((key) => (
                             <div key={key} className="formGroup">
-                                {(key === 'days') ? (
-                                <>
-                                    {fieldsChecks.days &&
+                                {(currentStructure[key] === "list") ? (
+                                fieldsChecks.days &&
                                     <>
                                         <label htmlFor={key}>{formatLabel(key)}</label>
                                         <div className="daysButtons">
-                                            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                                            {itemStructure.lists[key].options.map((val) => (
                                                 <button
-                                                    key={day}
+                                                    key={val}
                                                     type="button"
-                                                    className={formValues.days?.includes(day) ? 'selected' : ''}
-                                                    onClick={() => toggleDaySelection(day)}
+                                                    className={formValues[key]?.includes(val) ? 'selected' : ''}
+                                                    onClick={() => toggleListSelection(key, val, itemStructure.lists[key].many)}
                                                 >
-                                                    {day}
+                                                    {val}
                                                 </button>
                                             ))}
                                         </div>
                                     </>
-                                    }
-                                </>
                                 ) : (
                                 <>
                                     {((key === 'serviceName' && fieldsChecks.serviceName) || key !== 'serviceName') &&

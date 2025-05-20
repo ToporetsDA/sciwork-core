@@ -71,10 +71,15 @@ const App = () => {
       endDate: 'date',
       startTime: 'time',
       endTime: 'time',
+      type: 'list',
       repeat: 'checkbox',
-      days: 'days',
+      days: 'list',
       thirdParty: 'checkbox',
       serviceName: 'text'
+    },
+    lists: {
+      days: { many: true, options: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']},
+      types: { many: false, options: ['', '', '', '', '', '', '', '', '', '']}
     }
   }
 
@@ -93,6 +98,7 @@ const App = () => {
         endDate: '',
         startTime: '',
         endTime: '',
+        type: 'Dev',
         page: false,
         repeat: false,
         days: [],
