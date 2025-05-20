@@ -5,18 +5,19 @@ import '../../../css/pages/sharedComponents/ItemTiles.css'
 import * as Shared from './'
 import * as Items from '../../Items'
 
-const ItemTiles = ({userData, data, setData, state, setState, itemsToDisplay, container, rights, recentActivities, setRecentActivities}) => {
+const ItemTiles = ({userData, data, setData, activities, setActivities, state, setState, itemsToDisplay, container, rights, recentActivities, setRecentActivities}) => {
 
     const getAccess = (item) => {
         return item.userList?.find(user => user.id === userData._id)?.access || 0
     }
     
     const orderedItemsToDisplay = useMemo(() => {
+        const field = (state.currentProject) ? "path" : "_id"
         return Object.values(itemsToDisplay).sort((a, b) => {
-            const getSuffix = (id) => parseInt(id.split('.').pop(), 10)
-            return getSuffix(a._id) - getSuffix(b._id)
+            const getSuffix = (val) => parseInt(val.split('.').pop(), 10)
+            return getSuffix(a[field]) - getSuffix(b[field])
         })
-    }, [itemsToDisplay])
+    }, [itemsToDisplay, state.currentProject])
 
     return (
         <>
@@ -31,6 +32,8 @@ const ItemTiles = ({userData, data, setData, state, setState, itemsToDisplay, co
                                     userData={userData}
                                     data={data}
                                     setData={setData}
+                                    activities={activities}
+                                    setActivities={setActivities}
                                     state={state}
                                     setState={setState}
                                     item={item}

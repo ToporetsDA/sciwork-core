@@ -5,7 +5,7 @@ import * as Dialogs from './dialogs'
 
 import * as Shared from '../Components/pages/sharedComponents'
 
-const AppContent = ({userData, setUserData, profileData, state, setState, data, setData, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
+const AppContent = ({userData, setUserData, profileData, state, setState, data, setData, activities, setActivities, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
 
     // dialogs
 
@@ -49,6 +49,8 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
                     setUserData={setUserData}
                     data={data}
                     setData={setData}
+                    activities={activities}
+                    setActivities={setActivities}
                     state={state}
                     setState={setState}
                     rights={rights}
@@ -68,6 +70,8 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
                         setState={setState}
                         data={data}
                         setData={setData}
+                        activities={activities}
+                        setActivities={setActivities}
                         itemsToDisplay={itemsToDisplay}
                         setItemsToDisplay={setItemsToDisplay}
                         rights={rights}

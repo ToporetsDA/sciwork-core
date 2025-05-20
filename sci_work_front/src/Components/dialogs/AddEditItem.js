@@ -4,7 +4,7 @@ import '../../css/dialogs/dialog.css'
 
 import * as Shared from '../pages/sharedComponents'
 
-const AddEditItem = ({ userData, setUserData, data, setData, state, setState, rights, itemStructure, defaultStructure, isCompany }) => {
+const AddEditItem = ({ userData, setUserData, data, setData, activities, setActivities, state, setState, rights, itemStructure, defaultStructure, isCompany }) => {
 
     const currentItem = state.currentDialog.params[0]
     const currentItemId = state.currentDialog.params[1] || false
@@ -46,6 +46,7 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
     // Update set of selected days
     const toggleListSelection = (field, value, many) => {
         setFormValues((prev) => {
+
             const currentList = prev[field] || []
             const baseList = many ? currentList : currentList.filter((v) => v === value)
             const updatedList = baseList.includes(value)
@@ -199,7 +200,7 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
             const { parent: container } = Shared.FindItemWithParent(project.activities, "_id", currentItemId, project)
             if (!container.activities) container.activities = []
             container.activities.push(newItem)
-            Shared.NormalizeItemIds(container)
+            Shared.NormalizeItemsPath(container, state.currentProject, setData)
         } else {
             const existingItem = data.find((item) => item._id === currentItem._id)
             if (existingItem) {
@@ -209,9 +210,9 @@ const AddEditItem = ({ userData, setUserData, data, setData, state, setState, ri
                 action = "add"
                 item = newItem
             }
+            setData({ action, item })
         }
-
-        setData({ action, item })
+        
         setState((prevState) => ({
             ...prevState,
             currentProject: ((isActivity === true) ? item : project),

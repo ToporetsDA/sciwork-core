@@ -13,18 +13,35 @@ const send = (ws, message, sessionToken, type, data) => {
   ws.send(JSON.stringify({ message, sessionToken, data: { type, data } }))
 }
 
-const getData = async (type, login, ws, sessionToken) => {
+const extractIdsFromTree = (nodes) => {
+  let ids = []
+  for (const node of nodes) {
+    if (node._id) {
+      ids.push(node._id)
+    }
+    // Recurse if children exist
+    if (Array.isArray(node.activities)) {
+      ids = ids.concat(extractIdsFromTree(node.activities))
+    }
+  }
+  return ids
+}
+
+const getData = async (type, login, ws, sessionToken, _id) => {
 
   let data
 
+  console.log("_id", _id)
+
   switch (type) {
     case "all": {
-
-      // Fetch all data (user, projects, and organisation)
-      const user = await User.findOne({ login })
+      // Fetch Fetch user by login
+      const user = await User.findOne(login)
       if (!user) {
         throw new Error(`User not found for login: ${login}`)
       }
+
+      // Fetch all data (user, projects, and organisation)
       const items = await Project.find({
         "userList.id": user._id
       })
@@ -45,40 +62,73 @@ const getData = async (type, login, ws, sessionToken) => {
       break
     }
     case "user": {
-
-      // Fetch user by login
-      const user = await User.findOne({ login })
+      // Fetch Fetch user by login
+      const user = await User.findOne(login)
       if (!user) {
         throw new Error(`User not found for login: ${login}`)
       }
+
+      // Fetch user by login
       data =  user
       break
     }
     case "data": {
-
-      // Fetch projects where user is in userList
-      const user = await User.findOne({ login })
+      // Fetch Fetch user by login
+      const user = await User.findOne(login)
       if (!user) {
         throw new Error(`User not found for login: ${login}`)
       }
-      let items
-      if (admins.get(sessionToken).projectId) {
-        items = await Project.find({
-          "userList.id": user._id
-        })
-      }
-      else {
-        items = await Activity.find({
-          _id: { $regex: `^${admins.get(sessionToken).projectId}\\.` }
-        })
-      }
-      
 
-      data = items
+      const projects = await Project.find({
+        "userList.id": user._id
+      })
+      if (!projects) {
+        throw new Error(`Projects not found for user: ${user._id}`)
+      }
+
+      data = projects
+      break
+    }
+    case "project": {
+      // Fetch Fetch user by login
+      const user = await User.findOne(login)
+      if (!user) {
+        throw new Error(`User not found for login: ${login}`)
+      }
+
+      const project = await Project.findById(_id)
+      if (!project) {
+        throw new Error(`Project not found with _id: ${_id}`)
+      }
+
+      data = project
+      break
+    }
+    case "activities": {
+      // Fetch Fetch user by login
+      const user = await User.findOne(login)
+      if (!user) {
+        throw new Error(`User not found for login: ${login}`)
+      }
+
+      const project = await Project.findById(_id)
+      if (!project) {
+        throw new Error(`Project not found with _id: ${_id}`)
+      }
+
+      const validIds = extractIdsFromTree(project.activities)
+
+      // Fetch all activities whose _id starts with `${_id}.`
+      let activities = await Activity.find({
+        _id: { $regex: `^${_id}\\.` }
+      })
+
+      activities = activities.filter(a => validIds.includes(a._id))
+
+      data = activities
       break
     }
     case "organisation": {
-
       // Fetch organisation with name "default"
       const organisation = await Organisation.findOne({ name: "default" })
       if (!organisation) {
@@ -102,7 +152,7 @@ const getData = async (type, login, ws, sessionToken) => {
     }
   }
   send(ws, "data", sessionToken, type, data)
-} 
+}
 
 // start the WebSocket server
 const startWebSocketServer = (port) => {
@@ -130,7 +180,7 @@ const startWebSocketServer = (port) => {
               clients.set(sessionToken, {socket: ws, login: parsedMessage.data.login}) // Add WebSocket connection to the map
               console.log(`WebSocket connection associated with session token: ${sessionToken}`)
               
-              getData("all",  parsedMessage.data.login, ws, sessionToken)
+              getData("all",  parsedMessage.data, ws, sessionToken)
             }
             else {
               ws.send(JSON.stringify({ error: "Session token missing" }))
@@ -139,7 +189,11 @@ const startWebSocketServer = (port) => {
           }
           case "goTo": {
             const {page, isId} = parsedMessage.data
-            clients.get(sessionToken).projectId = parsedMessage.data
+            clients.get(sessionToken).page = page
+            if (isId) {
+              const login = clients.get(sessionToken).login
+              getData("activities", {login}, ws, sessionToken, page)
+            }
             break
           }
           case "addEditData": {
@@ -170,25 +224,26 @@ const startWebSocketServer = (port) => {
                     return
                   }
                   // Iterate over the clients map to find the sessionToken where the login matches
-                  let targetClientKey = null
+                  let targetClientToken = null
                   for (let [key, value] of clients) {
                     if (value.login === userData.login) {
-                      targetClientKey = key // Found the sessionToken corresponding to userData.login
+                      targetClientToken = key // Found the sessionToken corresponding to userData.login
                       break // Exit loop after finding the match
                     }
                   }
             
                   // If the sessionToken was found, proceed with the WebSocket logic
-                  if (!targetClientKey) {
+                  if (!targetClientToken) {
                     console.error(`No client found with login: ${userData.login}`)
                   }
-                  const targetClient = clients.get(targetClientKey).socket // Get the WebSocket socket for the matched client
+                  const targetClientWs = clients.get(targetClientToken).socket
+                  const targetClientLogin = clients.get(targetClientToken).login
           
                   // Ensure this is not the sender and the target client is ready
-                  if (userData.login !== clients.get(sessionToken).login && targetClient.readyState === WebSocket.OPEN) {
-                    console.log(clients.get(targetClientKey).login)
+                  if (userData.login !== clients.get(sessionToken).login && targetClientWs.readyState === WebSocket.OPEN) {
+                    console.log(targetClientLogin)
                     // Send the data to the target client
-                    send(targetClient, "addEdit", sessionToken, "project", project)
+                    getData("project", {login: targetClientLogin}, targetClientWs, targetClientToken, project._id)
                   }
                 })
                 .catch(userErr => {

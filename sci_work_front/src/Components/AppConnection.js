@@ -4,7 +4,7 @@ import LogIn from './dialogs/LogIn'
 
 import * as Shared from './pages/sharedComponents'
 
-const Connection = ({ state, setState, userData, setUserData, data, setData, isLoggedIn, setLoggedIn, setRights, setUsers, isUserUpdatingData, setIsUserUpdatingData, isUserUpdatingUserData, setIsUserUpdatingUserData }) => {
+const Connection = ({ state, setState, userData, setUserData, data, setData, activities, setActivities, isLoggedIn, setLoggedIn, setRights, setUsers, isUserUpdatingData, setIsUserUpdatingData, isUserUpdatingUserData, setIsUserUpdatingUserData }) => {
 
     const [servers, setServers] = useState([])
     const [loading, setLoading] = useState(true)
@@ -109,7 +109,8 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
                     setData(updatedData)
                     break
                 }
-                case "activity": {//add along with activity templates
+                case "activities": {//add along with activity templates
+                    setActivities(data)
                     break
                 }
                 case "delete": {//just _id
@@ -169,14 +170,14 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, isL
         } catch (error) {
             console.error("Error processing message:", error.message)
         }
-    }, [data, setData, setLoggedIn, setRights, setUsers, setUserData])
+    }, [data, setData, setActivities, setLoggedIn, setRights, setUsers, setUserData])
 
     //send update ONLY when page changes
     const lastSentProject = useRef(null)
     useEffect(() => {
         if (lastSentProject.current === state.currentPage || !isLoggedIn) return
-            const location = state.currentActivity || state.currentProject || state.currentPage
-            sendMsg("goTo", format(location))
+            const location = state.currentProject || state.currentPage
+            sendMsg("goTo", { page: format(location), isId: (!!state.currentProject)})
         lastSentProject.current = state.currentPage
     }, [sendMsg, state.currentPage, state.currentProject, state.currentActivity, isLoggedIn])
 

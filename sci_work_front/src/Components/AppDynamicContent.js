@@ -5,7 +5,7 @@ import AppContent from './AppContent'
 
 import * as Shared from './pages/sharedComponents'
 
-const AppDynamicContent = ({userData, setUserData, profileData, state, setState, isLoggedIn, data, setData, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
+const AppDynamicContent = ({userData, setUserData, profileData, state, setState, isLoggedIn, data, setData, activities, setActivities, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -81,6 +81,8 @@ const AppDynamicContent = ({userData, setUserData, profileData, state, setState,
       setState={setState}
       data={data}
       setData={setData}
+      activities={activities}
+      setActivities={setActivities}
       rights={rights}
       users={users}
       itemStructure={itemStructure}

@@ -5,7 +5,7 @@ import ControlPanel from './sharedComponents/ControlPanel'
 
 import * as Shared from './sharedComponents'
 
-const Projects = ({ userData, setUserData, state, setState, data, setData, itemsToDisplay, setItemsToDisplay, rights, recentActivities, setRecentActivities }) => {
+const Projects = ({ userData, setUserData, state, setState, data, setData, activities, setActivities, itemsToDisplay, setItemsToDisplay, rights, recentActivities, setRecentActivities }) => {
 
     const displayOptions = new Map([
         ['tiles', 'grid'],
@@ -68,7 +68,7 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
         }))
 
         // Step 5: Normalize all _id values
-        Shared.NormalizeItemIds(project, state, setData)
+        Shared.NormalizeItemsPath(project, state.currentProject, setData)
     }
 
     return (
@@ -123,6 +123,8 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, items
                                 userData={userData}
                                 data={data}
                                 setData={setData}
+                                activities={activities}
+                                setActivities={setActivities}
                                 state={state}
                                 setState={setState}
                                 itemsToDisplay={itemsToDisplay.activities}

@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate } from "react-router-dom"
 import '../css/AppNav.css'
 
-import * as Shared from '../Components/pages/sharedComponents'
+import * as Shared from './pages/sharedComponents'
 
 const AppNav = ({ data, state, isLoggedIn, organisationType, recentActivities, setRecentActivities }) => {
   

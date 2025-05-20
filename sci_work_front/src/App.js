@@ -79,7 +79,7 @@ const App = () => {
     },
     lists: {
       days: { many: true, options: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']},
-      types: { many: false, options: ['', '', '', '', '', '', '', '', '', '']}
+      types: { many: false, options: ['group', 'text', 'chat', 'list', 'table', 'attendance', 'report', 'test']}
     }
   }
 
@@ -109,6 +109,8 @@ const App = () => {
   }, [])
 
   const [data, setData] = useState([])
+
+  const [activities, setActivities] = useState([])
 
   //header
   const isCompany = true
@@ -140,7 +142,6 @@ const App = () => {
         )
       )
     }
-    console.log("from updateData: ", data)
   }
 
   const updateUser = (newData, currentSettingsEdit) => {
@@ -297,6 +298,8 @@ const App = () => {
                 isLoggedIn={isLoggedIn}
                 data={data}
                 setData={updateData}
+                activities={activities}
+                setActivities={setActivities}
                 rights={rights}
                 users={users}
                 itemStructure={defaultItemStructure}
@@ -318,6 +321,8 @@ const App = () => {
       setUserData={setUserData}
       data={data}
       setData={setData}
+      activities={activities}
+      setActivities={setActivities}
       isLoggedIn={isLoggedIn}
       setLoggedIn={setLoggedIn}
       setRights={setRights}

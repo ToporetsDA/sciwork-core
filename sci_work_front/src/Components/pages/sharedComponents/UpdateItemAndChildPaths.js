@@ -1,12 +1,12 @@
-const UpdateItemAndChildrenIds = (item, newBaseId) => {
+const UpdateItemAndChildrenIds = (item, newBasePath) => {
     const updatedItem = {
         ...item,
-        _id: newBaseId,
+        path: newBasePath,
     }
 
     if (item.activities) {
         updatedItem.activities = item.activities.map((child, i) =>
-            UpdateItemAndChildrenIds(child, `${newBaseId}.${i}`)
+            UpdateItemAndChildrenIds(child, `${newBasePath}.${i}`)
         )
     }
 

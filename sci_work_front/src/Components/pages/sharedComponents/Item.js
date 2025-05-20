@@ -2,9 +2,10 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import '../../../css/pages/sharedComponents/Item.css'
 
+import * as Shared from '../sharedComponents'
 import * as Items from '../../Items'
 
-const Item = ({userData, data, setData, state, setState, item, index, rights, recentActivities, setRecentActivities }) => {
+const Item = ({userData, data, setData, activities, setActivities, state, setState, item, index, rights, recentActivities, setRecentActivities }) => {
     
     const ItemComponent = Items[item.type]
 
@@ -17,9 +18,8 @@ const Item = ({userData, data, setData, state, setState, item, index, rights, re
 
     const handleAddAfter = (_id) => {
 
-        const parts = _id.split(".");
-        const itemId = Number(parts.pop()) + 1
-        const newId = [...parts, itemId.toString()].join(".")
+        const parent = Shared.GetItemById(data, state.currentProject)
+        const newId = [parent._id, parent.dndCount].join(".")
 
         setState(prev => ({
             ...prev,
@@ -61,6 +61,8 @@ const Item = ({userData, data, setData, state, setState, item, index, rights, re
                 userData={userData}
                 data={data}
                 setData={setData}
+                activities={activities}
+                setActivities={setActivities}
                 state={state}
                 setState={setState}
                 item={item}
