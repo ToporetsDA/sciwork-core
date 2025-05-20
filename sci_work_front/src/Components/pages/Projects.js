@@ -67,8 +67,8 @@ const Projects = ({ userData, setUserData, state, setState, data, setData, activ
             activities: activities,
         }))
 
-        // Step 5: Normalize all _id values
-        Shared.NormalizeItemsPath(project, state.currentProject, setData)
+        // Step 5: Normalize path values
+        Shared.NormalizeItemsPath(activities, project, state.currentProject, setData)
     }
 
     return (

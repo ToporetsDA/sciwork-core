@@ -1,9 +1,9 @@
-import * as Shared from '.'
+import * as Shared from './'
 
-const NormalizeItemsPath = (item, parentPath, setData) => {
+const NormalizeItemsPath = (items, item, parentPath, setData) => {
     const normalizedActivities = item.activities.map((item, index) => {
         const newBasePath = `${parentPath}.${index}`
-        return Shared.UpdateItemAndChildrenPaths(item, newBasePath)
+        return Shared.UpdateItemAndChildrenPaths(items, Shared.GetItemById(items, item._id), newBasePath)
     })
 
     const updatedProject = {

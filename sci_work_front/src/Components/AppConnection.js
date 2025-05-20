@@ -4,7 +4,7 @@ import LogIn from './dialogs/LogIn'
 
 import * as Shared from './pages/sharedComponents'
 
-const Connection = ({ state, setState, userData, setUserData, data, setData, activities, setActivities, isLoggedIn, setLoggedIn, setRights, setUsers, isUserUpdatingData, setIsUserUpdatingData, isUserUpdatingUserData, setIsUserUpdatingUserData }) => {
+const Connection = ({ state, setState, userData, setUserData, data, setData, activities, setActivities, isLoggedIn, setLoggedIn, setRights, setUsers, isUserUpdatingData, setIsUserUpdatingData, isUserUpdatingActivity, isUserUpdatingUserData, setIsUserUpdatingUserData }) => {
 
     const [servers, setServers] = useState([])
     const [loading, setLoading] = useState(true)
@@ -110,6 +110,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, act
                     break
                 }
                 case "activities": {//add along with activity templates
+                    console.log("activities", data)
                     setActivities(data)
                     break
                 }

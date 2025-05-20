@@ -5,11 +5,11 @@ import '../../../css/pages/sharedComponents/Item.css'
 import * as Shared from '../sharedComponents'
 import * as Items from '../../Items'
 
-const Item = ({userData, data, setData, activities, setActivities, state, setState, item, index, rights, recentActivities, setRecentActivities }) => {
+const Item = ({userData, data, setData, activities, setActivities, state, setState, item, index, type, rights, recentActivities, setRecentActivities }) => {
     
-    const ItemComponent = Items[item.type]
+    const ItemComponent = Items[type]
 
-    const {attributes, listeners, setNodeRef, transform, transition} = useSortable({ id: item.dnd })
+    const {attributes, listeners, setNodeRef, transform, transition} = useSortable({ id: item._id })
 
     const style = {
         transition,
@@ -39,7 +39,7 @@ const Item = ({userData, data, setData, activities, setActivities, state, setSta
             style={style}
         >
             {/* ➕ Add below button */}
-            {<button
+            <button
                 className="add-button"
                 onClick={(e) => {
                 e.stopPropagation()
@@ -47,15 +47,15 @@ const Item = ({userData, data, setData, activities, setActivities, state, setSta
                 }}
             >
                 ➕
-            </button>}
+            </button>
             {/* 🔘 DRAG HANDLE (6-dots) */}
-            {<div
+            <div
                 className="drag-handle"
                 // {...provided.dragHandleProps}
                 onClick={(e) => e.stopPropagation()}
             >
                 ⋮⋮
-            </div>}
+            </div>
             <ItemComponent
                 key={item._id}
                 userData={userData}

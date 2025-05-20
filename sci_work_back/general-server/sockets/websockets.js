@@ -13,25 +13,9 @@ const send = (ws, message, sessionToken, type, data) => {
   ws.send(JSON.stringify({ message, sessionToken, data: { type, data } }))
 }
 
-const extractIdsFromTree = (nodes) => {
-  let ids = []
-  for (const node of nodes) {
-    if (node._id) {
-      ids.push(node._id)
-    }
-    // Recurse if children exist
-    if (Array.isArray(node.activities)) {
-      ids = ids.concat(extractIdsFromTree(node.activities))
-    }
-  }
-  return ids
-}
-
 const getData = async (type, login, ws, sessionToken, _id) => {
 
   let data
-
-  console.log("_id", _id)
 
   switch (type) {
     case "all": {
@@ -116,15 +100,12 @@ const getData = async (type, login, ws, sessionToken, _id) => {
         throw new Error(`Project not found with _id: ${_id}`)
       }
 
-      const validIds = extractIdsFromTree(project.activities)
-
       // Fetch all activities whose _id starts with `${_id}.`
       let activities = await Activity.find({
         _id: { $regex: `^${_id}\\.` }
       })
 
-      activities = activities.filter(a => validIds.includes(a._id))
-
+      activities = activities.filter(a => a.userList?.some(u => u.id === user._id.toString()))
       data = activities
       break
     }

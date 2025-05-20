@@ -124,19 +124,25 @@ const App = () => {
   //connection
 
   const [isUserUpdatingData, setIsUserUpdatingData] = useState(false)
+  const [isUserUpdatingActivity, setIsUserUpdatingActivity] = useState(false)
   const [isUserUpdatingUserData, setIsUserUpdatingUserData] = useState(false)
 
   const [users, setUsers] = useState()
 
   const updateData = (data) => {
     const { action, item } = data
-    setIsUserUpdatingData(item._id)
+    if (!item || !item._id) return
+    
+    const setter = item?.path ? setActivities : setData
+    const flagSetter = item?.path ? setIsUserUpdatingActivity : setIsUserUpdatingData
+
+    flagSetter(item._id)
 
     if (action === "add") {
-      setData(prevData => [ ...prevData, item ])
+      setter(prevData => [ ...prevData, item ])
     }
     if (action === "edit") {
-      setData(prevData => 
+      setter(prevData => 
         prevData.map(d => 
           d._id === item._id ? item : d
         )
@@ -299,7 +305,7 @@ const App = () => {
                 data={data}
                 setData={updateData}
                 activities={activities}
-                setActivities={setActivities}
+                setActivities={updateData}
                 rights={rights}
                 users={users}
                 itemStructure={defaultItemStructure}
@@ -329,6 +335,8 @@ const App = () => {
       setUsers={setUsers}
       isUserUpdatingData={isUserUpdatingData}
       setIsUserUpdatingData={setIsUserUpdatingData}
+      isUserUpdatingActivity={isUserUpdatingActivity}
+      setIsUserUpdatingActivity={setIsUserUpdatingActivity}
       isUserUpdatingUserData={isUserUpdatingUserData}
       setIsUserUpdatingUserData={setIsUserUpdatingUserData}
     />

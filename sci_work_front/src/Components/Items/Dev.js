@@ -3,7 +3,7 @@ import '../../css/Items/Dev.css'
 
 import * as Shared from '../pages/sharedComponents'
 
-const Activity = ({ userData, setUserData, state, setState, data, setData, item, index, rights, recentActivities, setRecentActivities }) => {
+const Dev = ({ userData, setUserData, state, setState, data, setData, item, index, rights, recentActivities, setRecentActivities }) => {
     
     const navigate = useNavigate()
 
@@ -21,7 +21,7 @@ const Activity = ({ userData, setUserData, state, setState, data, setData, item,
         >
             <h3 className="name">{item.name}</h3>
             <p className="timeLimit">
-            {item.startDate ? item.startDate : 'N/A'} - {item.endDate}
+             Dev type Activity. Testing ONLY
             </p>
             <Shared.ItemActions
                 userData={userData}
@@ -35,4 +35,4 @@ const Activity = ({ userData, setUserData, state, setState, data, setData, item,
     )
 }
 
-export default Activity
+export default Dev

@@ -6,6 +6,24 @@ const projectSchema = new mongoose.Schema({
     name: { type: String, required: true },
     template: { type: String, default: "none" },
     content: { type: mongoose.Schema.Types.Mixed, required: false },
+    activities: [
+        {
+        _id: { type: String, auto: true },
+        path: { type: String, required: true },
+        dnd: { type: Number, required: true },
+        name: { type: String, required: true },
+        startDate: { type: String, required: true },
+        endDate: { type: String, required: true },
+        startTime: { type: String, default: "00:00" },
+        endTime: { type: String, default: "00:00" },
+        type: { type: String, default: "Dev" },
+        page: { type: Boolean, default: false },
+        repeat: { type: Boolean, default: false },
+        days: { type: [String], default: [] },
+        thirdParty: { type: Boolean, default: false },
+        serviceName: { type: String, default: null }
+        }
+    ],
     userList: [
         {
             id: { type: String, required: true },

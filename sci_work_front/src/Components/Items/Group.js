@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom"
 import '../../css/Items/Group.css'
 
 import * as Shared from '../pages/sharedComponents'
@@ -6,11 +5,12 @@ import * as Items from './'
 
 const Group = ({userData, data, setData, activities, setActivities, state, setState, item, index, rights, recentActivities, setRecentActivities}) => {
 
-    const navigate = useNavigate()
-
+    // console.log("item in Group component", activities)
     return (
-        <>
-            <Items.Text
+        <div
+            className='group-wrapper'    
+        >
+            {/* <Items.Text
                 key={item._id}
                 userData={userData}
                 data={data}
@@ -24,32 +24,22 @@ const Group = ({userData, data, setData, activities, setActivities, state, setSt
                 rights={rights}
                 recentActivities={recentActivities}
                 setRecentActivities={setRecentActivities}
+            /> */}
+            <Shared.ItemTiles
+                userData={userData}
+                data={data}
+                setData={setData}
+                activities={activities}
+                setActivities={setActivities}
+                state={state}
+                setState={setState}
+                itemsToDisplay={item.activities}
+                container={Shared.GetItemById(data, state.currentProject)}
+                rights={rights}
+                recentActivities={recentActivities}
+                setRecentActivities={setRecentActivities}
             />
-            <div
-                key={index}
-                className={`
-                card
-                ${(new Date(item.endDate) - new Date()) / (24 * 60 * 60 * 1000) < 30 ? 'expiring' : ''}
-                ${(new Date(item.endDate) < new Date()) ? 'expired' : ''}
-                `}
-                onClick={() => {
-                    navigate(Shared.GoTo(item, data, recentActivities, setRecentActivities))
-                }}
-            >
-                <h3 className="name">{item.name}</h3>
-                <p className="timeLimit">
-                {item.startDate ? item.startDate : 'N/A'} - {item.endDate}
-                </p>
-                <Shared.ItemActions
-                    userData={userData}
-                    data={data}
-                    setData={setData}
-                    setState={setState}
-                    item={item}
-                    rights={rights}
-                />
-            </div>
-        </>
+        </div>
     )
 }
 
