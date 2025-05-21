@@ -21,7 +21,7 @@ const Dev = ({ userData, setUserData, state, setState, data, setData, item, inde
         >
             <h3 className="name">{item.name}</h3>
             <p className="timeLimit">
-             Dev type Activity. Testing ONLY
+                Dev type Activity. Testing ONLY
             </p>
             <Shared.ItemActions
                 userData={userData}

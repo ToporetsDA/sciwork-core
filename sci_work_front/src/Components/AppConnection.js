@@ -195,11 +195,11 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, act
     }, [readyState, sendMsg])
 
     // Trigger project update when a user modifies `data`
-    useEffect(() => {
-        if (isUserUpdatingData) {
-            updateItem(data.find(item => item._id === isUserUpdatingData))
-        }
-    }, [data, updateItem, isUserUpdatingData])
+    // useEffect(() => {
+    //     if (isUserUpdatingData) {
+    //         updateItem(data.find(item => item._id === isUserUpdatingData))
+    //     }
+    // }, [data, updateItem, isUserUpdatingData])
 
     // Track user-initiated changes to `userData`
     const updateUser = useCallback((updatedUserData) => {

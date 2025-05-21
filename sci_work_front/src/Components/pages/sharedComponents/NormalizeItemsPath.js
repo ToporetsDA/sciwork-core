@@ -1,17 +1,23 @@
 import * as Shared from './'
 
-const NormalizeItemsPath = (items, item, parentPath, setData) => {
+const NormalizeItemsPath = (items, item, parentPath) => {
+    let updatedActivities = []
     const normalizedActivities = item.activities.map((item, index) => {
         const newBasePath = `${parentPath}.${index}`
-        return Shared.UpdateItemAndChildrenPaths(items, Shared.GetItemById(items, item._id), newBasePath)
+        updatedActivities.push(Shared.UpdateItemAndChildrenPaths(items, Shared.GetItemById(items, item._id), newBasePath))
+
+        return {
+            ...item,
+            path: newBasePath
+        }
     })
 
-    const updatedProject = {
+    const updatedActivity = {
         ...item,
         activities: normalizedActivities
     }
 
-    setData({ item: updatedProject, action: 'edit' })
+    return [...updatedActivities, updatedActivity]
 }
 
 export default NormalizeItemsPath

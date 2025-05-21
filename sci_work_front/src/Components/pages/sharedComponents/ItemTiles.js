@@ -1,16 +1,26 @@
 import { useMemo }  from 'react'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { SortableContext } from '@dnd-kit/sortable'
 import '../../../css/pages/sharedComponents/ItemTiles.css'
 
 import * as Shared from './'
 import * as Items from '../../Items'
 
-const ItemTiles = ({userData, data, setData, activities, setActivities, state, setState, itemsToDisplay, container, rights, recentActivities, setRecentActivities}) => {
+const ItemTiles = ({
+    userData,
+    data, setData,
+    activities,
+    state, setState,
+    itemsToDisplay,
+    container,
+    rights,
+    recentActivities, setRecentActivities
+}) => {
 
     const getAccess = (item) => {
         return item.userList?.find(user => user.id === userData._id)?.access || 0
     }
     
+    //order metadata py "path"
     const orderedMetaItems = useMemo(() => {
         if (!state.currentProject) {
             return itemsToDisplay
@@ -33,6 +43,7 @@ const ItemTiles = ({userData, data, setData, activities, setActivities, state, s
         )
     }
 
+    //order data based on orderedMetaDataItems "_id"s
     const orderedItemsToDisplay = () => {
         if (!state.currentProject || !activities) {
             return itemsToDisplay
@@ -61,7 +72,6 @@ const ItemTiles = ({userData, data, setData, activities, setActivities, state, s
                                     data={data}
                                     setData={setData}
                                     activities={activities}
-                                    setActivities={setActivities}
                                     state={state}
                                     setState={setState}
                                     item={item}
@@ -77,11 +87,31 @@ const ItemTiles = ({userData, data, setData, activities, setActivities, state, s
                     <div
                         className="item-tiles"
                     >
-                        <SortableContext
-                            items={orderedItemsToDisplay().map(item => item._id)}
+                        <SortableContext items={orderedItemsToDisplay().map((i) => i._id)}>
+                            {orderedItemsToDisplay().map((item, index) => (
+                                <Shared.Item
+                                    key={item._id}
+                                    
+                                    userData={userData}
+                                    data={data}
+                                    setData={setData}
+                                    activities={activities}
+                                    state={state}
+                                    setState={setState}
+                                    item={item}
+                                    index={index}
+                                    type={orderedMetaItems[index].type}
+                                    rights={rights}
+                                    recentActivities={recentActivities}
+                                    setRecentActivities={setRecentActivities}
+                                />
+                            ))}
+                        </SortableContext>
+                        {/* <SortableContext
+                            items={/*orderedItemsToDisplay()/itemsToDisplay.map(item => item._id)}
                             strategy={verticalListSortingStrategy}
                         >
-                            {orderedItemsToDisplay().map((item, index) => {
+                            {/*orderedItemsToDisplay()/itemsToDisplay.map((item, index) => {
                                 return (
                                     <Shared.Item
                                         key={item._id}
@@ -95,14 +125,29 @@ const ItemTiles = ({userData, data, setData, activities, setActivities, state, s
                                         setState={setState}
                                         item={item}
                                         index={index}
-                                        type={orderedMetaItems[index].type}
+                                        type={"Group"/*orderedMetaItems[index].type/}
                                         rights={rights}
                                         recentActivities={recentActivities}
                                         setRecentActivities={setRecentActivities}
+                                        //dnd
+                                        containers={containers}
+                                        setContainers={setContainers}
+                                        activeId={activeId}
+                                        setActiveId={setActiveId}
+                                        currentContainerId={currentContainerId}
+                                        setCurrentContainerId={setCurrentContainerId}
+                                        containerName={containerName}
+                                        setContainerName={setContainerName}
+                                        itemName={itemName}
+                                        setItemName={setItemName}
+                                        showAddContainerModal={showAddContainerModal}
+                                        setShowAddContainerModal={setShowAddContainerModal}
+                                        showAddItemModal={showAddItemModal}
+                                        setShowAddItemModal={setShowAddItemModal}
                                     />
                                 )
                             })}
-                        </SortableContext>
+                        </SortableContext> */}
                     </div>
                 )
             }

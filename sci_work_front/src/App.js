@@ -134,19 +134,34 @@ const App = () => {
     if (!item || !item._id) return
     
     const setter = item?.path ? setActivities : setData
+    const flag = item?.path ? isUserUpdatingActivity : isUserUpdatingData
     const flagSetter = item?.path ? setIsUserUpdatingActivity : setIsUserUpdatingData
 
+    if (flag) {
+      return
+    }
     flagSetter(item._id)
-
+    
     if (action === "add") {
       setter(prevData => [ ...prevData, item ])
     }
     if (action === "edit") {
-      setter(prevData => 
-        prevData.map(d => 
-          d._id === item._id ? item : d
+      if (item?.path) {
+        //activity
+        const parts = item.path.split('.')
+        parts.pop()
+        setActivities((prevActivities) => ({
+          ...prevActivities,
+          ...Shared.NormalizeItemsPath(activities, item, parts, setActivities)
+        }))
+      } else {
+        //project
+        setter(prevData => 
+          prevData.map(d => 
+            d._id === item._id ? item : d
+          )
         )
-      )
+      }
     }
   }
 
