@@ -25,7 +25,8 @@ const Group = ({userData, data, setData, activities, state, setState, item, inde
                 recentActivities={recentActivities}
                 setRecentActivities={setRecentActivities}
             /> */}
-            <Shared.ItemTiles
+            this is group
+            {/* <Shared.ItemTiles
                 userData={userData}
                 data={data}
                 setData={setData}
@@ -33,11 +34,10 @@ const Group = ({userData, data, setData, activities, state, setState, item, inde
                 state={state}
                 setState={setState}
                 itemsToDisplay={item.activities}
-                container={Shared.GetItemById(data, state.currentProject)}
                 rights={rights}
                 recentActivities={recentActivities}
                 setRecentActivities={setRecentActivities}
-            />
+            /> */}
         </div>
     )
 }

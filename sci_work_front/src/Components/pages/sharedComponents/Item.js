@@ -12,14 +12,18 @@ const Item = ({
     state, setState,
     item,
     index,
-    type,
     rights,
     recentActivities, setRecentActivities
 }) => {
     
-    const ItemComponent = Items[type]
+    const ItemComponent = Items[item.type]
 
-    const {attributes, listeners, setNodeRef, transform, transition} = useSortable({ id: item._id })
+    const {attributes, listeners, setNodeRef, transform, transition} = useSortable({
+        id: item._id, 
+        data: {
+            type: "container"//(item.type === "Group") ? "container" : "item"
+        }
+    })
 
     const style = {
         transition,

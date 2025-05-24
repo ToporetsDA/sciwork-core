@@ -1,4 +1,4 @@
-import { Suspense, useState, useEffect }  from 'react'
+import { Suspense, useState, useEffect, useCallback }  from 'react'
 import { DndContext, KeyboardSensor, PointerSensor, closestCorners, useSensor, useSensors, } from '@dnd-kit/core'
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
 import { v4 as uuidv4 } from 'uuid'
@@ -22,73 +22,36 @@ const Projects = ({
         ['table', 'table']
     ])
 
-    /* const handleDragEnd = (event) => {
-        const { active, over } = event
-        if (!over || active.id === over.id) return
-
-        const project = Shared.GetItemById(data, state.currentProject)
-        const activities = project.activities
-
-        // Step 1: Find the moved item and its parent
-        const fromInfo = Shared.FindItemWithParent(activities, "dnd", active.id, project)
-        if (!fromInfo) return
-
-        const { item: movedItem, parent: fromParent, index: oldIndex } = fromInfo
-        const fromArray = fromParent ? fromParent.activities : activities
-
-        // Remove the item from its original array
-        fromArray.splice(oldIndex, 1)
-
-        // Step 2: Find the drop target and its parent
-        const toInfo = Shared.FindItemWithParent(activities, "dnd", over.id, project)
-        if (!toInfo) return
-
-        console.log("fromTo", fromInfo, toInfo)
-
-        const { item: overItem, parent: toParent, index: newIndexInTarget } = toInfo
-
-        // Step 3: Decide target array and index
-        let toArray, insertIndex
-
-        if (overItem.activities) {
-            // Dropped over a container → insert as first child
-            toArray = overItem.activities
-            insertIndex = newIndexInTarget
-        } else {
-            // Dropped over sibling → insert next to it
-            toArray = toParent.activities
-            insertIndex = newIndexInTarget
-            console.log("insert index", insertIndex)
-            if (toArray === fromArray && oldIndex <= insertIndex) {
-                insertIndex += 1
+    const getItems = useCallback((item) => {
+        let arr = []
+        const amount = item?.activities.length || 0
+        for (let i = 0; i < amount; i++) {
+            let items = Shared.GetItemById(activities, item.activities[i]._id)
+            items = {
+                ...items,
+                activities: getItems(items)
             }
-            console.log("insert index", insertIndex)
-            if (insertIndex === -1) insertIndex = toArray.length
-            console.log("insert index", insertIndex)
+            arr.push(items)
         }
+        return arr
+    }, [activities])
 
-        // Insert the moved item into the new array
-        toArray.splice(insertIndex, 0, movedItem)
-
-        // Step 4: Update UI
-        setItemsToDisplay((prev) => ({
-            ...prev,
-            activities: activities,
-        }))
-
-        // Step 5: Normalize path values
-        Shared.NormalizeItemsPath(activities, project, state.currentProject, setData)
-    }*/
-
-    //activities + current Project
-    const [dndItems, setDndItems] = useState([])
-    //habdle loading delay!
+    const [containers, setContainers] = useState(Shared.GetItemById(data, state.currentProject))
     useEffect(() => {
         if (state.currentProject) {
-            setDndItems(state.currentProject ? [/*...activities,*/ Shared.GetItemById(data, state.currentProject)] : [] )
+            const project = Shared.GetItemById(data, state.currentProject)
+            if (activities.length === project.dndCount) {
+                const groups = getItems(project)
+                const tree = {
+                    ...project,
+                    activities: groups
+                }
+                // setContainers(tree)
+                setContainers([...activities, Shared.GetItemById(data, state.currentProject)])
+            }
         }
-    }, [data, activities, state.currentProject])
-    
+    }, [getItems, data, activities, state.currentProject])
+
     const [activeId, setActiveId] = useState(null)
     const [currentContainerId, setCurrentContainerId] = useState()
     const [containerName, setContainerName] = useState('')
@@ -96,10 +59,43 @@ const Projects = ({
     const [showAddContainerModal, setShowAddContainerModal] = useState(false)
     const [showAddItemModal, setShowAddItemModal] = useState(false)
 
-    // Find the value of the items
-    const findValueOfItems = (id) => {
-        return dndItems.find((item) => item._id === id)
+    // DND Handlers
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+        coordinateGetter: sortableKeyboardCoordinates,
+        }),
+    )
+
+    if (state.currentProject && !containers?.activities) {
+        return (
+            <>Loading Activities</>
+        )
     }
+
+    console.log("containers", containers)
+
+    // Find the value of the items
+    // const findValueOfItems = (id, items = containers) => {
+    //     for (const item of items) {
+    //         if (item._id === id) return item
+    //         if (item.activities?.length) {
+    //             const found = findValueOfItems(id, item.activities)
+    //             if (found) return found
+    //         }
+    //     }
+    //     return null
+    // }
+    const findValueOfItems = (id, type) => {
+    if (type === 'container') {
+      return containers.find((item) => item.id === id)
+    }
+    if (type === 'item') {
+      return containers.find((container) =>
+        container.items.find((item) => item.id === id),
+      )
+    }
+  }
 
     const findItemTitle = (id) => {
         const container = findValueOfItems(id)
@@ -121,14 +117,6 @@ const Projects = ({
         return container.items
     }
 
-    // DND Handlers
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, {
-        coordinateGetter: sortableKeyboardCoordinates,
-        }),
-    )
-
     const handleDragStart = (event) => {
         const { active } = event
         const { id } = active
@@ -138,67 +126,100 @@ const Projects = ({
 
     const handleDragMove = (event) => {
         const { active, over } = event
-        console.log("handleDragMove")
+
         // Handle Items Sorting
         if (
-        active.id.includes('.') &&
-        over?.id.includes('.') &&
+        active.id.toString().includes('item') &&
+        over?.id.toString().includes('item') &&
         active &&
         over &&
         active.id !== over.id
         ) {
-            // Find the active container and over container
-            const activeContainer = findValueOfItems(active.id)
-            const overContainer = findValueOfItems(over.id)
+        // Find the active container and over container
+        const activeContainer = findValueOfItems(active.id, 'item')
+        const overContainer = findValueOfItems(over.id, 'item')
 
-            console.log("from to container ids", activeContainer, overContainer)
+        console.log("from to ontainers", activeContainer, overContainer)
+        // If the active or over container is not found, return
+        if (!activeContainer || !overContainer) return
 
-            // If the active or over container is not found, return
-            if (!activeContainer || !overContainer) return
+        // Find the index of the active and over container
+        const activeContainerIndex = containers.findIndex(
+            (container) => container.id === activeContainer.id,
+        )
+        const overContainerIndex = containers.findIndex(
+            (container) => container.id === overContainer.id,
+        )
 
-            // Find the index of the active and over container
-            let parts
+        // Find the index of the active and over item
+        const activeitemIndex = activeContainer.items.findIndex(
+            (item) => item.id === active.id,
+        )
+        const overitemIndex = overContainer.items.findIndex(
+            (item) => item.id === over.id,
+        )
+        // In the same container
+        if (activeContainerIndex === overContainerIndex) {
+            let newItems = [...containers]
+            newItems[activeContainerIndex].items = arrayMove(
+            newItems[activeContainerIndex].items,
+            activeitemIndex,
+            overitemIndex,
+            )
 
-            parts = activeContainer?.path.split('.') || [activeContainer._id]
-            const activeContainerIndex = parts[parts.length - 1]
+            setContainers(newItems)
+        } else {
+            // In different containers
+            let newItems = [...containers]
+            const [removeditem] = newItems[activeContainerIndex].items.splice(
+            activeitemIndex,
+            1,
+            )
+            newItems[overContainerIndex].items.splice(
+            overitemIndex,
+            0,
+            removeditem,
+            )
+            setContainers(newItems)
+        }
+        }
 
-            parts = overContainer?.path.split('.') || [activeContainer._id]
-            const overContainerIndex = parts[parts.length - 1]
+        // Handling Item Drop Into a Container
+        if (
+        active.id.toString().includes('.') &&
+        !over?.id.toString().includes('.') &&
+        active &&
+        over &&
+        active.id !== over.id
+        ) {
+        // Find the active and over container
+        const activeContainer = findValueOfItems(active.id, 'item')
+        const overContainer = findValueOfItems(over.id, 'container')
 
-            console.log("from to container indexs", activeContainerIndex, overContainerIndex)
+        // If the active or over container is not found, return
+        if (!activeContainer || !overContainer) return
 
-            // Find the index of the active and over item
-            parts = activeContainer.activities.find(
-                (item) => item._id === active.id,
-            ).path.split('.')
-            const activeitemIndex = parts[parts.length - 1]
-            
-            parts = overContainer.activities.find(
-                (item) => item._id === over.id,
-            ).path.split('.')
-            const overitemIndex = parts[parts.length - 1]
+        // Find the index of the active and over container
+        const activeContainerIndex = containers.findIndex(
+            (container) => container.id === activeContainer.id,
+        )
+        const overContainerIndex = containers.findIndex(
+            (container) => container.id === overContainer.id,
+        )
 
-            console.log("from to item indexs", activeitemIndex, overitemIndex)
+        // Find the index of the active and over item
+        const activeitemIndex = activeContainer.items.findIndex(
+            (item) => item.id === active.id,
+        )
 
-            if (activeContainerIndex === overContainerIndex) {
-                console.log("same container")
-                // In the same container
-
-                activeContainer.activities = arrayMove(
-                    activeContainer.activities,
-                    activeitemIndex,
-                    overitemIndex,
-                )
-                //update metadata tree in app component
-                setData({ item: activeContainer, action: "edit" })
-            } else {
-                console.log("to another container")
-                // In different containers
-                const [removeditem] = activeContainer.activities.splice( activeitemIndex, 1 )
-                overContainer.activities.splice( overitemIndex, 0, removeditem )
-                setData({ item: activeContainer, action: "edit" })
-                setData({ item: overContainer, action: "edit" })
-            }
+        // Remove the active item from the active container and add it to the over container
+        let newItems = [...containers]
+        const [removeditem] = newItems[activeContainerIndex].items.splice(
+            activeitemIndex,
+            1,
+        )
+        newItems[overContainerIndex].items.push(removeditem)
+        setContainers(newItems)
         }
     }
 
@@ -215,16 +236,16 @@ const Projects = ({
             active.id !== over.id
         ) {
         // Find the index of the active and over container
-        const activeContainerIndex = dndItems.findIndex(
+        const activeContainerIndex = containers.findIndex(
             (container) => container.id === active.id,
         )
-        const overContainerIndex = dndItems.findIndex(
+        const overContainerIndex = containers.findIndex(
             (container) => container.id === over.id,
         )
         // Swap the active and over container
-        let newItems = [...dndItems]
+        let newItems = [...containers]
         newItems = arrayMove(newItems, activeContainerIndex, overContainerIndex)
-        setDndItems(newItems)
+        setContainers(newItems)
         }
 
         // Handling item Sorting
@@ -242,10 +263,10 @@ const Projects = ({
         // If the active or over container is not found, return
         if (!activeContainer || !overContainer) return
         // Find the index of the active and over container
-        const activeContainerIndex = dndItems.findIndex(
+        const activeContainerIndex = containers.findIndex(
             (container) => container.id === activeContainer.id,
         )
-        const overContainerIndex = dndItems.findIndex(
+        const overContainerIndex = containers.findIndex(
             (container) => container.id === overContainer.id,
         )
         // Find the index of the active and over item
@@ -258,16 +279,16 @@ const Projects = ({
 
         // In the same container
         if (activeContainerIndex === overContainerIndex) {
-            let newItems = [...dndItems]
+            let newItems = [...containers]
             newItems[activeContainerIndex].items = arrayMove(
             newItems[activeContainerIndex].items,
             activeitemIndex,
             overitemIndex,
             )
-            setDndItems(newItems)
+            setContainers(newItems)
         } else {
             // In different containers
-            let newItems = [...dndItems]
+            let newItems = [...containers]
             const [removeditem] = newItems[activeContainerIndex].items.splice(
             activeitemIndex,
             1,
@@ -277,7 +298,7 @@ const Projects = ({
             0,
             removeditem,
             )
-            setDndItems(newItems)
+            setContainers(newItems)
         }
         }
         // Handling item dropping into Container
@@ -295,10 +316,10 @@ const Projects = ({
         // If the active or over container is not found, return
         if (!activeContainer || !overContainer) return
         // Find the index of the active and over container
-        const activeContainerIndex = dndItems.findIndex(
+        const activeContainerIndex = containers.findIndex(
             (container) => container.id === activeContainer.id,
         )
-        const overContainerIndex = dndItems.findIndex(
+        const overContainerIndex = containers.findIndex(
             (container) => container.id === overContainer.id,
         )
         // Find the index of the active and over item
@@ -306,13 +327,13 @@ const Projects = ({
             (item) => item.id === active.id,
         )
 
-        let newItems = [...dndItems]
+        let newItems = [...containers]
         const [removeditem] = newItems[activeContainerIndex].items.splice(
             activeitemIndex,
             1,
         )
         newItems[overContainerIndex].items.push(removeditem)
-        setDndItems(newItems)
+        setContainers(newItems)
         }
         setActiveId(null)
     }
@@ -340,7 +361,7 @@ const Projects = ({
                                 state={state}
                                 setState={setState}
                                 itemsToDisplay={itemsToDisplay.projects}
-                                container={{userList: {}}}
+                                // container={{userList: {}}}
                                 rights={rights}
                                 recentActivities={recentActivities}
                                 setRecentActivities={setRecentActivities}
@@ -375,8 +396,8 @@ const Projects = ({
                                 activities={activities}
                                 state={state}
                                 setState={setState}
-                                itemsToDisplay={itemsToDisplay.activities}
-                                container={Shared.GetItemById(data, state.currentProject)}
+                                itemsToDisplay={containers.activities}
+                                // container={containers}
                                 rights={rights}
                                 recentActivities={recentActivities}
                                 setRecentActivities={setRecentActivities}

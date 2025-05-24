@@ -11,7 +11,7 @@ const ItemTiles = ({
     activities,
     state, setState,
     itemsToDisplay,
-    container,
+    // container,
     rights,
     recentActivities, setRecentActivities
 }) => {
@@ -21,49 +21,43 @@ const ItemTiles = ({
     }
     
     //order metadata py "path"
-    const orderedMetaItems = useMemo(() => {
-        if (!state.currentProject) {
-            return itemsToDisplay
-        }
+    // const orderedMetaItems = useMemo(() => {
+    //     if (!state.currentProject) {
+    //         return itemsToDisplay
+    //     }
 
-        const field = "path"
-        if (itemsToDisplay.length < 2) {
-            return itemsToDisplay
-        }
+    //     const field = "path"
+    //     if (itemsToDisplay.length < 2) {
+    //         return itemsToDisplay
+    //     }
         
-        return Object.values(itemsToDisplay).sort((a, b) => {
-            const getSuffix = (val) => parseInt(val.split('.').pop(), 10)
-            return getSuffix(a[field]) - getSuffix(b[field])
-        })
-    }, [itemsToDisplay, state.currentProject])
-
-    if (state.currentProject && !activities) {
-        return (
-            <>Loading Activities</>
-        )
-    }
+    //     return Object.values(itemsToDisplay).sort((a, b) => {
+    //         const getSuffix = (val) => parseInt(val.split('.').pop(), 10)
+    //         return getSuffix(a[field]) - getSuffix(b[field])
+    //     })
+    // }, [itemsToDisplay, state.currentProject])
 
     //order data based on orderedMetaDataItems "_id"s
-    const orderedItemsToDisplay = () => {
-        if (!state.currentProject || !activities) {
-            return itemsToDisplay
-        }
-        if (activities.length !== Shared.GetItemById(data, state.currentProject).dndCount) {
-            return []
-        }
-        let sortedItems = []
-        for (let i = 0; i < orderedMetaItems.length; i++) {
-            sortedItems.push(activities.find(a => a._id === orderedMetaItems[i]._id))
-        }
-        return sortedItems
-    }
+    // const orderedItemsToDisplay = () => {
+    //     if (!state.currentProject || !activities) {
+    //         return itemsToDisplay
+    //     }
+    //     if (activities.length !== Shared.GetItemById(data, state.currentProject).dndCount) {
+    //         return []
+    //     }
+    //     let sortedItems = []
+    //     for (let i = 0; i < orderedMetaItems.length; i++) {
+    //         sortedItems.push(activities.find(a => a._id === orderedMetaItems[i]._id))
+    //     }
+    //     return sortedItems
+    // }
 
     return (
         <>
-            {(state.currentPage === "Projects" || !rights.edit.includes(getAccess(container))) ?
+            {(state.currentPage === "Projects" /*|| !rights.edit.includes(getAccess(container))*/) ?
                 (
                     <>
-                        {orderedItemsToDisplay().map((item, index) => {
+                        {itemsToDisplay.map((item, index) => {
                             return (
                                 <Items.Project
                                     key={item._id}
@@ -87,8 +81,8 @@ const ItemTiles = ({
                     <div
                         className="item-tiles"
                     >
-                        <SortableContext items={orderedItemsToDisplay().map((i) => i._id)}>
-                            {orderedItemsToDisplay().map((item, index) => (
+                        <SortableContext items={itemsToDisplay.map((i) => i._id)}>
+                            {itemsToDisplay.map((item, index) => (
                                 <Shared.Item
                                     key={item._id}
                                     
@@ -100,7 +94,6 @@ const ItemTiles = ({
                                     setState={setState}
                                     item={item}
                                     index={index}
-                                    type={orderedMetaItems[index].type}
                                     rights={rights}
                                     recentActivities={recentActivities}
                                     setRecentActivities={setRecentActivities}

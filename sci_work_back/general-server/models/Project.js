@@ -18,7 +18,6 @@ const projectSchema = new mongoose.Schema({
       endDate: { type: String, required: true },
       startTime: { type: String, default: "00:00" },
       endTime: { type: String, default: "00:00" },
-      type: { type: String, default: "Dev" },
       page: { type: Boolean, default: false },
       repeat: { type: Boolean, default: false },
       days: { type: [String], default: [] },
