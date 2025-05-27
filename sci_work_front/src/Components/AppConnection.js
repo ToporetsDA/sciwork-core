@@ -4,7 +4,18 @@ import LogIn from './dialogs/LogIn'
 
 import * as Shared from './pages/sharedComponents'
 
-const Connection = ({ state, setState, userData, setUserData, data, setData, activities, setActivities, isLoggedIn, setLoggedIn, setRights, setUsers, isUserUpdatingData, setIsUserUpdatingData, isUserUpdatingActivity, isUserUpdatingUserData, setIsUserUpdatingUserData }) => {
+const Connection = ({
+    state, setState,
+    userData, setUserData,
+    projects, setProjects,
+    activities, setActivities,
+    isLoggedIn, setLoggedIn,
+    setRights,
+    setUsers,
+    isUserUpdatingProjects, setIsUserUpdatingProjects,
+    isUserUpdatingActivities, setIsUserUpdatingActivities,
+    isUserUpdatingUserData, setIsUserUpdatingUserData
+}) => {
 
     const [servers, setServers] = useState([])
     const [loading, setLoading] = useState(true)
@@ -65,15 +76,17 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, act
         sendMessage(JSON.stringify(message))
         console.log('Sent message:', message)
 
-        setIsUserUpdatingData(false) // Reset flag
-        setIsUserUpdatingUserData(false) // Reset flag
-    }, [sendMessage, sessionToken, setIsUserUpdatingData, setIsUserUpdatingUserData])
+         // Reset flags
+        setIsUserUpdatingProjects(false)
+        setIsUserUpdatingActivities(false)
+        setIsUserUpdatingUserData(false)
+    }, [sendMessage, sessionToken, setIsUserUpdatingProjects, setIsUserUpdatingActivities, setIsUserUpdatingUserData])
 
     const handleResponse = useCallback((event) => {
         console.log("from handleResponse: ")
         try {
             const response = JSON.parse(event.data)
-            const currentData = data
+            const currentData = projects
             console.log(response) // This will log the entire response
         
             // Now, you can access specific parts of the response
@@ -89,7 +102,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, act
                 case "all": {
                     setUserData(data.user)
                     console.log(data.items)
-                    setData(data.items)
+                    setProjects(data.items)
                     setRights(data.organisation.rights)
                     setUsers(data.users)
                     break
@@ -99,14 +112,14 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, act
                     break
                 }
                 case "data": {
-                    setData(data)
+                    setProjects(data)
                     break
                 }
                 case "project": {
                     const updatedData = currentData.map(item =>
                         item._id === data._id ? data : item
                     )
-                    setData(updatedData)
+                    setProjects(updatedData)
                     break
                 }
                 case "activities": {//add along with activity templates
@@ -115,7 +128,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, act
                     break
                 }
                 case "delete": {//just _id
-                    Shared.DeleteItem(currentData, setData, data._id)
+                    Shared.DeleteItem(currentData, setProjects, data._id)
                     break
                 }
                 case "organisation": {
@@ -142,11 +155,11 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, act
                 switch (type) {
                 case"item": {
                     const item = fetchedData
-                    if (data.find(d => d._id === item._id).length === 0) {
-                    setData(prevData => ({ ...prevData, item }))
+                    if (projects.find(d => d._id === item._id).length === 0) {
+                    setProjects(prevData => ({ ...prevData, item }))
                     }
                     else {
-                        setData(prevData => 
+                        setProjects(prevData => 
                             prevData.map(d => 
                             d._id === item._id ? item : d
                         ))
@@ -171,7 +184,7 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, act
         } catch (error) {
             console.error("Error processing message:", error.message)
         }
-    }, [data, setData, setActivities, setLoggedIn, setRights, setUsers, setUserData])
+    }, [projects, setProjects, setActivities, setLoggedIn, setRights, setUsers, setUserData])
 
     //send update ONLY when page changes
     const lastSentProject = useRef(null)
@@ -182,8 +195,8 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, act
         lastSentProject.current = state.currentPage
     }, [sendMsg, state.currentPage, state.currentProject, state.currentActivity, isLoggedIn])
 
-    // Track user-initiated changes to `data`
-    const updateItem = useCallback((item) => {
+    // Track user-initiated changes to `projects`
+    const updateProjects = useCallback((item) => {
 
         if (readyState === 1) { // Check if WebSocket is open
             sendMsg("addEditData", item)
@@ -194,12 +207,33 @@ const Connection = ({ state, setState, userData, setUserData, data, setData, act
 
     }, [readyState, sendMsg])
 
-    // Trigger project update when a user modifies `data`
-    // useEffect(() => {
-    //     if (isUserUpdatingData) {
-    //         updateItem(data.find(item => item._id === isUserUpdatingData))
-    //     }
-    // }, [data, updateItem, isUserUpdatingData])
+    // Trigger project update when a user modifies `projects`
+    useEffect(() => {
+        if (isUserUpdatingProjects) {
+            updateProjects(Shared.GetItemById(projects, isUserUpdatingProjects[0]))
+        }
+    }, [projects, updateProjects, isUserUpdatingProjects])
+
+    // Track user-initiated changes to `activities`
+    const updateActivities = useCallback((item) => {
+
+        if (readyState === 1) { // Check if WebSocket is open
+            sendMsg("addEditData", item)
+            console.log("Sent item update:", item)
+        } else {
+            console.error("WebSocket is not open. Cannot send item update.")
+        }
+
+    }, [readyState, sendMsg])
+
+    // Trigger project update when a user modifies `activities`
+    useEffect(() => {
+        if (isUserUpdatingActivities) {
+            for (let i = 0; i < isUserUpdatingActivities.length; i++) {
+                updateActivities(Shared.GetItemById(activities, isUserUpdatingActivities[i]))
+            }
+        }
+    }, [activities, updateActivities, isUserUpdatingActivities])
 
     // Track user-initiated changes to `userData`
     const updateUser = useCallback((updatedUserData) => {

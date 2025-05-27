@@ -4,7 +4,15 @@ import '../../../css/pages/specificComponents/ScheduleBoard.css'
 
 import * as Shared from '../sharedComponents'
 
-const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, gridValues, setGridValues, intervalAnchor, scheduleBoard, recentActivities, setRecentActivities }) => {
+const ScheduleBoard = ({
+    projects,
+    state, setState,
+    currentScale, setCurrentScale,
+    gridValues, setGridValues,
+    intervalAnchor,
+    scheduleBoard,
+    recentActivities, setRecentActivities
+}) => {
 
     const navigate = useNavigate()
     const goTo = Shared.GoTo
@@ -120,12 +128,12 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
 
     // ranged data for current scale
     const scaledData = useMemo(() => {
-        if (!data) return []
+        if (!projects) return []
 
         const { start, end } = rangeToDisplay[currentScale]
     
         // Filter and process activities Math.floor(event._id / 1000000000)
-        const filteredActivities = data
+        const filteredActivities = projects
             .flatMap(project => project.activities)
             .flatMap(activity => {
     
@@ -200,7 +208,7 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
     
         // Filter and process projects for 'year' scale
         const filteredProjects = currentScale === 'year'
-            ? data
+            ? projects
                 .flatMap(project => {
     
                     const startItem = {
@@ -234,7 +242,7 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
             })
     
         return rangedData
-    }, [data, currentScale, rangeToDisplay])
+    }, [projects, currentScale, rangeToDisplay])
 
     // scaledData with grouped overlaps
     const scaledDataWithOverlaps = useMemo(() => {
@@ -360,14 +368,14 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
                             }
                         }))
                     ) : (
-                        navigate(goTo(group[i], data, recentActivities, setRecentActivities))
+                        navigate(goTo(group[i], projects, recentActivities, setRecentActivities))
                     )
                 }}
             >
                 {content}
             </div>
         )
-    }, [currentScale, firstDayOfMonth, data, setState, weeksInMonth, intervalAnchor, goTo, navigate, recentActivities, setRecentActivities])
+    }, [currentScale, firstDayOfMonth, projects, setState, weeksInMonth, intervalAnchor, goTo, navigate, recentActivities, setRecentActivities])
 
     //schedule events as <div></div>s to display
     const eventsToDisplay = useMemo(() => {
@@ -380,7 +388,7 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
                     // event data to display
                     let content = ``
                     if (group[i].type === 'activity') {
-                        content += `${data.find(p => p._id === projectId(group[0]._id)).name}: `
+                        content += `${projects.find(p => p._id === projectId(group[0]._id)).name}: `
                     }
                     
                     if (currentScale === 'week') {
@@ -401,7 +409,7 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
                 let content = ``;
                 if (group.length === 1) {//event
                     if (group[0].type === 'activity') {
-                        content += `${data.find(p => p._id === projectId(group[0]._id)).name}: `
+                        content += `${projects.find(p => p._id === projectId(group[0]._id)).name}: `
                     }
                     
                     if (currentScale === 'week') {
@@ -414,7 +422,7 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
                 else {//joint block
                     group.forEach((event, i) => {
                         if (event.type === 'activity') {
-                            content += `${data.find(p => p._id === projectId(event._id)).name}: `
+                            content += `${projects.find(p => p._id === projectId(event._id)).name}: `
                         }
                         content += `${event.name}\n`
                     })
@@ -440,7 +448,7 @@ const ScheduleBoard = ({ data, state, setState, currentScale, setCurrentScale, g
 
         return eventDivs
         
-    }, [data, currentScale, renderEvents, scaledDataWithOverlaps])
+    }, [projects, currentScale, renderEvents, scaledDataWithOverlaps])
 
     return (
         <div

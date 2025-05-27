@@ -2,7 +2,6 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import '../../../css/pages/sharedComponents/Item.css'
 
-import * as Shared from '../sharedComponents'
 import * as Items from '../../Items'
 
 const Item = ({
@@ -11,23 +10,24 @@ const Item = ({
     activities,
     state, setState,
     item,
-    index,
+    containerId,
     rights,
     recentActivities, setRecentActivities
 }) => {
     
     const ItemComponent = Items[item.type]
 
-    const {attributes, listeners, setNodeRef, transform, transition} = useSortable({
+    const {attributes, listeners, setNodeRef, transform, transition, isDragging} = useSortable({
         id: item._id, 
         data: {
-            type: "container"//(item.type === "Group") ? "container" : "item"
+            type: (!containerId.includes('.')) ? "Group" : "item"
         }
     })
 
     const style = {
         transition,
         transform: CSS.Transform.toString(transform),
+        opacity: (isDragging) ? 0.5 : 1
     }
 
     // const handleAddAfter = (_id) => {
@@ -46,10 +46,9 @@ const Item = ({
 
     return (
         <div
-            className='activity-item'
+            className={'activity-item'}
             ref={setNodeRef}
             {...attributes}
-            {...listeners}
             style={style}
         >
             {/* ➕ Add below button */}
@@ -79,7 +78,7 @@ const Item = ({
                 state={state}
                 setState={setState}
                 item={item}
-                index={index}
+                containerId={containerId}
                 rights={rights}
                 recentActivities={recentActivities}
                 setRecentActivities={setRecentActivities}

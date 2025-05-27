@@ -5,7 +5,22 @@ import AppContent from './AppContent'
 
 import * as Shared from './pages/sharedComponents'
 
-const AppDynamicContent = ({userData, setUserData, profileData, state, setState, isLoggedIn, data, setData, activities, setActivities, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
+const AppDynamicContent = ({
+  userData, setUserData,
+  profileData,
+  state, setState,
+  isLoggedIn,
+  projects,
+  activities,
+  setData,
+  rights,
+  users,
+  itemStructure,
+  defaultStructure,
+  isCompany,
+  notifications, setNotifications,
+  recentActivities, setRecentActivities
+}) => {
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -48,14 +63,14 @@ const AppDynamicContent = ({userData, setUserData, profileData, state, setState,
         break
       }
       case 2: {
-        const project = Shared.GetItemById(data, pathParts[1]) || undefined
+        const project = Shared.GetItemById(projects, pathParts[1]) || undefined
         page = pathParts[0]
         pr = project._id
         act = undefined
         break
       }
       case 3: {
-        const project = Shared.GetItemById(data, pathParts[1]) || undefined
+        const project = Shared.GetItemById(projects, pathParts[1]) || undefined
         const activity = (project) ? Shared.GetItemById(project.activities, pathParts[2]) || undefined : undefined
 
         if (state.currentProject !== project) {
@@ -70,7 +85,7 @@ const AppDynamicContent = ({userData, setUserData, profileData, state, setState,
 
     updateState(page, pr, act)
 
-  }, [location.pathname, state, setState, data, isLoggedIn, navigate])
+  }, [location.pathname, state, setState, projects, isLoggedIn, navigate])
   
   return (
     <AppContent
@@ -79,10 +94,9 @@ const AppDynamicContent = ({userData, setUserData, profileData, state, setState,
       profileData={profileData}
       state={state}
       setState={setState}
-      data={data}
-      setData={setData}
+      projects={projects}
       activities={activities}
-      setActivities={setActivities}
+      setData={setData}
       rights={rights}
       users={users}
       itemStructure={itemStructure}

@@ -6,6 +6,13 @@ const Project = require("../models/Project")
 const Organisation = require("../models/Organisation")
 const Activity = require("../models/Activity")
 
+const Collections = {
+  user: User,
+  project: Project,
+  organisation: Organisation,
+  activity: Activity
+}
+
 // Map to store WebSocket connections by session token
 const clients = new Map() // This will store WebSocket connections keyed by session token
 
@@ -20,21 +27,21 @@ const getData = async (type, login, ws, sessionToken, _id) => {
   switch (type) {
     case "all": {
       // Fetch Fetch user by login
-      const user = await User.findOne(login)
+      const user = await Collections.user.findOne(login)
       if (!user) {
         throw new Error(`User not found for login: ${login}`)
       }
 
       // Fetch all data (user, projects, and organisation)
-      const items = await Project.find({
+      const items = await Collections.project.find({
         "userList.id": user._id
       })
 
-      const organisation = await Organisation.findOne({
+      const organisation = await Collections.organisation.findOne({
         name: "default"
       })
 
-      const users = await User.find({}, {
+      const users = await Collections.user.find({}, {
         login: 0,
         password: 0,
         currentSettings: 0,
@@ -47,7 +54,7 @@ const getData = async (type, login, ws, sessionToken, _id) => {
     }
     case "user": {
       // Fetch Fetch user by login
-      const user = await User.findOne(login)
+      const user = await Collections.user.findOne(login)
       if (!user) {
         throw new Error(`User not found for login: ${login}`)
       }
@@ -58,12 +65,12 @@ const getData = async (type, login, ws, sessionToken, _id) => {
     }
     case "data": {
       // Fetch Fetch user by login
-      const user = await User.findOne(login)
+      const user = await Collections.user.findOne(login)
       if (!user) {
         throw new Error(`User not found for login: ${login}`)
       }
 
-      const projects = await Project.find({
+      const projects = await Collections.project.find({
         "userList.id": user._id
       })
       if (!projects) {
@@ -75,12 +82,12 @@ const getData = async (type, login, ws, sessionToken, _id) => {
     }
     case "project": {
       // Fetch Fetch user by login
-      const user = await User.findOne(login)
+      const user = await Collections.user.findOne(login)
       if (!user) {
         throw new Error(`User not found for login: ${login}`)
       }
 
-      const project = await Project.findById(_id)
+      const project = await Collections.project.findById(_id)
       if (!project) {
         throw new Error(`Project not found with _id: ${_id}`)
       }
@@ -90,18 +97,18 @@ const getData = async (type, login, ws, sessionToken, _id) => {
     }
     case "activities": {
       // Fetch Fetch user by login
-      const user = await User.findOne(login)
+      const user = await Collections.user.findOne(login)
       if (!user) {
         throw new Error(`User not found for login: ${login}`)
       }
 
-      const project = await Project.findById(_id)
+      const project = await Collections.project.findById(_id)
       if (!project) {
         throw new Error(`Project not found with _id: ${_id}`)
       }
 
       // Fetch all activities whose _id starts with `${_id}.`
-      let activities = await Activity.find({
+      let activities = await Collections.activity.find({
         _id: { $regex: `^${_id}\\.` }
       })
 
@@ -111,7 +118,7 @@ const getData = async (type, login, ws, sessionToken, _id) => {
     }
     case "organisation": {
       // Fetch organisation with name "default"
-      const organisation = await Organisation.findOne({ name: "default" })
+      const organisation = await Collections.organisation.findOne({ name: "default" })
       if (!organisation) {
         throw new Error("Organisation with name 'default' not found")
       }
@@ -119,7 +126,7 @@ const getData = async (type, login, ws, sessionToken, _id) => {
       break
     }
     case "users": {
-      const users = await User.find({}, {
+      const users = await Collections.user.find({}, {
         login: 0,
         password: 0,
         currentSettings: 0,
@@ -178,27 +185,29 @@ const startWebSocketServer = (port) => {
             break
           }
           case "addEditData": {
-            const updatedProject = parsedMessage.data
-            const projectId = updatedProject._id || new mongoose.Types.ObjectId()
+            const updatedItem = parsedMessage.data
+            const itemId = updatedItem._id || new mongoose.Types.ObjectId()
+
+            const type = (itemId.includes(".")) ? "activity" : "project"
             
             // Update project in the database
-            Project.findByIdAndUpdate(projectId, updatedProject, { new: true, upsert: true })
-            .then(project => {
-              if (!project) {
-                console.error(`Failed to update project with ID ${projectId}.`)
+            Collections[type].findByIdAndUpdate(itemId, updatedItem, { new: true, upsert: true })
+            .then(item => {
+              if (!item) {
+                console.error(`Failed to update project with ID ${itemId}.`)
                 return
               }
-              console.log(`Project ${projectId} updated successfully.`)
+              console.log(`Item ${itemId} updated successfully.`)
 
               // Broadcast the updated project to all relevant users except the sender
-              if (!project.userList || !Array.isArray(project.userList)) {
-                console.error("Error: project.userList is either undefined or not an array.")
+              if (!item.userList || !Array.isArray(item.userList)) {
+                console.error("Error: item.userList is either undefined or not an array.")
                 return
               }
-              project.userList.forEach(user => {
+              item.userList.forEach(user => {
                 const objectId = new ObjectId(user.id)
                 // Fetch user data from the database to get login
-                User.findById(objectId)
+                Collections.user.findById(objectId)
                 .then(userData => {
                   if (!userData) {
                     console.error(`No user found with ID: ${user.id}`)
@@ -224,7 +233,7 @@ const startWebSocketServer = (port) => {
                   if (userData.login !== clients.get(sessionToken).login && targetClientWs.readyState === WebSocket.OPEN) {
                     console.log(targetClientLogin)
                     // Send the data to the target client
-                    getData("project", {login: targetClientLogin}, targetClientWs, targetClientToken, project._id)
+                    getData("project", {login: targetClientLogin}, targetClientWs, targetClientToken, item._id)
                   }
                 })
                 .catch(userErr => {
@@ -242,7 +251,7 @@ const startWebSocketServer = (port) => {
             const userId = updatedUserData._id
             console.log(updatedUserData, userId)
         
-            User.findByIdAndUpdate(userId, updatedUserData, { new: true })
+            Collections.user.findByIdAndUpdate(userId, updatedUserData, { new: true })
             .then((user) => {
               if (!user) {
                 console.error(`Failed to update user with ID ${userId}.`)

@@ -108,7 +108,7 @@ const App = () => {
     }
   }, [])
 
-  const [data, setData] = useState([])
+  const [projects, setProjects] = useState([])
 
   const [activities, setActivities] = useState([])
 
@@ -123,46 +123,103 @@ const App = () => {
 
   //connection
 
-  const [isUserUpdatingData, setIsUserUpdatingData] = useState(false)
-  const [isUserUpdatingActivity, setIsUserUpdatingActivity] = useState(false)
+  const [isUserUpdatingProjects, setIsUserUpdatingProjects] = useState(false)
+  const [isUserUpdatingActivities, setIsUserUpdatingActivies] = useState([])
   const [isUserUpdatingUserData, setIsUserUpdatingUserData] = useState(false)
 
   const [users, setUsers] = useState()
 
   const updateData = (data) => {
-    const { action, item } = data
-    if (!item || !item._id) return
-    
-    const setter = item?.path ? setActivities : setData
-    const flag = item?.path ? isUserUpdatingActivity : isUserUpdatingData
-    const flagSetter = item?.path ? setIsUserUpdatingActivity : setIsUserUpdatingData
 
-    if (flag) {
-      return
-    }
-    flagSetter(item._id)
+    const { action, item } = data
+
+    //by default update data
+    let source = projects || []
+    let setter = setProjects
+    let flag = setIsUserUpdatingProjects
     
-    if (action === "add") {
-      setter(prevData => [ ...prevData, item ])
-    }
-    if (action === "edit") {
-      if (item?.path) {
-        //activity
-        const parts = item.path.split('.')
-        parts.pop()
-        setActivities((prevActivities) => ({
-          ...prevActivities,
-          ...Shared.NormalizeItemsPath(activities, item, parts, setActivities)
-        }))
-      } else {
-        //project
-        setter(prevData => 
-          prevData.map(d => 
-            d._id === item._id ? item : d
+
+    switch(action) {
+      case "add": {
+        flag([item._id])
+
+        setter(prevItems => [ ...prevItems, item ])
+        break
+      }
+      case "edit": {
+        flag([item._id])
+
+        setter(prevItems => 
+          prevItems.map(i => 
+            i._id === item._id ? item : i
           )
         )
+        break
+      }
+      case "dnd": {
+        const { type, containerId, array} = item
+
+        //update 1 item. It is either activity or project
+        if (type === "sort") {
+          // update activities
+          let fullArr = projects
+          if (containerId.includes(".")) {
+            source = activities || []
+            setter = setActivities
+            flag = setIsUserUpdatingActivies
+            fullArr = activities
+          }
+          
+          const container = Shared.GetItemById(source, containerId)
+          const arrayOfIds = array.map(item => item._id)
+          let metaArray = Shared.SortByIds(container.activities, arrayOfIds, fullArr)
+          flag([containerId])
+          //update source of truth
+          setter(prevItems => 
+            prevItems.map(i => ({
+                ...i,
+                activities: (i._id === containerId) ? metaArray : i.activities
+              })
+            )
+          )
+        }
+        //update 2 items. Activities only
+        if (type === "drop") {
+          source = activities || []
+          setter = setActivities
+          flag = setIsUserUpdatingActivies
+          
+          const containerFrom = Shared.GetItemById(source, containerId.from)
+          const containerTo = Shared.GetItemById(source, containerId.to)
+
+          const arrayOfFromIds = array.from.map(item => item._id)
+          const arrayOfToIds = array.to.map(item => item._id)
+
+          const metaFromArray = Shared.SortByIds(containerFrom.activities, arrayOfFromIds, containerFrom.activities)
+          const metaToArray = Shared.SortByIds(containerTo.activities, arrayOfToIds, containerFrom.activities)
+
+          flag([containerId.from, containerId.to])
+          //update source of truth
+          setter(prevItems => 
+            prevItems.map(item => ({
+                ...item,
+                activities:
+                  (item._id === containerId.from)
+                  ? metaFromArray
+                  : (item._id === containerId.to)
+                    ? metaToArray
+                    : item.activities
+              })
+            )
+          )
+        }
+        break
+      }
+      default: {
+        console.log("No such action to updateData")
       }
     }
+    console.log("from updateData: ", data)
   }
 
   const updateUser = (newData, currentSettingsEdit) => {
@@ -195,7 +252,7 @@ const App = () => {
 
     const updated = [...notificationsRef.current]
     // Loop through users and their activities
-    data.forEach((project) => {
+    projects.forEach((project) => {
       project.activities?.forEach((activity) => {
         const activityStartTime = new Date(`${activity.startDate}T${activity.startTime}:00`)
 
@@ -241,7 +298,7 @@ const App = () => {
     if (!isSameArray(updated, notificationsRef.current)) {
       setNotifications(updated)
     }
-  }, [data])
+  }, [projects])
 
   //load existing messages on log in
   useEffect(() => {
@@ -301,7 +358,8 @@ const App = () => {
         />
         <div>
           <AppNav
-            data={data}
+            projects={projects}
+            activities={activities}
             state={state}
             isLoggedIn={isLoggedIn}
             organisationType={isCompany}
@@ -317,10 +375,9 @@ const App = () => {
                 state={state}
                 setState={setState}
                 isLoggedIn={isLoggedIn}
-                data={data}
-                setData={updateData}
+                projects={projects}
                 activities={activities}
-                setActivities={updateData}
+                setData={updateData}
                 rights={rights}
                 users={users}
                 itemStructure={defaultItemStructure}
@@ -340,18 +397,18 @@ const App = () => {
       setState={setState}
       userData={userData}
       setUserData={setUserData}
-      data={data}
-      setData={setData}
+      projects={projects}
+      setProjects={setProjects}
       activities={activities}
       setActivities={setActivities}
       isLoggedIn={isLoggedIn}
       setLoggedIn={setLoggedIn}
       setRights={setRights}
       setUsers={setUsers}
-      isUserUpdatingData={isUserUpdatingData}
-      setIsUserUpdatingData={setIsUserUpdatingData}
-      isUserUpdatingActivity={isUserUpdatingActivity}
-      setIsUserUpdatingActivity={setIsUserUpdatingActivity}
+      isUserUpdatingProjects={isUserUpdatingProjects}
+      setIsUserUpdatingProjects={setIsUserUpdatingProjects}
+      isUserUpdatingActivities={isUserUpdatingActivities}
+      setIsUserUpdatingActivities={setIsUserUpdatingActivies}
       isUserUpdatingUserData={isUserUpdatingUserData}
       setIsUserUpdatingUserData={setIsUserUpdatingUserData}
     />

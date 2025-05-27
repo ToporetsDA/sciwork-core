@@ -3,7 +3,16 @@ import '../../../css/pages/sharedComponents/ControlPanel.css'
 
 import * as Shared from './'
 
-const ControlPanel = ({ userData, setUserData, state, setState, data, rights, setItemsToDisplay, currentScale, setCurrentScale, editIntervalAnchor }) => {
+const ControlPanel = ({
+    userData, setUserData,
+    state, setState,
+    projects,
+    activities,
+    rights,
+    setItemsToDisplay,
+    currentScale,
+    setCurrentScale,
+    editIntervalAnchor }) => {
 
     const filterOptions = {
         sort: ["A-Z", "Z-A", "start date", "end date"],
@@ -131,15 +140,15 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
     //data to display
 
     const projectsToDisplay = useMemo(() => {
-        return data ? filterItems(sortItems([...data])) : []
-    }, [data, filterItems, sortItems])
+        return projects ? filterItems(sortItems([...projects])) : []
+    }, [projects, filterItems, sortItems])
 
     const activitiesToDisplay = useMemo(() => {
-        const activities = Shared.GetItemById(data, state.currentProject).activities
+        const activities = Shared.GetItemById(projects, state.currentProject).activities
         return Array.isArray(activities)
             ? filterItems(sortItems([...activities]))
             : []
-    }, [data, state.currentProject, filterItems, sortItems])
+    }, [projects, state.currentProject, filterItems, sortItems])
 
     //return data to display it
     useEffect(() => {
@@ -220,7 +229,7 @@ const ControlPanel = ({ userData, setUserData, state, setState, data, rights, se
                             )}
                         </div>
                         {((state.currentPage !== "Projects")
-                        && ((state.currentProject) ? rights.edit.includes(getAccess(Shared.GetItemById(data, state.currentProject))) : false))
+                        && ((state.currentProject) ? rights.edit.includes(getAccess(Shared.GetItemById(projects, state.currentProject))) : false))
                         && (
                             <div>
                             <button className="addItem" onClick={() => {

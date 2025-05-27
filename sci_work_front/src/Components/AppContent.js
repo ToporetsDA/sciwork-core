@@ -5,7 +5,21 @@ import * as Dialogs from './dialogs'
 
 import * as Shared from '../Components/pages/sharedComponents'
 
-const AppContent = ({userData, setUserData, profileData, state, setState, data, setData, activities, setActivities, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
+const AppContent = ({
+    userData, setUserData,
+    profileData,
+    state, setState,
+    projects,
+    activities,
+    setData,
+    rights,
+    users,
+    itemStructure,
+    defaultStructure,
+    isCompany,
+    notifications, setNotifications,
+    recentActivities, setRecentActivities
+}) => {
 
     // dialogs
 
@@ -34,12 +48,12 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
 
     // more for pages
 
-    const project = Shared.GetItemById(data, state.currentProject)
+    const project = Shared.GetItemById(projects, state.currentProject)
 
     const [itemsToDisplay, setItemsToDisplay] = useState({
-        projects: data || [],
+        projects: projects || [],
         activities: project?.activities ? project.activities : []
-    }, [state.currentProject, data])
+    }, [state.currentProject, projects])
 
     return (
         <main className="content">
@@ -47,10 +61,9 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
                 <DialogComponent
                     userData={userData}
                     setUserData={setUserData}
-                    data={data}
+                    data={projects}
                     setData={setData}
                     activities={activities}
-                    setActivities={setActivities}
                     state={state}
                     setState={setState}
                     rights={rights}
@@ -68,10 +81,9 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
                         profileData={profileData}
                         state={state}
                         setState={setState}
-                        data={data}
-                        setData={setData}
+                        projects={projects}
                         activities={activities}
-                        setActivities={setActivities}
+                        setData={setData}
                         itemsToDisplay={itemsToDisplay}
                         setItemsToDisplay={setItemsToDisplay}
                         rights={rights}

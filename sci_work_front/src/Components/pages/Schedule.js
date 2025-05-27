@@ -3,7 +3,16 @@ import '../../css/pages/Schedule.css'
 import ControlPanel from './sharedComponents/ControlPanel'
 import ScheduleBoard from './specificComponents/ScheduleBoard'
 
-const Schedule = ({ userData, setUserData, state, setState, data, setData, itemsToDisplay, setItemsToDisplay, rights, recentActivities, setRecentActivities }) => {
+const Schedule = ({
+    userData, setUserData,
+    state, setState,
+    projects,
+    activities,
+    setData,
+    itemsToDisplay, setItemsToDisplay,
+    rights,
+    recentActivities, setRecentActivities
+}) => {
     
     const daysOfWeek = useMemo(() => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], [])
     const months = useMemo(() => ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'], [])
@@ -145,7 +154,8 @@ const Schedule = ({ userData, setUserData, state, setState, data, setData, items
                 setUserData={setUserData}
                 state={state}
                 setState={setState}
-                data={data}
+                projects={projects}
+                activities={activities}
                 rights={rights}
                 setItemsToDisplay={setItemsToDisplay}
                 currentScale={currentScale}
@@ -174,7 +184,7 @@ const Schedule = ({ userData, setUserData, state, setState, data, setData, items
                     {scheduleHMap}
                 </div>
                 <ScheduleBoard
-                    data={data}
+                    projects={projects}
                     state={state}
                     setState={setState}
                     currentScale={currentScale}

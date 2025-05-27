@@ -3,14 +3,20 @@ import '../../css/pages/Notifications.css'
 
 import * as Shared from './sharedComponents/index'
 
-const Notifications = ({data, setData, state, setState, notifications, setNotifications, recentActivities, setRecentActivities}) => {
+const Notifications = ({
+    projects,
+    setData,
+    state, setState,
+    notifications, setNotifications,
+    recentActivities, setRecentActivities
+}) => {
 
     const ItemList = Shared.LinkList
 
     return (
         <div className="notificationsContainer">
             <ItemList
-                data={data}
+                data={projects}
                 state={state}
                 setState={setState}
                 list={notifications}

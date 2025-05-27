@@ -11,7 +11,6 @@ const projectSchema = new mongoose.Schema({
   activities: [
     {
       _id: { type: String, auto: true },
-      path: { type: String, required: true },
       dnd: { type: Number, required: true },
       name: { type: String, required: true },
       startDate: { type: String, required: true },

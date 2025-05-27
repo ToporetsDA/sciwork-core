@@ -4,7 +4,7 @@ import '../css/AppNav.css'
 
 import * as Shared from './pages/sharedComponents'
 
-const AppNav = ({ data, state, isLoggedIn, organisationType, recentActivities, setRecentActivities }) => {
+const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, recentActivities, setRecentActivities }) => {
   
   const navigate = useNavigate()
 
@@ -21,7 +21,7 @@ const AppNav = ({ data, state, isLoggedIn, organisationType, recentActivities, s
     return (
       <li
         key={activity._id}
-        onClick={() => {navigate(Shared.GoTo(activity, data, recentActivities, setRecentActivities))}}
+        onClick={() => {navigate(Shared.GoTo(activity, projects, recentActivities, setRecentActivities))}}
         className={state.currentActivity === undefined ? 'active' : ''}
         style={{
           fontWeight: state.currentPage === undefined ? 'bold' : 'normal',
@@ -50,7 +50,7 @@ const AppNav = ({ data, state, isLoggedIn, organisationType, recentActivities, s
             {organisationType === true ? 'Projects' : 'Subjects'}
           </h4>
 
-          {data.map((project) => (
+          {projects.map((project) => (
             <li key={project._id}>
               <details>
                 <summary>{project.name}</summary>
@@ -66,7 +66,7 @@ const AppNav = ({ data, state, isLoggedIn, organisationType, recentActivities, s
           
         <ul className="recent">
           <h4>Recent</h4>
-          {data.map((project) => {
+          {projects.map((project) => {
             const projectRecentActivities = recentActivities.filter(recent => projectId(recent._id) === project._id)
             
             if (projectRecentActivities.length > 0) {
