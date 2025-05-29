@@ -4,11 +4,23 @@ import '../../css/dialogs/dialog.css'
 
 import * as Shared from '../pages/sharedComponents'
 
-const AddEditItem = ({ userData, setUserData, data, setData, activities, setActivities, state, setState, rights, itemStructure, defaultStructure, isCompany }) => {
+const AddEditItem = ({
+    userData, setUserData,
+    projects,
+    activities,
+    setData,
+    state, setState,
+    rights,
+    itemStructure,
+    defaultStructure,
+    isCompany
+}) => {
 
     const currentItem = state.currentDialog.params[0]
     const currentItemId = state.currentDialog.params[1] || false
-    const selectedType = ["Activity", "Project"].includes(state.currentPage) ? state.currentPage : "Project"
+    const activityIndex = state.currentDialog.params[2] || false
+    const containerId = state.currentDialog.params[3] || false
+    const selectedType = ["Activity", "Project"].includes(state.currentPage) ? "Activity" : "Project"
 
     // Initialize form values based on default type
 
@@ -47,7 +59,7 @@ const AddEditItem = ({ userData, setUserData, data, setData, activities, setActi
     const toggleListSelection = (field, value, many) => {
         setFormValues((prev) => {
 
-            const currentList = prev[field] || []
+            const currentList = [...prev[field]] || []
             const baseList = many ? currentList : currentList.filter((v) => v === value)
             const updatedList = baseList.includes(value)
                 ? baseList.filter((v) => v !== value)
@@ -62,10 +74,31 @@ const AddEditItem = ({ userData, setUserData, data, setData, activities, setActi
 
     //show item-fields
     const showItemFields = useMemo(() => {
-        return (state.currentPage !== 'Schedule' || selectedType === 'Project' ||
-        (selectedType === 'Activity' && state.currentProject !== undefined)) &&
-        ((state.currentProject !== undefined) ? rights.edit.includes(Shared.GetItemById(data, state.currentProject).access) : true)
-    }, [data, state, selectedType, rights.edit])
+        const isSchedule = state.currentPage === 'Schedule'
+        const userList = (state.currentProject)
+            ? Shared.GetItemById(activities, currentItemId).userList
+            : Shared.GetItemById(projects, state.currentProject).userList
+        
+        let canEdit = userData.genStatus
+        if (userList) {
+            canEdit = userList.find(user => user._id === userData._id)?.access
+        }
+        else if (containerId) {
+            const item = (!containerId.includes('.'))
+                ? Shared.GetItemById(projects, containerId)
+                : Shared.GetItemById(activities, containerId)
+            
+            canEdit = item.userList.find(user => user.id === userData._id)?.access
+        }
+        return (
+            !isSchedule
+            && (
+                (selectedType === 'Project')
+                || (selectedType === 'Activity' && state.currentProject)
+            )
+            && (rights.edit.includes(canEdit))
+        )
+    }, [userData, projects, activities, state, selectedType, currentItemId, containerId, rights.edit])
 
     //conditions for fields that should appear based on other fields values
     const fieldsChecks = useMemo(() => {
@@ -115,7 +148,7 @@ const AddEditItem = ({ userData, setUserData, data, setData, activities, setActi
             }
 
             if (selectedType === 'Activity') {
-                const project = Shared.GetItemById(data, Shared.GetItemById(data, state.currentProject))
+                const project = Shared.GetItemById(projects, Shared.GetItemById(projects, state.currentProject))
                 
                 if (startDate < project.startDate || startDate >= project.endDate) {
                     errors.startDate = "Start date must be within project's lifetime."
@@ -166,7 +199,7 @@ const AddEditItem = ({ userData, setUserData, data, setData, activities, setActi
             return
         }
 
-        const project = Shared.GetItemById(data, state.currentProject)
+        const project = Shared.GetItemById(projects, state.currentProject)
 
         let newItem = {
             ...formValues,
@@ -187,8 +220,6 @@ const AddEditItem = ({ userData, setUserData, data, setData, activities, setActi
             project.dndCount += 1
         }
 
-        console.log(newItem)
-
         // submit
 
         let action = "edit"
@@ -202,7 +233,7 @@ const AddEditItem = ({ userData, setUserData, data, setData, activities, setActi
             container.activities.push(newItem)
             Shared.NormalizeItemsPath(container, state.currentProject, setData)
         } else {
-            const existingItem = data.find((item) => item._id === currentItem._id)
+            const existingItem = projects.find((item) => item._id === currentItem._id)
             if (existingItem) {
                 item = { ...existingItem, ...formValues }
             }
@@ -223,7 +254,7 @@ const AddEditItem = ({ userData, setUserData, data, setData, activities, setActi
         }))
     }
 
-    const handleOutsideClick = (e) => {
+    const handleCancel = (e) => {
         if (e.target === e.currentTarget) {
             setState((prevState) => ({
                 ...prevState,
@@ -240,7 +271,7 @@ const AddEditItem = ({ userData, setUserData, data, setData, activities, setActi
     const currentStructure = itemStructure[selectedType.toLowerCase()]
 
     return (
-        <div className="addEditItemDialog dialogContainer" onClick={handleOutsideClick}>
+        <div className="addEditItemDialog dialogContainer">
             <div className="dialogContent">
                 <h2>{currentItem === true 
                     ? (state.currentProject ? 'Add new Activity' : 'Add New Project')
@@ -280,10 +311,10 @@ const AddEditItem = ({ userData, setUserData, data, setData, activities, setActi
                         Object.keys(currentStructure).map((key) => (
                             <div key={key} className="formGroup">
                                 {(currentStructure[key] === "list") ? (
-                                fieldsChecks.days &&
+                                (fieldsChecks.days || key !== 'days') &&
                                     <>
                                         <label htmlFor={key}>{formatLabel(key)}</label>
-                                        <div className="daysButtons">
+                                        <div className="listButtons">
                                             {itemStructure.lists[key].options.map((val) => (
                                                 <button
                                                     key={val}
@@ -317,7 +348,8 @@ const AddEditItem = ({ userData, setUserData, data, setData, activities, setActi
                             </div>
                         ))
                     )}
-                    <button type="submit" className="submitButton">Save</button>
+                    <button type="button" className="actionButton" onClick={handleCancel}>Cancel</button>
+                    <button type="submit" className="actionButton">Save</button>
                 </form>
             </div>
         </div>

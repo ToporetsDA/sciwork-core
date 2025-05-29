@@ -4,7 +4,7 @@ import '../../css/dialogs/dialog.css'
 
 import * as Shared from '../pages/sharedComponents'
 
-const JointEventOverlapDialog = ({ data, setData, state, setState }) => {
+const JointEventOverlapDialog = ({ projects, activities, state, setState }) => {
 
     // Close the dialog
 
@@ -29,7 +29,8 @@ const JointEventOverlapDialog = ({ data, setData, state, setState }) => {
         >
             <div className="dialogContent">
                 <ItemList
-                    data={data}
+                    projects={projects}
+                    activities={activities}
                     state={state}
                     setState={setState}
                     list={state.currentDialog.params[0]}

@@ -2,14 +2,17 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import '../../../css/pages/sharedComponents/Item.css'
 
+import * as Shared from './'
 import * as Items from '../../Items'
 
 const Item = ({
     userData,
-    data, setData,
+    projects,
     activities,
+    setData,
     state, setState,
     item,
+    index,
     containerId,
     rights,
     recentActivities, setRecentActivities
@@ -30,19 +33,19 @@ const Item = ({
         opacity: (isDragging) ? 0.5 : 1
     }
 
-    // const handleAddAfter = (_id) => {
+    const handleAddAfter = (_id) => {
 
-    //     const parent = Shared.GetItemById(data, state.currentProject)
-    //     const newId = [parent._id, parent.dndCount].join(".")
+        const project = Shared.GetItemById(projects, state.currentProject)
+        const newId = project._id + '.' + project.dndCount
 
-    //     setState(prev => ({
-    //         ...prev,
-    //         currentDialog: {
-    //             name: 'AddEditItem',
-    //             params: [true, newId]
-    //         }
-    //     }))
-    // }
+        setState(prev => ({
+            ...prev,
+            currentDialog: {
+                name: 'AddEditItem',
+                params: [true, newId, index, containerId]
+            }
+        }))
+    }
 
     return (
         <div
@@ -52,37 +55,43 @@ const Item = ({
             style={style}
         >
             {/* ➕ Add below button */}
-            {/* <button
+            {<button
                 className="add-button"
                 onClick={(e) => {
                 e.stopPropagation()
-                // handleAddAfter(item._id)
+                handleAddAfter(item._id)
                 }}
             >
                 ➕
-            </button> */}
-            {/* 🔘 DRAG HANDLE (6-dots) */}
-            <div
-                className="drag-handle"
-                {...listeners}
-                onClick={(e) => e.stopPropagation()}
-            >
-                ⋮⋮
-            </div>
-            <ItemComponent
-                key={item._id}
-                userData={userData}
-                data={data}
-                setData={setData}
-                activities={activities}
-                state={state}
-                setState={setState}
-                item={item}
-                containerId={containerId}
-                rights={rights}
-                recentActivities={recentActivities}
-                setRecentActivities={setRecentActivities}
-            />
+            </button>}
+            <>
+                {item !== true &&
+                    <>
+                    {/* 🔘 DRAG HANDLE (6-dots) */}
+                    <div
+                        className="drag-handle"
+                        {...listeners}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        ⋮⋮
+                    </div>
+                    <ItemComponent
+                        key={item._id}
+                        userData={userData}
+                        projects={projects}
+                        activities={activities}
+                        setData={setData}
+                        state={state}
+                        setState={setState}
+                        item={item}
+                        containerId={containerId}
+                        rights={rights}
+                        recentActivities={recentActivities}
+                        setRecentActivities={setRecentActivities}
+                    />
+                </>
+                }
+            </>
         </div>
     )
 }

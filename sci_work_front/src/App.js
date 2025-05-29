@@ -79,7 +79,7 @@ const App = () => {
     },
     lists: {
       days: { many: true, options: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']},
-      types: { many: false, options: ['group', 'text', 'chat', 'list', 'table', 'attendance', 'report', 'test']}
+      type: { many: false, options: ['group', 'text', 'chat', 'list', 'table', 'attendance', 'report', 'test']}
     }
   }
 
@@ -134,7 +134,7 @@ const App = () => {
     const { action, item } = data
 
     //by default update data
-    let source = projects || []
+    // let source = projects || []
     let setter = setProjects
     let flag = setIsUserUpdatingProjects
     
@@ -154,65 +154,6 @@ const App = () => {
             i._id === item._id ? item : i
           )
         )
-        break
-      }
-      case "dnd": {
-        const { type, containerId, array} = item
-
-        //update 1 item. It is either activity or project
-        if (type === "sort") {
-          // update activities
-          let fullArr = projects
-          if (containerId.includes(".")) {
-            source = activities || []
-            setter = setActivities
-            flag = setIsUserUpdatingActivies
-            fullArr = activities
-          }
-          
-          const container = Shared.GetItemById(source, containerId)
-          const arrayOfIds = array.map(item => item._id)
-          let metaArray = Shared.SortByIds(container.activities, arrayOfIds, fullArr)
-          flag([containerId])
-          //update source of truth
-          setter(prevItems => 
-            prevItems.map(i => ({
-                ...i,
-                activities: (i._id === containerId) ? metaArray : i.activities
-              })
-            )
-          )
-        }
-        //update 2 items. Activities only
-        if (type === "drop") {
-          source = activities || []
-          setter = setActivities
-          flag = setIsUserUpdatingActivies
-          
-          const containerFrom = Shared.GetItemById(source, containerId.from)
-          const containerTo = Shared.GetItemById(source, containerId.to)
-
-          const arrayOfFromIds = array.from.map(item => item._id)
-          const arrayOfToIds = array.to.map(item => item._id)
-
-          const metaFromArray = Shared.SortByIds(containerFrom.activities, arrayOfFromIds, containerFrom.activities)
-          const metaToArray = Shared.SortByIds(containerTo.activities, arrayOfToIds, containerFrom.activities)
-
-          flag([containerId.from, containerId.to])
-          //update source of truth
-          setter(prevItems => 
-            prevItems.map(item => ({
-                ...item,
-                activities:
-                  (item._id === containerId.from)
-                  ? metaFromArray
-                  : (item._id === containerId.to)
-                    ? metaToArray
-                    : item.activities
-              })
-            )
-          )
-        }
         break
       }
       default: {

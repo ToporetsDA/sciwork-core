@@ -3,7 +3,17 @@ import '../../css/Items/Group.css'
 import * as Shared from '../pages/sharedComponents'
 import * as Items from './'
 
-const Group = ({userData, data, setData, activities, state, setState, item, rights, recentActivities, setRecentActivities}) => {
+const Group = ({
+    userData,
+    projects,
+    activities,
+    setData,
+    state, setState,
+    item,
+    rights,
+    recentActivities,
+    setRecentActivities
+}) => {
 
     // console.log("item in Group component", activities)
     return (
@@ -28,9 +38,9 @@ const Group = ({userData, data, setData, activities, state, setState, item, righ
             this is group
             <Shared.ItemTiles
                 userData={userData}
-                data={data}
-                setData={setData}
+                projects={projects}
                 activities={activities}
+                setData={setData}
                 state={state}
                 setState={setState}
                 itemsToDisplay={item.activities}

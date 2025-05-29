@@ -61,9 +61,9 @@ const AppContent = ({
                 <DialogComponent
                     userData={userData}
                     setUserData={setUserData}
-                    data={projects}
-                    setData={setData}
+                    projects={projects}
                     activities={activities}
+                    setData={setData}
                     state={state}
                     setState={setState}
                     rights={rights}

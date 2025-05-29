@@ -1,6 +1,6 @@
 import * as Shared from './'
 
-const ItemActions = ({userData, data, setData, setState, item, rights}) => {
+const ItemActions = ({userData, projects, setData, setState, item, rights}) => {
 
     const getAccess = (item) => {
         return item.userList?.find(user => user.id === userData._id)?.access || 0
@@ -18,7 +18,7 @@ const ItemActions = ({userData, data, setData, setState, item, rights}) => {
                     ...prevState,
                     currentDialog: {
                         name: 'AddEditItem',
-                        params: [item],
+                        params: [item, item._id],
                     },
                     }))
                 }}
@@ -29,7 +29,7 @@ const ItemActions = ({userData, data, setData, setState, item, rights}) => {
                 className="deleteButton"
                 onClick={(e) => {
                     e.stopPropagation()
-                    Shared.DeleteItem(data, setData, item._id)
+                    Shared.DeleteItem(projects, setData, item._id)
                 }}
                 >
                 🗑️

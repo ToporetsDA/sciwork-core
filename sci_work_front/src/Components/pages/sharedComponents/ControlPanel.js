@@ -255,7 +255,7 @@ const ControlPanel = ({
                 />
             }
             {(rights.edit.includes(userData.genStatus)
-            && !["Activity", "Project"].includes(state.currentPage))
+            && ["Projects"].includes(state.currentPage))
             && (
                 <button className="addItem" onClick={() => {
                     setState((prevState) => ({

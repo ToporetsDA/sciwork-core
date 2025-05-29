@@ -3,7 +3,17 @@ import '../../css/Items/Dev.css'
 
 import * as Shared from '../pages/sharedComponents'
 
-const Dev = ({ userData, setUserData, state, setState, data, setData, item, index, rights, recentActivities, setRecentActivities }) => {
+const Dev = ({
+    userData, setUserData,
+    state, setState,
+    projects,
+    activities,
+    setData,
+    item,
+    index,
+    rights,
+    recentActivities, setRecentActivities
+}) => {
     
     const navigate = useNavigate()
 
@@ -16,7 +26,7 @@ const Dev = ({ userData, setUserData, state, setState, data, setData, item, inde
             ${(new Date(item.endDate) < new Date()) ? 'expired' : ''}
             `}
             onClick={() => {
-                navigate(Shared.GoTo(item, data, recentActivities, setRecentActivities))
+                navigate(Shared.GoTo(item, projects, recentActivities, setRecentActivities))
             }}
         >
             <h3 className="name">{item.name}</h3>
@@ -25,7 +35,8 @@ const Dev = ({ userData, setUserData, state, setState, data, setData, item, inde
             </p>
             <Shared.ItemActions
                 userData={userData}
-                data={data}
+                projects={projects}
+                activities={activities}
                 setData={setData}
                 setState={setState}
                 item={item}

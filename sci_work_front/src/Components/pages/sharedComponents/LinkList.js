@@ -4,7 +4,7 @@ import '../../../css/pages/sharedComponents/LinkList.css'
 import '../../../css/pages/Notifications.css'
 import * as Shared from './index'
 
-const LinkList = ({ data, state, setState, list, setList, recentActivities, setRecentActivities }) => {
+const LinkList = ({ projects, activities, state, setState, list, setList, recentActivities, setRecentActivities }) => {
 
     const navigate = useNavigate()
     const goTo = Shared.GoTo
@@ -26,7 +26,7 @@ const LinkList = ({ data, state, setState, list, setList, recentActivities, setR
                 const end = new Date(`${item.endDate}T${item.endTime || "02:45"}`).toLocaleString()
                 return (
                     <div key={i} className='item' onClick={() => {
-                        navigate(goTo(item, data, setRecentActivities))
+                        navigate(goTo(item, projects, setRecentActivities))
                     }}>
                         <div className='content'>
                             <p>{`${item.name}`}</p>
@@ -38,10 +38,10 @@ const LinkList = ({ data, state, setState, list, setList, recentActivities, setR
             }
             case "Notifications": {
 
-                const tmpItem = (!item._id.includes(".")) ? findEl(data, item._id) : findEl(findEl(data,  projectId(item._id)).activities, item._id)
+                const tmpItem = (!item._id.includes(".")) ? findEl(projects, item._id) : findEl(findEl(projects,  projectId(item._id)).activities, item._id)
                 
-                const projectName = findEl(data, projectId(item._id)).name
-                const activityName = (item._id.includes(".")) ? findEl(findEl(data,  projectId(item._id)).activities, item._id).name : undefined
+                const projectName = findEl(projects, projectId(item._id)).name
+                const activityName = (item._id.includes(".")) ? findEl(findEl(projects,  projectId(item._id)).activities, item._id).name : undefined
                 
                 return (
                     <div
@@ -49,7 +49,7 @@ const LinkList = ({ data, state, setState, list, setList, recentActivities, setR
                         className={`item ${item.state}`}
                         onClick={
                             () => {
-                                navigate(goTo(tmpItem, data, recentActivities, setRecentActivities))
+                                navigate(goTo(tmpItem, projects, recentActivities, setRecentActivities))
                                 const updatedItem = { ...item, state: 'read' }
             
                                 setList(
@@ -77,7 +77,7 @@ const LinkList = ({ data, state, setState, list, setList, recentActivities, setR
             default: return <></>
             }
         })
-    }, [data, state, list, goTo, navigate, setList, recentActivities, setRecentActivities])
+    }, [projects, state, list, goTo, navigate, setList, recentActivities, setRecentActivities])
 
     return (
         <div className='list'>

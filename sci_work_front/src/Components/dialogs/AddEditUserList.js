@@ -4,7 +4,7 @@ import '../../css/dialogs/dialog.css'
 
 import * as Shared from '../pages/sharedComponents'
 
-const AddEditUserList = ({ userData, setUserData, data, setData, state, setState, rights, users, itemStructure, defaultStructure, isCompany }) => {
+const AddEditUserList = ({ userData, setUserData, projects, activities, setData, state, setState, rights, users, itemStructure, defaultStructure, isCompany }) => {
 
     const getFullName = (user) => {
         let fullName = user.name + ' '
@@ -21,8 +21,8 @@ const AddEditUserList = ({ userData, setUserData, data, setData, state, setState
     }
 
     const userList = useMemo(() => {
-        return Shared.GetItemById(data, state.currentProject).userList || []
-    }, [data, state.currentProject])
+        return Shared.GetItemById(projects, state.currentProject).userList || []
+    }, [projects, state.currentProject])
 
     const getAccess = useCallback((user, userList) => {
         return userList.find(listItem => listItem.id === user._id)?.access
@@ -64,7 +64,7 @@ const AddEditUserList = ({ userData, setUserData, data, setData, state, setState
             const newState = {
                 ...prevState,
                 currentProject: {
-                    ...Shared.GetItemById(data, state.currentProject),
+                    ...Shared.GetItemById(projects, state.currentProject),
                     userList: updatedUserList,
                 },
             }

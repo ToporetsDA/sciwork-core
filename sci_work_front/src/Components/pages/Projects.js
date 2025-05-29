@@ -1,4 +1,4 @@
-import { Suspense, useState, useEffect, useCallback }  from 'react'
+import { Suspense, useState, useEffect }  from 'react'
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners, useSensor, useSensors, } from '@dnd-kit/core'
 import { arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
 import '../../css/pages/Projects.css'
@@ -23,41 +23,24 @@ const Projects = ({
     ])
 
     const [activeId, setActiveId] = useState(null)
-    const [activeGroupId, setActiveGroupId] = useState(null)
     const [prevDnd, setPrevDnd] = useState(null)
-
-    const getItems = useCallback((item) => {
-        let arr = []
-        const amount = item?.activities.length || 0
-        for (let i = 0; i < amount; i++) {
-            let items = Shared.GetItemById(activities, item.activities[i]._id)
-            items = {
-                ...items,
-                activities: getItems(items)
-            }
-            arr.push(items)
-        }
-        return arr
-    }, [activities])
 
     const [containers, setContainers] = useState([])
     useEffect(() => {
         if (state.currentProject) {
             const project = Shared.GetItemById(projects, state.currentProject)
             if (activities.length === project.dndCount) {
-                const groups = getItems(project)
-                const tree = {
-                    ...project,
-                    activities: groups
-                }
-                // setContainers(tree)
-                setContainers([...tree.activities])
+                setContainers([...project.activities])
             }
         }
-    }, [getItems, projects, activities, state.currentProject])
+    }, [projects, activities, state.currentProject])
 
-    const saveDndUpdate = (type, containerId, array) => {
-        setData({action: "dnd", item: {type, containerId, array}})
+    const saveDndUpdate = () => {
+        const project = {
+            ...Shared.GetItemById(projects, state.currentProject),
+            activities: containers
+        }
+        setData({action: "edit", item: project})
     }
 
     // DND Handlers
@@ -89,10 +72,6 @@ const Projects = ({
         const { active } = event
         const { id } = active
         setActiveId(id)
-        if (findValueOfContainer(id, 'Item')) {
-            const container = findValueOfContainer(id, 'Item')?._id || null
-            setActiveGroupId(container)
-        }
         setPrevDnd(containers)
     }
 
@@ -135,11 +114,10 @@ const Projects = ({
             if (activeContainerIndex === overContainerIndex) {
                 let newItems = [...containers]
                 newItems[activeContainerIndex].activities = arrayMove(
-                newItems[activeContainerIndex].activities,
-                activeitemIndex,
-                overitemIndex,
+                    newItems[activeContainerIndex].activities,
+                    activeitemIndex,
+                    overitemIndex,
                 )
-
                 setContainers(newItems)
             }
             else {
@@ -216,9 +194,7 @@ const Projects = ({
                 (container) => container._id === over.id,
             )
             // Swap the active and over container
-            let newItems = [...containers]
-            newItems = arrayMove(newItems, activeContainerIndex, overContainerIndex)
-
+            const newItems = arrayMove(containers, activeContainerIndex, overContainerIndex)
             setContainers(newItems)
         }
     }
@@ -228,58 +204,12 @@ const Projects = ({
         const { active, over } = event
         if (!over) {
             setContainers(prevDnd)
-            setActiveGroupId(null)
-            setActiveId(null)
-            return
-        }
-
-        const overGroup = findValueOfContainer(over.id, 'Item')
-        const overGroupId = overGroup ? overGroup._id : null
-
-        // Handle Items Sorting
-        if (
-            activeGroupId &&
-            active &&
-            over &&
-            activeGroupId === overGroupId
-        ) {
-            // console.log("Handle Items Sorting")
-
-            const items = findValueOfContainer(activeGroupId, 'Group').activities
-            saveDndUpdate("sort", activeGroupId, items)
-        }
-
-        // Handling Item Drop Into a Container
-        if (
-            activeGroupId &&
-            active &&
-            over &&
-            activeGroupId !== overGroupId
-        ) {
-            // console.log("Handling Item Drop Into a Container")
-
-            const items = {
-                from: findValueOfContainer(activeGroupId, 'Group').activities,
-                to: findValueOfContainer(overGroupId, 'Group').activities
-            }
-            const ids = {
-                from: activeGroupId,
-                to: overGroupId
-            }
-            saveDndUpdate("drop", ids, items)
-        }
-
-        // Handling Container Sorting
-        if (
-            !activeGroupId &&
-            active &&
-            over
-        ) {
-            // console.log("Handling Container Sorting")
-            saveDndUpdate("sort", state.currentProject, containers)
         }
         
-        setActiveGroupId(null)
+        if (active && over) {
+            saveDndUpdate()
+        }
+        
         setActiveId(null)
     }
 
@@ -289,9 +219,9 @@ const Projects = ({
                 return (
                     <Shared.ItemTiles
                         userData={userData}
-                        data={projects}
-                        setData={setData}
+                        projects={projects}
                         activities={activities}
+                        setData={setData}
                         state={state}
                         setState={setState}
                         itemsToDisplay={containers}
@@ -308,9 +238,9 @@ const Projects = ({
                         key={item._id}
                         
                         userData={userData}
-                        data={projects}
-                        setData={setData}
+                        projects={projects}
                         activities={activities}
+                        setData={setData}
                         state={state}
                         setState={setState}
                         item={item}
@@ -328,9 +258,9 @@ const Projects = ({
                         key={i._id}
                         
                         userData={userData}
-                        data={projects}
-                        setData={setData}
+                        projects={projects}
                         activities={activities}
+                        setData={setData}
                         state={state}
                         setState={setState}
                         item={i}
@@ -366,7 +296,7 @@ const Projects = ({
                         (
                             <Shared.ItemTiles
                                 userData={userData}
-                                data={projects}
+                                projects={projects}
                                 setData={setData}
                                 state={state}
                                 setState={setState}
@@ -378,7 +308,7 @@ const Projects = ({
                         ) : (
                             <Shared.ItemTable
                                 userData={userData}
-                                data={projects}
+                                projects={projects}
                                 setData={setData}
                                 state={state}
                                 setState={setState}
