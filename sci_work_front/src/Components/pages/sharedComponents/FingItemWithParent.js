@@ -5,11 +5,11 @@ const FindItemWithParent = (items, field, target, parent) => {
             return { item, parent, index: i }
         }
         if (item.activities) {
-            const result = FindItemWithParent(item.activities, target, item)
-            if (result) return result
+            const result = FindItemWithParent(item.activities, field, target, item)
+            if (result.item) return result
         }
     }
-    return null
+    return { item: null, parent, index: null }
 }
 
 export default FindItemWithParent

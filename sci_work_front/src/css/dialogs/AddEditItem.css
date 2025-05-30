@@ -1,15 +1,22 @@
+.addEditItemDialog .dialogContent {
+  max-height: 75%;
+  overflow-y: auto;
+}
 .addEditItemDialog .dialogContent #itemType {
   margin-bottom: 4px;
 }
-.addEditItemDialog .dialogContent .formGroup {
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
+.addEditItemDialog .dialogContent .formGroup .fieldBox {
+  margin-bottom: 10px;
 }
-.addEditItemDialog .dialogContent .formGroup label {
+.addEditItemDialog .dialogContent .formGroup .fieldBox label {
+  display: block;
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 4px;
+}
+.addEditItemDialog .dialogContent .formGroup .checkboxFieldBox {
+  display: flex;
+  gap: 10px;
 }
 .addEditItemDialog .dialogContent .formGroup .listButtons {
   display: flex;

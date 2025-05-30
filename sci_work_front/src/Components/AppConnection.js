@@ -200,7 +200,7 @@ const Connection = ({
 
         if (readyState === 1) { // Check if WebSocket is open
             sendMsg("addEditData", item)
-            console.log("Sent item update:", item)
+            console.log("Sent project update:", item)
         } else {
             console.error("WebSocket is not open. Cannot send item update.")
         }
@@ -210,7 +210,7 @@ const Connection = ({
     // Trigger project update when a user modifies `projects`
     useEffect(() => {
         if (isUserUpdatingProjects) {
-            updateProjects(Shared.GetItemById(projects, isUserUpdatingProjects[0]))
+            updateProjects(Shared.GetItemById(projects, isUserUpdatingProjects))
         }
     }, [projects, updateProjects, isUserUpdatingProjects])
 
@@ -219,7 +219,7 @@ const Connection = ({
 
         if (readyState === 1) { // Check if WebSocket is open
             sendMsg("addEditData", item)
-            console.log("Sent item update:", item)
+            console.log("Sent activities update:", item)
         } else {
             console.error("WebSocket is not open. Cannot send item update.")
         }
@@ -229,9 +229,7 @@ const Connection = ({
     // Trigger project update when a user modifies `activities`
     useEffect(() => {
         if (isUserUpdatingActivities) {
-            for (let i = 0; i < isUserUpdatingActivities.length; i++) {
-                updateActivities(Shared.GetItemById(activities, isUserUpdatingActivities[i]))
-            }
+            updateActivities(Shared.GetItemById(activities, isUserUpdatingActivities))
         }
     }, [activities, updateActivities, isUserUpdatingActivities])
 

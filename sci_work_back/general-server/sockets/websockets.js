@@ -107,12 +107,29 @@ const getData = async (type, login, ws, sessionToken, _id) => {
         throw new Error(`Project not found with _id: ${_id}`)
       }
 
-      // Fetch all activities whose _id starts with `${_id}.`
-      let activities = await Collections.activity.find({
-        _id: { $regex: `^${_id}\\.` }
-      })
+      // Flatten activity tree into a flat array with full `_id` paths
+      const flattenActivities = (list, result = []) => {
+        for (const activity of list) {
+          result.push(activity)
+          if (activity.activities?.length) {
+            flattenActivities(activity.activities, result)
+          }
+        }
+        return result
+      }
 
-      activities = activities.filter(a => a.userList?.some(u => u.id === user._id.toString()))
+      // Get all accessible metadata entries
+      const allActivities = flattenActivities(project.activities)
+      const accessibleMetadata = allActivities.filter(activity =>
+        activity.userList?.some(u => u.id === user._id.toString())
+      )
+
+      // Now fetch *only* the full activity data for those the user can access
+      const activityIds = accessibleMetadata.map(a => a._id)
+      const activities = await Collections.activity.find({
+        _id: { $in: activityIds }
+      })
+      
       data = activities
       break
     }

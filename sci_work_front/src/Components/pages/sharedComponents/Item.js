@@ -33,16 +33,13 @@ const Item = ({
         opacity: (isDragging) ? 0.5 : 1
     }
 
-    const handleAddAfter = (_id) => {
-
-        const project = Shared.GetItemById(projects, state.currentProject)
-        const newId = project._id + '.' + project.dndCount
+    const handleAddAfter = () => {
 
         setState(prev => ({
             ...prev,
             currentDialog: {
                 name: 'AddEditItem',
-                params: [true, newId, index, containerId]
+                params: [true, false, index, containerId]
             }
         }))
     }
@@ -59,7 +56,7 @@ const Item = ({
                 className="add-button"
                 onClick={(e) => {
                 e.stopPropagation()
-                handleAddAfter(item._id)
+                handleAddAfter()
                 }}
             >
                 ➕

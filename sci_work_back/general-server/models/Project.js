@@ -16,13 +16,19 @@ const projectSchema = new mongoose.Schema({
       name: { type: String, required: true },
       startDate: { type: String, required: true },
       endDate: { type: String, required: true },
+      isTimed: { type: Boolean, default: false},
       startTime: { type: String, default: "00:00" },
       endTime: { type: String, default: "00:00" },
-      page: { type: Boolean, default: false },
       repeat: { type: Boolean, default: false },
       days: { type: [String], default: [] },
       thirdParty: { type: Boolean, default: false },
       serviceName: { type: String, default: null },
+      userList: [
+        {
+          id: { type: String, required: true },
+          access: { type: Number, required: true }
+        }
+      ],
       activities: { type: mongoose.Schema.Types.Mixed, default: [] }
     }
   ],

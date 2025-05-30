@@ -69,6 +69,7 @@ const App = () => {
       name: 'text',
       startDate: 'date',
       endDate: 'date',
+      isTimed: 'checkbox',
       startTime: 'time',
       endTime: 'time',
       type: 'list',
@@ -79,7 +80,13 @@ const App = () => {
     },
     lists: {
       days: { many: true, options: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']},
-      type: { many: false, options: ['group', 'text', 'chat', 'list', 'table', 'attendance', 'report', 'test']}
+      type: { many: false, options: ['Dev', 'Group', 'Text', 'Chat', 'List', 'Table', 'Attendance', 'Report', 'Test']}
+    },
+    checks: {
+      days:         {val: true, dep: "repeat"},
+      serviceName:  {val: true, dep: "thirdParty"},
+      startTime:    {val: true, dep: "isTimed"},
+      endTime:      {val: true, dep: "isTimed"},
     }
   }
 
@@ -96,10 +103,10 @@ const App = () => {
         name: '',
         startDate: '',
         endDate: '',
+        isTimed: true,
         startTime: '',
         endTime: '',
         type: 'Dev',
-        page: false,
         repeat: false,
         days: [],
         thirdParty: false,
@@ -135,25 +142,92 @@ const App = () => {
 
     //by default update data
     // let source = projects || []
-    let setter = setProjects
-    let flag = setIsUserUpdatingProjects
-    
+    let setter
+    let flag
+
+    const setPr = () => {
+      //projects
+      setter = setProjects
+      flag = setIsUserUpdatingProjects
+    }
+    const setAct = () =>  {
+      //activities
+      setter = setActivities
+      flag = setIsUserUpdatingActivies
+    }
 
     switch(action) {
       case "add": {
-        flag([item._id])
+        setPr()
+        //projects
+        if (!item._id.includes('.')) {
 
-        setter(prevItems => [ ...prevItems, item ])
+          flag(item._id)
+          setter(prevItems => [ ...prevItems, item ])
+        }
+        //activities
+        else {
+          const {containerId, index, activity} = item
+
+          let clone = Shared.GetItemById(projects, state.currentProject)
+          clone.dndCount++
+
+          const project = clone
+          if (!project) return // fallback in case project is not found
+
+          const { parent: container } = Shared.FindItemWithParent(project.activities, "_id", containerId, project)
+          if (!container) return // fallback in case container is not found
+
+          if (!container.activities) container.activities = []
+
+          if (index === false || index === null || index >= container.activities.length) {
+            // push to the end
+            container.activities.push(activity)
+          } else {
+            // insert after the index
+            container.activities.splice(index + 1, 0, activity)
+          }
+          
+          flag(clone._id)
+          setter(prevItems => 
+            prevItems.map(i =>
+              i._id === clone._id ? clone : i
+            )
+          )
+        }
         break
       }
       case "edit": {
-        flag([item._id])
-
-        setter(prevItems => 
-          prevItems.map(i => 
-            i._id === item._id ? item : i
+        setPr()
+        //project
+        if (!item._id.includes('.')) {
+          setter(prevItems => 
+            prevItems.map(i =>
+              i._id === item._id ? item : i
+            )
           )
-        )
+        }
+        //activity
+        else {
+          const project = Shared.GetItemById(projects, state.currentProject)
+          if (!project) return
+
+          const { item: target } = Shared.FindItemWithParent(project.activities, "_id", item._id, project)
+          if (!target) return
+
+          Object.assign(target, item)
+
+          setter(prevItems => 
+            prevItems.map(i =>
+              i._id === project._id ? project : i
+            )
+          )
+        }
+        break
+      }
+      case "content": {
+        setAct()
+
         break
       }
       default: {
