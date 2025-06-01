@@ -5,7 +5,7 @@ const projectSchema = new mongoose.Schema({
     _id: { type: String },
     name: { type: String, required: true },
     template: { type: String, default: "none" },
-    content: { type: mongoose.Schema.Types.Mixed, required: false }
+    content: { type: mongoose.Schema.Types.Mixed, required: true }
 })
 
 // Export the Activity model

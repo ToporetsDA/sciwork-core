@@ -131,7 +131,7 @@ const App = () => {
   //connection
 
   const [isUserUpdatingProjects, setIsUserUpdatingProjects] = useState(false)
-  const [isUserUpdatingActivities, setIsUserUpdatingActivies] = useState([])
+  const [isUserUpdatingActivities, setIsUserUpdatingActivies] = useState(false)
   const [isUserUpdatingUserData, setIsUserUpdatingUserData] = useState(false)
 
   const [users, setUsers] = useState()
@@ -201,6 +201,7 @@ const App = () => {
         setPr()
         //project
         if (!item._id.includes('.')) {
+          flag(item._id)
           setter(prevItems => 
             prevItems.map(i =>
               i._id === item._id ? item : i
@@ -217,6 +218,7 @@ const App = () => {
 
           Object.assign(target, item)
 
+          flag(item._id)
           setter(prevItems => 
             prevItems.map(i =>
               i._id === project._id ? project : i
@@ -234,7 +236,7 @@ const App = () => {
         console.log("No such action to updateData")
       }
     }
-    console.log("from updateData: ", data)
+    // console.log("from updateData: ", data)
   }
 
   const updateUser = (newData, currentSettingsEdit) => {
@@ -355,6 +357,10 @@ const App = () => {
   
   // Run the timer hook every set minutes
   useTimer(checkActivities, period, delay, isLoggedIn)
+
+  useEffect(() => {
+    console.log("change in activities", activities)
+  }, [activities])
 
   //Html
   return (

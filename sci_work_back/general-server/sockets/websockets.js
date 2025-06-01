@@ -20,6 +20,22 @@ const send = (ws, message, sessionToken, type, data) => {
   ws.send(JSON.stringify({ message, sessionToken, data: { type, data } }))
 }
 
+//methods
+const FindItemWithParent = (items, field, target, parent) => {
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
+    if (item[field] === target) {
+      return { item, parent, index: i }
+    }
+    if (item.activities) {
+      const result = FindItemWithParent(item.activities, field, target, item)
+      if (result.item) return result
+    }
+  }
+  return { item: null, parent, index: null }
+}
+
+//response handler
 const getData = async (type, login, ws, sessionToken, _id) => {
 
   let data
@@ -133,6 +149,22 @@ const getData = async (type, login, ws, sessionToken, _id) => {
       data = activities
       break
     }
+    case "activity": {
+      
+      // Fetch Fetch user by login
+      const user = await Collections.user.findOne(login)
+      if (!user) {
+        throw new Error(`User not found for login: ${login}`)
+      }
+
+      const activity = await Collections.activity.findById(_id)
+      if (!activity) {
+        throw new Error(`Activity not found with _id: ${_id}`)
+      }
+      
+      data = activity
+      break
+    }
     case "organisation": {
       // Fetch organisation with name "default"
       const organisation = await Collections.organisation.findOne({ name: "default" })
@@ -157,6 +189,119 @@ const getData = async (type, login, ws, sessionToken, _id) => {
     }
   }
   send(ws, "data", sessionToken, type, data)
+}
+
+//case handlers
+const handleAddEdit = async (sessionToken, updatedItem, itemId, type) => {
+  try {
+    // 1. Fetch the original project BEFORE updating
+    const originalProject = await Collections.project.findById(itemId)
+    if (!originalProject) {
+      console.error(`Original project with ID ${itemId} not found.`)
+      return
+    }
+
+    const originalDndCount = originalProject.dndCount
+
+    // 2. Perform the update
+    const item = await Collections[type].findByIdAndUpdate(itemId, updatedItem, { new: true, upsert: true })
+    if (!item) {
+      console.error(`Failed to update ${type} with ID ${itemId}.`)
+      return
+    }
+
+    console.log(`Item ${itemId} updated successfully.`)
+
+    // 3. Check if activity was added
+    if (
+      type === "project" &&
+      typeof originalDndCount === "number" &&
+      item.dndCount === originalDndCount + 1
+    ) {
+      const newActivityId = item._id + '.' + (item.dndCount - 1)
+
+      // Use the metadata tree to locate the new activity
+      const { item: newMetaActivity } = FindItemWithParent(updatedItem.activities, '_id', newActivityId, updatedItem)
+
+      if (newMetaActivity) {
+        // 4. Insert a new document into the activity collection
+        await Collections.activity.create({
+          _id: newMetaActivity._id,
+          name: newMetaActivity.name,
+          template: "none",
+          content: {}
+        })
+
+        const socket = clients.get(sessionToken).socket
+        const login = clients.get(sessionToken).login
+
+        getData("activity", {login}, socket, sessionToken, newMetaActivity._id)
+
+        console.log(`New activity created in DB: ${newActivityId}`)
+      } else {
+        console.warn(`New metadata activity ${newActivityId} not found in tree.`)
+      }
+    }
+
+    // 5. Broadcast the updated project to all relevant users except the sender
+    if (!item.userList || !Array.isArray(item.userList)) {
+      console.error("Error: item.userList is either undefined or not an array.")
+      return
+    }
+
+    for (const user of item.userList) {
+      const objectId = new ObjectId(user.id)
+
+      const userData = await Collections.user.findById(objectId)
+      if (!userData) {
+        console.error(`No user found with ID: ${user.id}`)
+        continue
+      }
+
+      // Find session token for this login
+      const targetClientToken = [...clients.entries()].find(([_, v]) => v.login === userData.login)?.[0]
+      if (!targetClientToken) {
+        console.error(`No client found with login: ${userData.login}`)
+        continue
+      }
+
+      const targetClient = clients.get(targetClientToken)
+      if (!targetClient || targetClient.login === clients.get(sessionToken).login) continue
+
+      if (targetClient.socket.readyState === WebSocket.OPEN) {
+        console.log(`Notifying client: ${targetClient.login}`)
+        getData("project", { login: targetClient.login }, targetClient.socket, targetClientToken, item._id)
+      }
+    }
+
+  } catch (err) {
+    console.error(`Error in handleAddEdit: ${err.message}`)
+  }
+}
+
+const handleEditUser = (sessionToken, updatedUserData, userId) => {
+
+  Collections.user.findByIdAndUpdate(userId, updatedUserData, { new: true })
+    .then((user) => {
+      if (!user) {
+        console.error(`Failed to update user with ID ${userId}.`)
+        return
+      }
+      console.log(`User ${userId} updated successfully.`)
+
+      // Ensure the user is not the sender before broadcasting the update
+      const senderLogin = clients.get(sessionToken).login
+
+      // Notify relevant WebSocket client (not the sender)
+      const targetClient = clients.get(user.login)?.socket
+
+      if (user.login !== senderLogin && targetClient.readyState === WebSocket.OPEN) {
+        send(targetClient, "addEdit", sessionToken, "user", user)
+      }
+    })
+    .catch((err) => {
+      console.error(`Error updating user with ID ${userId}:`, err.message)
+    })
 }
 
 // start the WebSocket server
@@ -204,91 +349,16 @@ const startWebSocketServer = (port) => {
           case "addEditData": {
             const updatedItem = parsedMessage.data
             const itemId = updatedItem._id || new mongoose.Types.ObjectId()
-
             const type = (itemId.includes(".")) ? "activity" : "project"
             
-            // Update project in the database
-            Collections[type].findByIdAndUpdate(itemId, updatedItem, { new: true, upsert: true })
-            .then(item => {
-              if (!item) {
-                console.error(`Failed to update project with ID ${itemId}.`)
-                return
-              }
-              console.log(`Item ${itemId} updated successfully.`)
-
-              // Broadcast the updated project to all relevant users except the sender
-              if (!item.userList || !Array.isArray(item.userList)) {
-                console.error("Error: item.userList is either undefined or not an array.")
-                return
-              }
-              item.userList.forEach(user => {
-                const objectId = new ObjectId(user.id)
-                // Fetch user data from the database to get login
-                Collections.user.findById(objectId)
-                .then(userData => {
-                  if (!userData) {
-                    console.error(`No user found with ID: ${user.id}`)
-                    return
-                  }
-                  // Iterate over the clients map to find the sessionToken where the login matches
-                  let targetClientToken = null
-                  for (let [key, value] of clients) {
-                    if (value.login === userData.login) {
-                      targetClientToken = key // Found the sessionToken corresponding to userData.login
-                      break // Exit loop after finding the match
-                    }
-                  }
-            
-                  // If the sessionToken was found, proceed with the WebSocket logic
-                  if (!targetClientToken) {
-                    console.error(`No client found with login: ${userData.login}`)
-                  }
-                  const targetClientWs = clients.get(targetClientToken).socket
-                  const targetClientLogin = clients.get(targetClientToken).login
-          
-                  // Ensure this is not the sender and the target client is ready
-                  if (userData.login !== clients.get(sessionToken).login && targetClientWs.readyState === WebSocket.OPEN) {
-                    console.log(targetClientLogin)
-                    // Send the data to the target client
-                    getData("project", {login: targetClientLogin}, targetClientWs, targetClientToken, item._id)
-                  }
-                })
-                .catch(userErr => {
-                  console.error(`Error fetching user data for ID ${user.id}:`, userErr.message)
-                })
-              })
-            })
-            .catch(err => {
-              console.error(`Error updating project: ${err.message}`)
-            })
+            handleAddEdit(sessionToken, updatedItem, itemId, type)
             break
           }
           case "addEditUser": {
             const updatedUserData = parsedMessage.data
             const userId = updatedUserData._id
-            console.log(updatedUserData, userId)
         
-            Collections.user.findByIdAndUpdate(userId, updatedUserData, { new: true })
-            .then((user) => {
-              if (!user) {
-                console.error(`Failed to update user with ID ${userId}.`)
-                return
-              }
-              console.log(`User ${userId} updated successfully.`)
-
-              // Ensure the user is not the sender before broadcasting the update
-              const senderLogin = clients.get(sessionToken).login
-
-              // Notify relevant WebSocket client (not the sender)
-              const targetClient = clients.get(user.login)?.socket
-
-              if (user.login !== senderLogin && targetClient.readyState === WebSocket.OPEN) {
-                send(targetClient, "addEdit", sessionToken, "user", user)
-              }
-            })
-            .catch((err) => {
-              console.error(`Error updating user with ID ${userId}:`, err.message)
-            })
+            handleEditUser(sessionToken, updatedUserData, userId)
             break
           }
           default: {

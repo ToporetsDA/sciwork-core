@@ -127,6 +127,23 @@ const Connection = ({
                     setActivities(data)
                     break
                 }
+                case "activity": {
+                    //edit
+                    if (Shared.GetItemById(activities, data._id)?._id) {
+                        console.log("edit activity subcase")
+                        setActivities(prevActivities =>
+                            prevActivities.map(act =>
+                                act._id === data._id ? data : act
+                            )
+                        )
+                    }
+                    //add
+                    else {
+                        console.log("add activity subcase", [...activities, data])
+                        setActivities(prevActivities => [...prevActivities, data])
+                    }
+                    break
+                }
                 case "delete": {//just _id
                     Shared.DeleteItem(currentData, setProjects, data._id)
                     break
@@ -184,7 +201,7 @@ const Connection = ({
         } catch (error) {
             console.error("Error processing message:", error.message)
         }
-    }, [projects, setProjects, setActivities, setLoggedIn, setRights, setUsers, setUserData])
+    }, [projects, setProjects, activities, setActivities, setLoggedIn, setRights, setUsers, setUserData])
 
     //send update ONLY when page changes
     const lastSentProject = useRef(null)
