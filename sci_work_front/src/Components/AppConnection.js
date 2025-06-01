@@ -99,97 +99,64 @@ const Connection = ({
         
                 // You can handle the data based on the type (user, projects, etc.)
                 switch (type) {
-                case "all": {
-                    setUserData(data.user)
-                    console.log(data.items)
-                    setProjects(data.items)
-                    setRights(data.organisation.rights)
-                    setUsers(data.users)
-                    break
-                }
-                case "user": {
-                    setUserData(data)
-                    break
-                }
-                case "data": {
-                    setProjects(data)
-                    break
-                }
-                case "project": {
-                    const updatedData = currentData.map(item =>
-                        item._id === data._id ? data : item
-                    )
-                    setProjects(updatedData)
-                    break
-                }
-                case "activities": {//add along with activity templates
-                    console.log("activities", data)
-                    setActivities(data)
-                    break
-                }
-                case "activity": {
-                    //edit
-                    if (Shared.GetItemById(activities, data._id)?._id) {
-                        console.log("edit activity subcase")
-                        setActivities(prevActivities =>
-                            prevActivities.map(act =>
-                                act._id === data._id ? data : act
-                            )
+                    case "all": {
+                        setUserData(data.user)
+                        console.log(data.items)
+                        setProjects(data.items)
+                        setRights(data.organisation.rights)
+                        setUsers(data.users)
+                        break
+                    }
+                    case "users": {
+                        setUsers(data)
+                        break
+                    }
+                    case "user": {
+                        setUserData(data)
+                        break
+                    }
+                    case "data": {
+                        setProjects(data)
+                        break
+                    }
+                    case "project": {
+                        const updatedData = currentData.map(item =>
+                            item._id === data._id ? data : item
                         )
+                        setProjects(updatedData)
+                        break
                     }
-                    //add
-                    else {
-                        console.log("add activity subcase", [...activities, data])
-                        setActivities(prevActivities => [...prevActivities, data])
+                    case "activities": {//add along with activity templates
+                        console.log("activities", data)
+                        setActivities(data)
+                        break
                     }
-                    break
-                }
-                case "delete": {//just _id
-                    Shared.DeleteItem(currentData, setProjects, data._id)
-                    break
-                }
-                case "organisation": {
-                    setRights(data.organisation.rights)
-                    break
-                }
-                case "users": {
-                    setUsers(data)
-                    break
-                }
-                default: {
-                    console.log("Unknown data type:", type)
-                }
-                }
-                break
-            }
-            case "addEdit": {
-                const { type, data: fetchedData } = response.data
-        
-                console.log("Received data type:", type)
-                console.log("Updated:", fetchedData)
-        
-                // You can handle the data based on the type (user, projects, etc.)
-                switch (type) {
-                case"item": {
-                    const item = fetchedData
-                    if (projects.find(d => d._id === item._id).length === 0) {
-                    setProjects(prevData => ({ ...prevData, item }))
+                    case "activity": {
+                        //edit
+                        if (Shared.GetItemById(activities, data._id)?._id) {
+                            setActivities(prevActivities =>
+                                prevActivities.map(act =>
+                                    act._id === data._id ? data : act
+                                )
+                            )
+                        }
+                        //add
+                        else {
+                            setActivities(prevActivities => [...prevActivities, data])
+                        }
+                        break
                     }
-                    else {
-                        setProjects(prevData => 
-                            prevData.map(d => 
-                            d._id === item._id ? item : d
-                        ))
+                    case "delete": {//just _id
+                        Shared.DeleteItem(currentData, setProjects, data._id)
+                        break
                     }
-                    break
-                }
-                case"user": {
-                    setUserData(fetchedData)
-                    break
-                }
-                default: {
-
-                }
+                    case "organisation": {
+                        setRights(data.organisation.rights)
+                        break
+                    }
+                    default: {
+                        console.log("Unknown data type:", type)
+                    }
                 }
                 break
             }
@@ -212,61 +179,30 @@ const Connection = ({
         lastSentProject.current = state.currentPage
     }, [sendMsg, state.currentPage, state.currentProject, state.currentActivity, isLoggedIn])
 
-    // Track user-initiated changes to `projects`
-    const updateProjects = useCallback((item) => {
+    // Track user-initiated changes to data
+    const updateByUser = useCallback((item, toDo, itemType) => {
 
         if (readyState === 1) { // Check if WebSocket is open
-            sendMsg("addEditData", item)
-            console.log("Sent project update:", item)
+            sendMsg(toDo, item)
+            console.log("Sent update:", item)
         } else {
-            console.error("WebSocket is not open. Cannot send item update.")
+            console.error(`WebSocket is not open. Cannot send ${itemType} update.`)
         }
 
     }, [readyState, sendMsg])
 
-    // Trigger project update when a user modifies `projects`
+    // Trigger user-initiated updates
     useEffect(() => {
         if (isUserUpdatingProjects) {
-            updateProjects(Shared.GetItemById(projects, isUserUpdatingProjects))
+            updateByUser(Shared.GetItemById(projects, isUserUpdatingProjects), "addEditData", "metadata")
         }
-    }, [projects, updateProjects, isUserUpdatingProjects])
-
-    // Track user-initiated changes to `activities`
-    const updateActivities = useCallback((item) => {
-
-        if (readyState === 1) { // Check if WebSocket is open
-            sendMsg("addEditData", item)
-            console.log("Sent activities update:", item)
-        } else {
-            console.error("WebSocket is not open. Cannot send item update.")
-        }
-
-    }, [readyState, sendMsg])
-
-    // Trigger project update when a user modifies `activities`
-    useEffect(() => {
         if (isUserUpdatingActivities) {
-            updateActivities(Shared.GetItemById(activities, isUserUpdatingActivities))
+            updateByUser(Shared.GetItemById(activities, isUserUpdatingActivities), "addEditContent", "content")
         }
-    }, [activities, updateActivities, isUserUpdatingActivities])
-
-    // Track user-initiated changes to `userData`
-    const updateUser = useCallback((updatedUserData) => {
-
-        if (readyState === 1) { // Check if WebSocket is open
-            sendMsg("addEditUser", updatedUserData)
-            console.log("Sent user update:", updatedUserData)
-        } else {
-            console.error("WebSocket is not open. Cannot send user update.")
-        }
-    }, [readyState, sendMsg])
-
-    // Trigger user update when a user modifies `userData`
-    useEffect(() => {
         if (isUserUpdatingUserData) {
-            updateUser(userData) // Pass session token and updated user data
+            updateByUser(userData, "addEditUser", "user")
         }
-    }, [userData, updateUser, isUserUpdatingUserData])
+    }, [projects, activities, userData, updateByUser, isUserUpdatingProjects, isUserUpdatingActivities, isUserUpdatingUserData])
 
     //on login
     const loginToServer = async (formValues) => {

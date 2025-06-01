@@ -20,22 +20,18 @@ const Group = ({
         <div
             className='group-wrapper'    
         >
-            {/* <Items.Text
+            {<Items.Text
                 key={item._id}
                 userData={userData}
-                data={data}
-                setData={setData}
+                projects={projects}
                 activities={activities}
-                setActivities={setActivities}
+                setData={setData}
                 state={state}
                 setState={setState}
                 item={item}
-                index={index}
+                data={"name"}
                 rights={rights}
-                recentActivities={recentActivities}
-                setRecentActivities={setRecentActivities}
-            /> */}
-            this is group
+            />}
             <Shared.ItemTiles
                 userData={userData}
                 projects={projects}

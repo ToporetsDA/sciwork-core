@@ -262,7 +262,7 @@ const ControlPanel = ({
                         ...prevState,
                         currentDialog: {
                             name: 'AddEditItem',
-                            params: [true, false]},
+                            params: [true, false]}
                     }))
                 }}>
                     New Project

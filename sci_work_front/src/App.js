@@ -229,7 +229,23 @@ const App = () => {
       }
       case "content": {
         setAct()
+        const { type, activity } = item
 
+        switch(type) {
+          case "Text": {
+            flag(activity._id)
+            setter(prevItems => 
+              prevItems.map(i =>
+                i._id === activity._id ? activity : i
+              )
+            )
+            break
+          }
+          default: {
+            console.warn("No such activity type")
+          }
+        }
+        
         break
       }
       default: {
@@ -357,10 +373,6 @@ const App = () => {
   
   // Run the timer hook every set minutes
   useTimer(checkActivities, period, delay, isLoggedIn)
-
-  useEffect(() => {
-    console.log("change in activities", activities)
-  }, [activities])
 
   //Html
   return (
