@@ -241,6 +241,10 @@ const App = () => {
             )
             break
           }
+          case "List": {
+            console.log("change in list", activity)
+            break
+          }
           default: {
             console.warn("No such activity type")
           }

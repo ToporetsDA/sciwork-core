@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import '../../css/Items/Project.css'
+import '../../css/items/Project.css'
 
 import * as Shared from '../pages/sharedComponents'
 

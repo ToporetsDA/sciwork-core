@@ -2,8 +2,8 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import '../../../css/pages/sharedComponents/Item.css'
 
-import * as Shared from './'
-import * as Items from '../../Items'
+import * as Items from '../../items'
+import * as SubItems from '../../items/subItems'
 
 const Item = ({
     userData,
@@ -18,7 +18,7 @@ const Item = ({
     recentActivities, setRecentActivities
 }) => {
     
-    const ItemComponent = Items[item.type]
+    const ItemComponent = (item !== true) ? ((item._id.split('.').length === 2) ? Items[item.type] : SubItems[item.type]) : null
 
     const {attributes, listeners, setNodeRef, transform, transition, isDragging} = useSortable({
         id: item._id, 

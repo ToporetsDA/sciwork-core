@@ -1,4 +1,4 @@
-import { useCallback, useMemo }  from 'react'
+import { useMemo }  from 'react'
 import '../../css/dialogs/AddEditUserList.css'
 import '../../css/dialogs/dialog.css'
 
@@ -24,18 +24,14 @@ const AddEditUserList = ({ userData, setUserData, projects, activities, setData,
         return Shared.GetItemById(projects, state.currentProject).userList || []
     }, [projects, state.currentProject])
 
-    const getAccess = useCallback((user, userList) => {
-        return userList.find(listItem => listItem.id === user._id)?.access
-    }, [])
-
     const usersWithAccess = useMemo(() => {
         return users.filter(user => userList.some(listItem => listItem.id === user._id))
             .map(user => {
                 console.log("userList", userList)
-                const userAccess = getAccess(user, userList)
+                const userAccess = Shared.GetAccess({userList}, user)
                 return { ...user, access: userAccess }
             });
-    }, [users, userList, getAccess])
+    }, [users, userList])
 
     const usersWithoutAccess = useMemo(() => {
         return users.filter(user => !userList.some(listItem => listItem.id === user._id))
@@ -105,7 +101,7 @@ const AddEditUserList = ({ userData, setUserData, projects, activities, setData,
                             <div key={user._id} className="userItem" >
                                 <span>{getFullName(user)}</span>
                                 { (user.access !== 0) && 
-                                  (getAccess(userData, userList) < user.access) &&
+                                  (Shared.GetAccess({userList}, userData) < user.access) &&
                                 <>
                                     <select
                                         value={user.access}

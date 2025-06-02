@@ -249,8 +249,9 @@ const ControlPanel = ({
             }
             {(state.currentPage === "Projects") &&
                 <Shared.ToggleButton
-                    userData={userData}
-                    setUserData={setUserData}
+                    data={userData.currentSettings}
+                    setter={setUserData}
+                    field={"displayProjects"}
                     displayOptions={displayOptions}
                 />
             }

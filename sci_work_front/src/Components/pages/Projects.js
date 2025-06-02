@@ -216,6 +216,7 @@ const Projects = ({
     const getItemTiles = (content, item) => {
         switch(content) {
             case "tiles": {
+                const items = (state.currentPage === "Projects") ? itemsToDisplay.projects : containers
                 return (
                     <Shared.ItemTiles
                         userData={userData}
@@ -224,7 +225,7 @@ const Projects = ({
                         setData={setData}
                         state={state}
                         setState={setState}
-                        itemsToDisplay={containers}
+                        itemsToDisplay={items}
                         containerId={state.currentProject}
                         rights={rights}
                         recentActivities={recentActivities}
@@ -294,17 +295,7 @@ const Projects = ({
                     <Suspense fallback={<div>Loading projects...</div>}>
                         {displayOptions.get(userData.currentSettings.displayProjects) !== 'table' ?
                         (
-                            <Shared.ItemTiles
-                                userData={userData}
-                                projects={projects}
-                                setData={setData}
-                                state={state}
-                                setState={setState}
-                                itemsToDisplay={itemsToDisplay.projects}
-                                rights={rights}
-                                recentActivities={recentActivities}
-                                setRecentActivities={setRecentActivities}
-                            />
+                            getItemTiles("tiles")
                         ) : (
                             <Shared.ItemTable
                                 userData={userData}

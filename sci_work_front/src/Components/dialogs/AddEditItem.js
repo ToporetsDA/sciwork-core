@@ -206,6 +206,30 @@ const AddEditItem = ({
         return errors
     }
 
+    const formatFormValues = (values) => {
+        const formatted = {}
+
+        for (const key in values) {
+            const value = values[key]
+            console.log("itemStructure", itemStructure)
+            const field = itemStructure.lists[key]
+
+            if (!field) {
+                formatted[key] = value
+                continue
+            }
+
+            if (field.many === false && Array.isArray(value)) {
+                formatted[key] = value[0] ?? null
+            }
+            else {
+                formatted[key] = value
+            }
+        }
+
+        return formatted
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault()
 
@@ -218,9 +242,10 @@ const AddEditItem = ({
         }
 
         const project = Shared.GetItemById(projects, state.currentProject)
+        const formattedFormValues = formatFormValues(formValues)
 
         let newItem = {
-            ...formValues,
+            ...formattedFormValues,
             _id: currentItemId
                 ? currentItemId
                 : selectedType === "Project"
@@ -244,7 +269,7 @@ const AddEditItem = ({
         if (selectedType === "Project") {
             //edit
             if (currentItemId) {
-                item = { ...currentItem, ...formValues }
+                item = { ...currentItem, ...formattedFormValues }
             }
             //add
             else {
@@ -258,11 +283,12 @@ const AddEditItem = ({
                 
                 const target = container.activities.find(act => act._id === currentItemId)
                 if (target) {
-                    Object.assign(target, formValues)
+                    Object.assign(target, formattedFormValues)
                 }
+                
                 item = {
                     ...target,
-                    ...formValues
+                    ...formattedFormValues
                 }
             }
             //add

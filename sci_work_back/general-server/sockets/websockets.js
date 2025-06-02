@@ -257,6 +257,8 @@ const handleAddEdit = async (sessionToken, updatedItem, itemId, type) => {
         return
       }
 
+      console.log("meta activity", metaActivity)
+
       userList = metaActivity.userList
     }
 

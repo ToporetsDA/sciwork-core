@@ -3,7 +3,7 @@ import { SortableContext } from '@dnd-kit/sortable'
 import '../../../css/pages/sharedComponents/ItemTiles.css'
 
 import * as Shared from './'
-import * as Items from '../../Items'
+import * as Items from '../../items'
 
 const ItemTiles = ({
     userData,
@@ -16,72 +16,46 @@ const ItemTiles = ({
     rights,
     recentActivities, setRecentActivities
 }) => {
+
+    const getItem = (item, index, dnd) => {
+        const Component = (dnd) ? Shared.Item : Items.Project
+        return (
+            <Component
+                key={item._id}
+                
+                userData={userData}
+                projects={projects}
+                activities={activities}
+                setData={setData}
+                state={state}
+                setState={setState}
+                item={item}
+                index={index}
+                containerId={containerId}//
+                rights={rights}
+                recentActivities={recentActivities}
+                setRecentActivities={setRecentActivities}
+            />
+        )
+    }
     
     return (
         <>
             {(state.currentPage === "Projects" /*|| !rights.edit.includes(getAccess(container))*/) ?
                 (
-                    <>
-                        {itemsToDisplay.map((item, index) => {
-                            return (
-                                <Items.Project
-                                    key={item._id}
-                                    
-                                    userData={userData}
-                                    projects={projects}
-                                    activities={activities}
-                                    setData={setData}
-                                    state={state}
-                                    setState={setState}
-                                    item={item}
-                                    index={index}
-                                    rights={rights}
-                                    recentActivities={recentActivities}
-                                    setRecentActivities={setRecentActivities}
-                                />
-                            )
-                        })}
-                    </>
+                    itemsToDisplay.map((item, index) => (
+                        getItem(item, index, false)
+                    ))
                 ) : (
                     <div
                         className="item-tiles"
                     >
                         <SortableContext items={itemsToDisplay.map((i) => i._id)}>
                             {itemsToDisplay.map((item, index) => (
-                                <Shared.Item
-                                    key={item._id}
-                                    
-                                    userData={userData}
-                                    projects={projects}
-                                    activities={activities}
-                                    setData={setData}
-                                    state={state}
-                                    setState={setState}
-                                    item={item}
-                                    index={index}
-                                    containerId={containerId}
-                                    rights={rights}
-                                    recentActivities={recentActivities}
-                                    setRecentActivities={setRecentActivities}
-                                />
+                                getItem(item, index, true)
                             ))}
                             {itemsToDisplay.length === 0 &&
-                                <Shared.Item
-                                    key={`${containerId}.0`}
-                                    
-                                    userData={userData}
-                                    projects={projects}
-                                    activities={activities}
-                                    setData={setData}
-                                    state={state}
-                                    setState={setState}
-                                    item={true}
-                                    index={0}
-                                    containerId={containerId}
-                                    rights={rights}
-                                    recentActivities={recentActivities}
-                                    setRecentActivities={setRecentActivities}
-                                />
+                                getItem(true, 0, true)
                             }
                         </SortableContext>
                     </div>

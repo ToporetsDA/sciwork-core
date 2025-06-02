@@ -1,7 +1,19 @@
-import '../../css/Items/Group.css'
+import '../../css/items/Group.css'
 
 import * as Shared from '../pages/sharedComponents'
 import * as Items from './'
+
+/*structure
+activity: {
+    _id
+    name
+    template
+    content: {
+        currentSettings: {}
+        name
+    }
+}
+*/
 
 const Group = ({
     userData,

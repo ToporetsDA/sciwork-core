@@ -3,7 +3,7 @@ import * as Shared from './'
 const ItemActions = ({userData, projects, setData, setState, item, rights}) => {
 
     const getAccess = (item) => {
-        return item.userList?.find(user => user.id === userData._id)?.access || 0
+        return item.userList?.find(user => user.id === userData._id)?.access || -1
     }
 
     return (

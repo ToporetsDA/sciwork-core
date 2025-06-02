@@ -1,25 +1,28 @@
 import { useState, useEffect } from 'react'
 
-const ToggleButton = ({userData, setUserData, displayOptions}) => {
+import '../../../css/pages/sharedComponents/ToggleButton.css'
 
-    const [currentDisplayOption, setCurrentDisplayOption] = useState(userData.currentSettings.displayProjects)
+const ToggleButton = ({data, setter, field, displayOptions}) => {
+
+    console.log(data, data[field])
+    const [currentOption, setCurrentOption] = useState(data[field])
 
     const handleDisplayOptionSelect = (option) => {
-        setUserData({ displayProjects: option}, true)
+        setter({ [field]: option}, true)
     }
 
     useEffect(() => {
-        if (userData) {
-            setCurrentDisplayOption(userData.currentSettings.displayProjects)
+        if (data) {
+            setCurrentOption(data[field])
         }
-    }, [userData])
+    }, [data, field])
     
     return (
-        <div className='displayProjects'>
+        <div className='toggle-wrapper'>
             {displayOptions.map((option) => (
                 <button
                 key={option}
-                className={`toggle-btn ${currentDisplayOption === option ? 'active' : ''}`}
+                className={`toggle-btn ${currentOption === option ? 'active' : ''}`}
                 onClick={() => handleDisplayOptionSelect(option)}
                 >
                 {option}
