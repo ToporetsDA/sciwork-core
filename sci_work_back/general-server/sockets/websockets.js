@@ -191,6 +191,66 @@ const getData = async (type, login, ws, sessionToken, _id) => {
   send(ws, "data", sessionToken, type, data)
 }
 
+const templates = {
+  group: {},
+  text: {},
+  list: {
+    attendance: {
+      startTime: "00:00",
+      endTime: "00:00",
+      useLate: false,
+      mark: ["present", "missing"] // if (useLate) ["present", "Late", "missing"]
+    }
+  }
+}
+
+//activities's content
+const getActivityContent = (type) => {
+
+  let content = {}
+
+  switch(type) {
+    case "Group": {
+      content = {
+        currentSettings: {},
+        name: "Group name"
+      }
+      break
+    }
+    case "Text": {
+      content = {
+        currentSettings: {},
+        text: "text"
+      }
+      break
+    }
+    case "List": {
+      content = {
+        currentSettings: {
+            type: "ul"
+        },
+        listItems: [],
+        liStructure: {
+          text: "html"
+        }
+      }
+      break
+    }
+    // case "": {
+    //   content = {
+    //     currentSettings: {}
+    //   }
+    //   break
+    // }
+    default: {
+      content = {
+        currentSettings: {}
+      }
+    }
+  }
+  return content
+}
+
 //case handlers
 const handleAddEdit = async (sessionToken, updatedItem, itemId, type) => {
   try {
@@ -229,7 +289,10 @@ const handleAddEdit = async (sessionToken, updatedItem, itemId, type) => {
           _id: newMetaActivity._id,
           name: newMetaActivity.name,
           template: "none",
-          content: {}
+          content: {
+            name: newMetaActivity.name,
+            ...getActivityContent(newMetaActivity.type)
+          }
         })
 
         const socket = clients.get(sessionToken).socket

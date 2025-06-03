@@ -3,7 +3,7 @@ import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, } fro
 import { arrayMove, SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 
 import * as Shared from '../pages/sharedComponents'
-import * as SubItems from './subItems'
+import * as Items from './'
 
 /*structure
 activity: {
@@ -15,10 +15,11 @@ activity: {
             type
         }
         listItems: [{
-            type
-            ...
+            text: "list item"   (default)
         }]
-        liStructure: {}
+        liStructure: {
+            text: 'html'
+        }
     }
 }
 */
@@ -32,6 +33,7 @@ const List = ({
     item,
     index,
     containerId,
+    containerType,
     rights,
     recentActivities, setRecentActivities
 }) => {
@@ -106,24 +108,22 @@ const List = ({
                 onDragEnd={handleDragEnd}
             >
                 <SortableContext items={items.map((i) => i._id)}>
-                    {items.map((item, index) => (
-                        <SubItems.ListItem
-                            key={item._id}
-                            
-                            userData={userData}
-                            projects={projects}
-                            activities={activities}
-                            setData={setData}
-                            state={state}
-                            setState={setState}
-                            item={item}
-                            index={index}
-                            containerId={state.currentProject}
-                            rights={rights}
-                            recentActivities={recentActivities}
-                            setRecentActivities={setRecentActivities}
-                        />
-                    ))}
+                    <Shared.ItemTiles
+                        key={item._id}
+                        
+                        userData={userData}
+                        projects={projects}
+                        activities={activities}
+                        setData={setData}
+                        state={state}
+                        setState={setState}
+                        itemsToDisplay={items}
+                        containerId={item._id}
+                        containerType={item.type}
+                        rights={rights}
+                        recentActivities={recentActivities}
+                        setRecentActivities={setRecentActivities}
+                    />
                 </SortableContext>
             </DndContext>
         )
@@ -131,6 +131,18 @@ const List = ({
 
     return (
         <div className="list-editor-wrapper">
+            <Items.Text
+                key={item._id}
+                userData={userData}
+                projects={projects}
+                activities={activities}
+                setData={setData}
+                state={state}
+                setState={setState}
+                item={item}
+                data={"name"}
+                rights={rights}
+            />
             <Shared.ToggleButton
                 data={settings}
                 setter={setSettings}

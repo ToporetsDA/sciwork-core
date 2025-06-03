@@ -13,6 +13,7 @@ const ItemTiles = ({
     state, setState,
     itemsToDisplay,
     containerId,
+    containerType,
     rights,
     recentActivities, setRecentActivities
 }) => {
@@ -32,6 +33,7 @@ const ItemTiles = ({
                 item={item}
                 index={index}
                 containerId={containerId}//
+                containerType={containerType}//
                 rights={rights}
                 recentActivities={recentActivities}
                 setRecentActivities={setRecentActivities}

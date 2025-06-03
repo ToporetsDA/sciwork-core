@@ -242,7 +242,12 @@ const App = () => {
             break
           }
           case "List": {
-            console.log("change in list", activity)
+            flag(activity._id)
+            setter(prevItems => 
+              prevItems.map(i =>
+                i._id === activity._id ? activity : i
+              )
+            )
             break
           }
           default: {

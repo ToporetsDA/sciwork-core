@@ -227,6 +227,7 @@ const Projects = ({
                         setState={setState}
                         itemsToDisplay={items}
                         containerId={state.currentProject}
+                        containerType={item}
                         rights={rights}
                         recentActivities={recentActivities}
                         setRecentActivities={setRecentActivities}
@@ -295,7 +296,7 @@ const Projects = ({
                     <Suspense fallback={<div>Loading projects...</div>}>
                         {displayOptions.get(userData.currentSettings.displayProjects) !== 'table' ?
                         (
-                            getItemTiles("tiles")
+                            getItemTiles("tiles", "Project")
                         ) : (
                             <Shared.ItemTable
                                 userData={userData}
@@ -319,7 +320,7 @@ const Projects = ({
                             onDragMove={handleDragMove}
                             onDragEnd={handleDragEnd}
                         >
-                            {getItemTiles("tiles")}
+                            {getItemTiles("tiles", "Project")}
                             <DragOverlay adjustScale={true}>
                                 {/* Drag Overlay For item Item */}
                                 {activeId && findValueOfContainer(activeId, "Item") && (

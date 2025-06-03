@@ -33,7 +33,6 @@ const Group = ({
             className='group-wrapper'    
         >
             {<Items.Text
-                key={item._id}
                 userData={userData}
                 projects={projects}
                 activities={activities}

@@ -14,11 +14,53 @@ const Item = ({
     item,
     index,
     containerId,
+    containerType,
     rights,
     recentActivities, setRecentActivities
 }) => {
+
+    const isItem = (item !== true)
+
+    const getComponentType = () => {
+        let type
+        if (isItem) {
+            switch (containerType) {
+                // Project
+                case "Project": {
+                    type = Items[item.type]
+                    break
+                }
+                // activities
+                case "Group": {
+                    type = Items[item.type]
+                    break
+                }
+                case "List":
+                case "Table":
+                case "Attendance": {
+                    type = SubItems.ListItem
+                    break
+                }
+                // case "Report": //maybe stored files
+                // case "Chat": {
+                //     type = SubItems.Message
+                //     break
+                // }
+                // case "Test": {
+                //     type = SubItems.Question
+                //     break
+                // }
+                // subActivities
+                default: {
+                    console.warn(`Unknown item type: ${item?.type} in container: ${containerType}`)
+                    type = Items.Dev
+                }
+            }
+        }
+        return type
+    }
     
-    const ItemComponent = (item !== true) ? ((item._id.split('.').length === 2) ? Items[item.type] : SubItems[item.type]) : null
+    const ItemComponent = getComponentType()
 
     const {attributes, listeners, setNodeRef, transform, transition, isDragging} = useSortable({
         id: item._id, 
@@ -34,11 +76,11 @@ const Item = ({
     }
 
     const handleAddAfter = () => {
-
+        console.log("containerType", containerType)
         setState(prev => ({
             ...prev,
             currentDialog: {
-                name: 'AddEditItem',
+                name: (containerType !== 'List') ? 'AddEditItem' : 'AddEditContent',
                 params: [true, false, index, containerId]
             }
         }))
@@ -62,7 +104,7 @@ const Item = ({
                 ➕
             </button>}
             <>
-                {item !== true &&
+                {isItem &&
                     <>
                     {/* 🔘 DRAG HANDLE (6-dots) */}
                     <div

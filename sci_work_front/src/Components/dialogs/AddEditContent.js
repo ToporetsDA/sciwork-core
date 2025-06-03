@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import '../../css/dialogs/AddEditContent.css'
 import '../../css/dialogs/dialog.css'
 
@@ -11,74 +11,168 @@ const AddEditContent = ({
     setData,
     state, setState,
     rights,
-    itemStructure,
-    defaultStructure,
     isCompany
 }) => {
-    const currentId = state.currentDialog.params[0]
-    const type = state.currentDialog.params[1]
-    const field = state.currentDialog.params[2]
 
-    // const editorRef = useRef(null)
-    // const [savedHtml, setSavedHtml] = useState('')
-    // const [errors, setErrors] = useState({})
+    const itemIndex = state.currentDialog.params[2]
+    const containerId = state.currentDialog.params[3]
 
-    const activity = Shared.GetItemById(activities, currentId)
+    const activity = Shared.GetItemById(activities, containerId)
+    const listStructure = activity.content?.liStructure || {}
+    const listItems = activity.content?.listItems || []
 
-    // useEffect(() => {
-    //     if (activity && activity.content?.[field]) {
-    //         setSavedHtml(activity.content[field])
-    //     }
-    // }, [activity, field])
+    console.log("activity", activity, containerId)
+
+    const [editType, setEditType] = useState({type: "Items"})
+
+
+    const [formValues, setFormValues] = useState(() =>
+        Object.keys(listStructure).reduce((acc, key) => {
+            acc[key] = listStructure[key] === 'checkbox' ? false : ''
+            return acc
+        }, {})
+    )
+
+    const [structureFields, setStructureFields] = useState(() => ({ ...listStructure }))
+
+    const [errors, setErrors] = useState({})
+
+    //handle dialog behaviors
 
     const closeDialog = () => {
-        setState((prevState) => ({
-            ...prevState,
-            currentDialog: {
-                name: undefined,
-                params: []
-            }
+        setState(prev => ({
+            ...prev,
+            currentDialog: { name: undefined, params: [] }
         }))
     }
 
-    // const validation = () => {
-    //     const errors = {}
-    //     // Add any validation rules if needed
-    //     return errors
-    // }
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target
+        setFormValues(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }))
+    }
 
-    // const handleSave = () => {
-    //     const newHtml = editorRef.current.innerHTML
+    const handleStructureChange = (key, type) => {
+        setStructureFields(prev => ({
+            ...prev,
+            [key]: type
+        }))
+    }
 
-    //     const errors = validation()
-    //     if (Object.keys(errors).length > 0) {
-    //         setErrors(errors)
-    //         alert('Please fix the errors before saving.')
-    //         return
-    //     }
+    //check special conditions. Will be added later
+    const validate = () => {
+        const newErrors = {}
+        //structure can not be empty
+        if (Object.keys(listStructure).length === 0) {
+            newErrors["listStructure"] = 'empty'
+        }
+        // for (const key in listStructure) {
+        //     const val = formValues[key]
+        //     if (listStructure[key] === 'checkbox') continue
+        //     if (typeof val === 'string' && val.trim() === '') {
+        //         newErrors[key] = 'Required'
+        //     }
+        // }
+        return newErrors
+    }
 
-    //     // Clone the activity and update the field inside 'content'
-    //     const updatedActivity = {
-    //         ...activity,
-    //         content: {
-    //             ...activity.content,
-    //             [field]: newHtml
-    //         }
-    //     }
+    const handleSubmit = () => {
 
-    //     // Call the parent handler to store it
-    //     console.log("I'll save activity", updatedActivity)
-    //     setData({ action: "content", item: { type, activity: updatedActivity } })
+        const errors = validate()
+        if (Object.keys(errors).length > 0) {
+            setErrors(errors)
+            alert('Please fix the errors before saving.')
+            return
+        }
 
-    //     closeDialog()
-    // }
+        const updatedActivity = { ...activity }
+
+        if (editType === "Structure") {
+            updatedActivity.content.liStructure = { ...structureFields }
+        }
+        else {
+            const newItem = {
+                _id: activity._id + '.' + listItems.length,
+                ...formValues
+            }
+
+            updatedActivity.content.listItems = [...listItems]
+            updatedActivity.content.listItems.splice(itemIndex + 1, 0, newItem)
+        }
+
+        setData({
+            action: "content",
+            item: {
+                type: "List",
+                activity: updatedActivity
+            }
+        })
+
+        closeDialog()
+    }
 
     return (
         <div className="addEditContentDialog dialogContainer">
             <div className="dialogContent">
+                <Shared.ToggleButton
+                    data={editType}
+                    setter={setEditType}
+                    field={"type"}
+                    displayOptions={['Structure', 'Items']}
+                />
+
+                <form className="dialogForm">
+                    {(editType.type === "Structure") ? (
+                        <>
+                            {Object.entries(structureFields).map(([key, type]) => (
+                                <div key={key}>
+                                    <label>{key}</label>
+                                    <select value={type} onChange={(e) => handleStructureChange(key, e.target.value)}>
+                                        <option value="text">text</option>
+                                        <option value="html">html</option>
+                                        <option value="checkbox">checkbox</option>
+                                    </select>
+                                </div>
+                            ))}
+                            <p className='warning'>WARNING: deletion of a field will erase it from existing entries!</p>
+                        </>
+                    ) : (
+                        Object.entries(listStructure).map(([key, type]) => {
+                            if (type === 'checkbox') {
+                                return (
+                                    <label key={key}>
+                                        <input
+                                            type="checkbox"
+                                            name={key}
+                                            checked={formValues[key]}
+                                            onChange={handleInputChange}
+                                        />
+                                        {key}
+                                    </label>
+                                )
+                            }
+                            else {
+                                return (
+                                    <label key={key}>
+                                        {key}
+                                        <input
+                                            type="text"
+                                            name={key}
+                                            value={formValues[key]}
+                                            onChange={handleInputChange}
+                                        />
+                                        {errors[key] && <span className="error">{errors[key]}</span>}
+                                    </label>
+                                )
+                            }
+                        })
+                    )}
+                </form>
 
                 <div className="dialogButtons">
-                    {/* <button onClick={handleSave}>Save</button> */}
+                    <button onClick={handleSubmit}>Save</button>
                     <button onClick={closeDialog}>Cancel</button>
                 </div>
             </div>

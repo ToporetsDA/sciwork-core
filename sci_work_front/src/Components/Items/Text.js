@@ -3,6 +3,18 @@ import '../../css/items/Text.css'
 
 import * as Shared from '../pages/sharedComponents'
 
+/*
+activity: {
+    _id
+    name
+    template
+    content: {
+        currentSettings: {}
+        [data]
+    }
+}
+*/
+
 const Text = ({
     userData,
     projects,

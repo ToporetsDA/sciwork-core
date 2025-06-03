@@ -1,7 +1,7 @@
 import React from 'react'
 import '../../../css/items/subItems/ListItem.css'
 
-import * as Shared from '../../pages/sharedComponents'
+// import * as Shared from '../../pages/sharedComponents'
 import * as Items from '../../items'
 
 const ListItem = ({
@@ -17,9 +17,11 @@ const ListItem = ({
     recentActivities, setRecentActivities
 }) => {
 
+    console.log("List item", item)
+
     return (
         <div className="listItem-wrapper">
-            <Items.Text
+            {/* <Items.Text
                 key={item._id}
                 userData={userData}
                 projects={projects}
@@ -30,7 +32,8 @@ const ListItem = ({
                 item={item}
                 data="content"
                 rights={rights}
-            />
+            /> */}
+
         </div>
     )
 }
