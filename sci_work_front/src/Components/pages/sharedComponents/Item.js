@@ -25,6 +25,10 @@ const Item = ({
         let type
         if (isItem) {
             switch (containerType) {
+                case "Dev": {
+                    type = Items.Dev
+                    break
+                }
                 // Project
                 case "Project": {
                     type = Items[item.type]
@@ -53,7 +57,6 @@ const Item = ({
                 // subActivities
                 default: {
                     console.warn(`Unknown item type: ${item?.type} in container: ${containerType}`)
-                    type = Items.Dev
                 }
             }
         }
@@ -123,6 +126,7 @@ const Item = ({
                         state={state}
                         setState={setState}
                         item={item}
+                        index={index}
                         containerId={containerId}
                         rights={rights}
                         recentActivities={recentActivities}

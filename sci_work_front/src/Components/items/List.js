@@ -65,8 +65,8 @@ const List = ({
 
     useEffect(() => {
         const parent = Shared.GetItemById(projects, containerId)
-        const metaItem = Shared.FindItemWithParent(parent.activities, "_id", activity._id, parent).item
-        const access = Shared.GetAccess(metaItem, userData)
+        const metaItem = Shared.FindItemWithParent(parent.activities, "_id", activity._id, parent)
+        const access = Shared.GetAccess(metaItem.item, userData)
 
         const change = (activity.content?.currentSettings?.type !== settings?.type) && settings?.type
 

@@ -14,7 +14,7 @@ const AddEditContent = ({
     isCompany
 }) => {
 
-    const itemIndex = state.currentDialog.params[2]
+    let itemIndex = state.currentDialog.params[2]
     const containerId = state.currentDialog.params[3]
 
     const activity = Shared.GetItemById(activities, containerId)
@@ -23,8 +23,10 @@ const AddEditContent = ({
 
     console.log("activity", activity, containerId)
 
-    const [editType, setEditType] = useState({type: "Items"})
+    const [editType, setEditType] = useState({type: "Add item"})
+    const [newField, setNewField] = useState({ name: '', type: 'text' })
 
+    
 
     const [formValues, setFormValues] = useState(() =>
         Object.keys(listStructure).reduce((acc, key) => {
@@ -89,10 +91,9 @@ const AddEditContent = ({
 
         const updatedActivity = { ...activity }
 
-        if (editType === "Structure") {
-            updatedActivity.content.liStructure = { ...structureFields }
-        }
-        else {
+        updatedActivity.content.liStructure = { ...structureFields }
+
+        if (editType !== "Structure") {
             const newItem = {
                 _id: activity._id + '.' + listItems.length,
                 ...formValues
@@ -100,6 +101,8 @@ const AddEditContent = ({
 
             updatedActivity.content.listItems = [...listItems]
             updatedActivity.content.listItems.splice(itemIndex + 1, 0, newItem)
+
+            itemIndex++
         }
 
         setData({
@@ -109,8 +112,6 @@ const AddEditContent = ({
                 activity: updatedActivity
             }
         })
-
-        closeDialog()
     }
 
     return (
@@ -120,7 +121,7 @@ const AddEditContent = ({
                     data={editType}
                     setter={setEditType}
                     field={"type"}
-                    displayOptions={['Structure', 'Items']}
+                    displayOptions={['Structure', 'Add item']}
                 />
 
                 <form className="dialogForm">
@@ -128,25 +129,69 @@ const AddEditContent = ({
                         <>
                             {Object.entries(structureFields).map(([key, type]) => (
                                 <div key={key}>
-                                    <label>{key}</label>
-                                    <select value={type} onChange={(e) => handleStructureChange(key, e.target.value)}>
-                                        <option value="text">text</option>
-                                        <option value="html">html</option>
-                                        <option value="checkbox">checkbox</option>
-                                    </select>
+                                    <label>
+                                        {key}
+                                        <select value={type} onChange={(e) => handleStructureChange(key, e.target.value)}>
+                                            <option value="text">text</option>
+                                            <option value="checkbox">checkbox</option>
+                                        </select>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setStructureFields(prev => {
+                                                    const updated = { ...prev }
+                                                    delete updated[key]
+                                                    return updated
+                                                })
+                                            }}
+                                            className="deleteFieldBtn"
+                                        >
+                                            X
+                                        </button>
+                                    </label>
                                 </div>
                             ))}
-                            <p className='warning'>WARNING: deletion of a field will erase it from existing entries!</p>
+                            <div className="add-field-form">
+                            <input
+                                type="text"
+                                placeholder="Field name"
+                                value={newField.name}
+                                onChange={e => setNewField(prev => ({ ...prev, name: e.target.value }))}
+                            />
+                            <select
+                                value={newField.type}
+                                onChange={e => setNewField(prev => ({ ...prev, type: e.target.value }))}
+                            >
+                                <option value="text">text</option>
+                                <option value="checkbox">checkbox</option>
+                            </select>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const { name, type } = newField
+                                    if (name && !(name in structureFields)) {
+                                        setStructureFields(prev => ({
+                                            ...prev,
+                                            [name]: type
+                                        }))
+                                        setNewField({ name: '', type: 'text' })
+                                    }
+                                }}
+                            >
+                                Add
+                            </button>
+                        </div>
+                            {/* <p className='warning'>WARNING: deletion of a field will erase it from existing entries!</p> */}
                         </>
                     ) : (
-                        Object.entries(listStructure).map(([key, type]) => {
+                        Object.entries(structureFields).map(([key, type]) => {
                             if (type === 'checkbox') {
                                 return (
                                     <label key={key}>
                                         <input
                                             type="checkbox"
                                             name={key}
-                                            checked={formValues[key]}
+                                            checked={formValues[key] || false}
                                             onChange={handleInputChange}
                                         />
                                         {key}
@@ -160,7 +205,7 @@ const AddEditContent = ({
                                         <input
                                             type="text"
                                             name={key}
-                                            value={formValues[key]}
+                                            value={formValues[key] || ""}
                                             onChange={handleInputChange}
                                         />
                                         {errors[key] && <span className="error">{errors[key]}</span>}
@@ -173,7 +218,7 @@ const AddEditContent = ({
 
                 <div className="dialogButtons">
                     <button onClick={handleSubmit}>Save</button>
-                    <button onClick={closeDialog}>Cancel</button>
+                    <button onClick={closeDialog}>Close</button>
                 </div>
             </div>
         </div>

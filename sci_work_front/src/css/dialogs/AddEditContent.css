@@ -36,4 +36,8 @@
   background-color: #f0f0f0;
 }
 
+label {
+  display: block;
+}
+
 /*# sourceMappingURL=AddEditContent.css.map */

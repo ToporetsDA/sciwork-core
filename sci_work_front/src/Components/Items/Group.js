@@ -52,6 +52,7 @@ const Group = ({
                 setState={setState}
                 itemsToDisplay={item.activities}
                 containerId={item._id}
+                containerType={item.type}
                 rights={rights}
                 recentActivities={recentActivities}
                 setRecentActivities={setRecentActivities}

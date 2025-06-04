@@ -3,8 +3,8 @@ import '../../css/items/Text.css'
 
 import * as Shared from '../pages/sharedComponents'
 
-/*
-activity: {
+/* structure
+{
     _id
     name
     template
@@ -26,16 +26,25 @@ const Text = ({
     rights
 }) => {
 
-    const activity = Shared.GetItemById(activities, item._id)
+    const parts = item._id.split('.')
+    const activityId = parts[0] + '.' + parts[1]
+    const activity = Shared.GetItemById(activities, activityId)
+
+    const project = Shared.GetItemById(projects, state.currentProject)
+    const metaActivity = Shared.FindItemWithParent(project.activities, "_id", activity._id, project).item
+
     const [isEditing, setIsEditing] = useState(false)
     const [savedHtml, setSavedHtml] = useState('')
     const editorRef = useRef(null)
     const toolbarRef = useRef(null)
 
     useEffect(() => {
-        if (activity?.content?.[data]) {
-            setSavedHtml(activity.content[data])
-        }
+        setSavedHtml(
+            data.split('.').reduce((acc, key) => {
+                const index = parseInt(key)
+                return acc?.[isNaN(index) ? key : index]
+            }, activity?.content)
+        )
     }, [activity, data])
 
     useEffect(() => {
@@ -65,13 +74,8 @@ const Text = ({
 
     const handleSave = () => {
         const newHtml = editorRef.current.innerHTML
-        const updatedActivity = {
-            ...activity,
-            content: {
-                ...activity.content,
-                [data]: newHtml
-            }
-        }
+        const updatedActivity = Shared.SetFieldValue(activity, data, newHtml)
+
         setData({ action: "content", item: { type: "Text", activity: updatedActivity } })
         setIsEditing(false)
     }
@@ -87,6 +91,7 @@ const Text = ({
     }
 
     const handleEditorClick = () => {
+        console.log("open toolbar to edit text")
         if (!isEditing) {
             setIsEditing(true)
             // Додатково встановити фокус у редактор
@@ -98,14 +103,8 @@ const Text = ({
         }
     }
 
-    //get item _id (not subItem)
-    const parts = item._id.split('.')
-    parts.pop()
-    const parentId = (parts.length === 1) ? parts[0] : parts[0] + '.' + parts[1]
-    const parent = Shared.GetItemById((parts.length === 1) ? projects : activities, parentId)
-
     return (
-        (rights.edit.includes(Shared.GetAccess(parent, userData))) ? (
+        (rights.edit.includes(Shared.GetAccess(metaActivity, userData))) ? (
             <div className='text-wrapper' style={{ position: 'relative' }}>
                 {isEditing && (
                     <div ref={toolbarRef} className="toolbar-popup">
@@ -133,7 +132,14 @@ const Text = ({
         ) : (
             <div className='text-wrapper'>
                 <div className='text-container'>
-                    <div dangerouslySetInnerHTML={{ __html: activity?.content?.[data] || '' }} />
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: data.split('.').reduce((acc, key) => {
+                                const index = parseInt(key)
+                                return acc?.[isNaN(index) ? key : index]
+                            }, activity?.content) || ''
+                        }}
+                    />
                 </div>
             </div>
         )
