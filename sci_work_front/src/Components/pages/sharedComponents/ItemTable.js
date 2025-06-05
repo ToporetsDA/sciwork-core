@@ -13,11 +13,16 @@ const ItemTable = ({
     itemsToDisplay,
     itemKeys,
     itemTypes,
+    nested,
     rights,
     recentActivities, setRecentActivities
 }) => {
 
     const navigate = useNavigate()
+
+    const parts = itemsToDisplay[0]._id.split('.')
+    parts.pop()
+    const activity = Shared.GetItemById(activities, parts.join('.'))
 
     const saveChanges = (key, value, activity, index) => {
     
@@ -30,9 +35,8 @@ const ItemTable = ({
         setData({action: "content", item: {type: "Table", activity: updatedActivity}})
     }
 
-    const getTileContent = (key, item) => {
-        const idParts = item._id.split('.')
-        const index = parseInt(idParts[idParts.length - 1], 10)
+    const getTileContent = (key, item, index) => {
+        
         switch(itemTypes[key]) {
             case"text" : {
                 return (
@@ -50,9 +54,6 @@ const ItemTable = ({
                 )
             }
             case"checkbox" : {
-                const parts = item._id.split('.')
-                parts.pop()
-                const activity = Shared.GetItemById(activities, parts.join('.'))
                 return (
                     <input
                         type="checkbox"
@@ -147,39 +148,66 @@ const ItemTable = ({
 
                 const items = (!state.currentProject) ? projects : activities
 
-                return (
-                    <tr
-                    key={index}
-                    className={`${isExpiring ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}
-                    onClick={() => {
-                        if (!state.currentProject) {
-                            navigate(Shared.GoTo(item, items, recentActivities, setRecentActivities))
-                        }
-                    }}
-                    >
-                    {itemKeys.map((key) => (
-                        <td key={key}>
-                        {(!state.currentProject) ? (
-                            item[key]
-                        ) : (
-                            getTileContent(key, item, index)
-                        )}
-                        </td>
-                    ))}
-                    {!state.currentProject &&
-                        <td>{status}</td>
-                    }
-                    <td onClick={(e) => e.stopPropagation()}>
-                        <Shared.ItemActions
-                            userData={userData}
-                            data={projects}
-                            setData={setData}
-                            setState={setState}
-                            item={item}
-                            rights={rights}
-                        />
-                    </td>
-                    </tr>
+                const access = Shared.GetAccess(item, userData)
+                const colSpan = itemKeys.length + (state.currentProject ? 1 : 2)
+
+                const idParts = item._id.split('.')
+                const i = parseInt(idParts[idParts.length - 1], 10)
+
+                return (//activity?.content?.currentSettings?.markable
+                    (nested && access === 0)
+                        ? (//nested table
+                            <tr key={index}>
+                                <td colSpan={colSpan}>
+                                    {/* Render nested table here */}
+                                    <ItemTable
+                                        userData={userData}
+                                        projects={projects}
+                                        activities={activities}
+                                        setData={setData}
+                                        state={state}
+                                        setState={setState}
+                                        itemsToDisplay={item.forCreator.listItems}
+                                        itemKeys={itemKeys}
+                                        itemTypes={itemTypes}
+                                        nested={true}
+                                        rights={rights}
+                                        recentActivities={recentActivities}
+                                        setRecentActivities={setRecentActivities}
+                                    />
+                                </td>
+                            </tr>
+                        ) : (//table entries
+                            <tr
+                                key={index}
+                                className={`${isExpiring ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}
+                                onClick={() => {
+                                    if (!state.currentProject && !nested) {
+                                        navigate(Shared.GoTo(item, items, recentActivities, setRecentActivities))
+                                    }
+                                }}
+                            >
+                                {itemKeys.map((key) => (
+                                    <td key={key}>
+                                        {!state.currentProject
+                                            ? item[key]
+                                            : getTileContent(key, item, i)
+                                        }
+                                    </td>
+                                ))}
+                                {!state.currentProject && <td>{status}</td>}
+                                <td onClick={(e) => e.stopPropagation()}>
+                                    <Shared.ItemActions
+                                        userData={userData}
+                                        data={projects}
+                                        setData={setData}
+                                        setState={setState}
+                                        item={item}
+                                        rights={rights}
+                                    />
+                                </td>
+                            </tr>
+                        )
                 )
                 })}
             </tbody>

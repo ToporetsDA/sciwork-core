@@ -307,8 +307,10 @@ const Projects = ({
                                 setData={setData}
                                 state={state}
                                 setState={setState}
-                                itemsToDisplay={itemsToDisplay.projects}
+                                itemsToDisplay={projects}
                                 itemKeys={["name", "dndCount", "startDate", "endDate"]}
+                                //itemTypes
+                                nested={false}
                                 rights={rights}
                                 recentActivities={recentActivities}
                                 setRecentActivities={setRecentActivities}
