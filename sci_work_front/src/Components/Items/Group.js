@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import '../../css/items/Group.css'
 
 import * as Shared from '../pages/sharedComponents'
@@ -27,6 +28,12 @@ const Group = ({
     setRecentActivities
 }) => {
 
+    const [showActivities, setShowActivities] = useState(true)
+
+    const toggleActivities = () => {
+        setShowActivities(prev => !prev)
+    }
+
     // console.log("item in Group component", activities)
     return (
         <div
@@ -43,20 +50,28 @@ const Group = ({
                 data={"name"}
                 rights={rights}
             />}
-            <Shared.ItemTiles
-                userData={userData}
-                projects={projects}
-                activities={activities}
-                setData={setData}
-                state={state}
-                setState={setState}
-                itemsToDisplay={item.activities}
-                containerId={item._id}
-                containerType={item.type}
-                rights={rights}
-                recentActivities={recentActivities}
-                setRecentActivities={setRecentActivities}
-            />
+            <button
+                className="group-toggle-button"
+                onClick={toggleActivities}
+            >
+                {showActivities ? 'Hide' : 'Show'}
+            </button>
+            {showActivities &&
+                <Shared.ItemTiles
+                    userData={userData}
+                    projects={projects}
+                    activities={activities}
+                    setData={setData}
+                    state={state}
+                    setState={setState}
+                    itemsToDisplay={item.activities}
+                    containerId={item._id}
+                    containerType={item.type}
+                    rights={rights}
+                    recentActivities={recentActivities}
+                    setRecentActivities={setRecentActivities}
+                />
+            }
         </div>
     )
 }
