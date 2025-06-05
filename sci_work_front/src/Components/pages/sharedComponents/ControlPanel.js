@@ -191,6 +191,7 @@ const ControlPanel = ({
             }
             {(state.currentPage === "Projects" || state.currentPage === "Project"  || state.currentPage === "Activity") &&
                 <>
+                    {userData.currentSettings.displayProjects !== "table" &&
                     <div className='sortAndFilter'>
                         <div>
                             <button
@@ -228,20 +229,21 @@ const ControlPanel = ({
                                 </ul>
                             )}
                         </div>
-                        {((state.currentPage !== "Projects")
-                        && ((state.currentProject) ? rights.edit.includes(getAccess(Shared.GetItemById(projects, state.currentProject))) : false))
-                        && (
-                            <div>
-                            {Shared.GetDialogButton(
-                                setState,
-                                "addItem",
-                                'AddEditUserList',
-                                [true],
-                                "Add/Edit users")
-                            }
-                            </div>
-                        )}
                     </div>
+                    }
+                    {((state.currentPage !== "Projects")
+                    && ((state.currentProject) ? rights.edit.includes(getAccess(Shared.GetItemById(projects, state.currentProject))) : false))
+                    && (
+                        <div>
+                        {Shared.GetDialogButton(
+                            setState,
+                            "addItem",
+                            'AddEditUserList',
+                            [true],
+                            "Add/Edit users")
+                        }
+                        </div>
+                    )}
                 </>
             }
             {(state.currentPage === "Projects") &&
