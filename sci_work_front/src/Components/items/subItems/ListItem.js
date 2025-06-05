@@ -23,10 +23,10 @@ const ListItem = ({
 
     const fieldsToRender = activity.content?.liStructure
 
-    const saveChanges = (key, value) => {
+    const saveChanges = (key, value, activity, index) => {
 
         const updatedActivity = Shared.SetFieldValue(
-            Shared.GetItemById(activities, item._id),
+            activity,
             `listItems.${index}.${key}`,
             value
         )
@@ -37,17 +37,23 @@ const ListItem = ({
     const getField = (key, type) => {
         switch(type) {
             case "checkbox": {
-                return (<input
-                    type="checkbox"
-                    key={item._id}
-                    checked={item[key] || false}
-                    onChange={(e) => {saveChanges(key, e.target.checked)}}
-                />)
+                return (
+                    <div
+                        key={item._id + '.' + key}
+                    >
+                        <p>{key}</p>
+                        <input
+                            type="checkbox"
+                            checked={item[key] || false}
+                            onChange={(e) => {saveChanges(key, e.target.checked, activity, index)}}
+                        />
+                    </div>
+                )
             }
             case "text": {
                 return (
                     <Items.Text
-                        key={item._id}
+                        key={item._id + '.' + key}
 
                         userData={userData}
                         projects={projects}
@@ -68,11 +74,11 @@ const ListItem = ({
     }
 
     return (
-        <div className="listItem-wrapper">
+        <li className="listItem-wrapper">
             {Object.entries(fieldsToRender).map(([key, type]) => (
                 getField(key, type)
             ))}
-        </div>
+        </li>
     )
 }
 

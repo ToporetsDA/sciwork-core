@@ -303,10 +303,12 @@ const Projects = ({
                             <Shared.ItemTable
                                 userData={userData}
                                 projects={projects}
+                                activities={activities}
                                 setData={setData}
                                 state={state}
                                 setState={setState}
                                 itemsToDisplay={itemsToDisplay.projects}
+                                itemKeys={["name", "dndCount", "startDate", "endDate"]}
                                 rights={rights}
                                 recentActivities={recentActivities}
                                 setRecentActivities={setRecentActivities}

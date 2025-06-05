@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import '../../../css/pages/sharedComponents/Item.css'
 
+import * as Shared from "./"
 import * as Items from '../../items'
 import * as SubItems from '../../items/subItems'
 
@@ -19,9 +20,21 @@ const Item = ({
     recentActivities, setRecentActivities
 }) => {
 
+    const types = {
+        Dev: "Dev",
+        Group: "Group",
+        List: "List",
+        Table: "List",
+        Attendance: "List",
+        Report: "Report",
+        Chat: "Chat",
+        Page: "Dev"
+    }
+
     const isItem = (item !== true)
 
     const getComponentType = () => {
+        const itemsType = types[item.type] || "Dev"
         let type
         if (isItem) {
             switch (containerType) {
@@ -31,20 +44,20 @@ const Item = ({
                 }
                 // Project
                 case "Project": {
-                    type = Items[item.type]
+                    type = Items[itemsType]
                     break
                 }
                 // activities
                 case "Group": {
-                    type = Items[item.type]
+                    type = Items[itemsType]
                     break
                 }
                 case "List":
-                case "Table":
                 case "Attendance": {
                     type = SubItems.ListItem
                     break
                 }
+                // case "Table": separate from ItemTiles
                 // case "Report": //maybe stored files
                 // case "Chat": {
                 //     type = SubItems.Message
@@ -78,17 +91,6 @@ const Item = ({
         opacity: (isDragging) ? 0.5 : 1
     }
 
-    const handleAddAfter = () => {
-        console.log("containerType", containerType)
-        setState(prev => ({
-            ...prev,
-            currentDialog: {
-                name: (containerType !== 'List') ? 'AddEditItem' : 'AddEditContent',
-                params: [true, false, index, containerId]
-            }
-        }))
-    }
-
     return (
         <div
             className={'activity-item'}
@@ -97,15 +99,13 @@ const Item = ({
             style={style}
         >
             {/* ➕ Add below button */}
-            {<button
-                className="add-button"
-                onClick={(e) => {
-                e.stopPropagation()
-                handleAddAfter()
-                }}
-            >
-                ➕
-            </button>}
+            {Shared.GetDialogButton(
+                setState,
+                "add-button",
+                (containerType !== 'List') ? 'AddEditItem' : 'AddEditContent',
+                [true, false, index, containerId, "Add Item"],
+                "➕")
+            }
             <>
                 {isItem &&
                     <>

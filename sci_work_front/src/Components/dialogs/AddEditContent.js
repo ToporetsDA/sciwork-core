@@ -16,14 +16,12 @@ const AddEditContent = ({
 
     let itemIndex = state.currentDialog.params[2]
     const containerId = state.currentDialog.params[3]
+    const editType =  state.currentDialog.params[4]
 
     const activity = Shared.GetItemById(activities, containerId)
     const listStructure = activity.content?.liStructure || {}
     const listItems = activity.content?.listItems || []
 
-    console.log("activity", activity, containerId)
-
-    const [editType, setEditType] = useState({type: "Add item"})
     const [newField, setNewField] = useState({ name: '', type: 'text' })
 
     
@@ -93,7 +91,7 @@ const AddEditContent = ({
 
         updatedActivity.content.liStructure = { ...structureFields }
 
-        if (editType !== "Structure") {
+        if (!editType.includes("Structure")) {
             const newItem = {
                 _id: activity._id + '.' + listItems.length,
                 ...formValues
@@ -117,15 +115,8 @@ const AddEditContent = ({
     return (
         <div className="addEditContentDialog dialogContainer">
             <div className="dialogContent">
-                <Shared.ToggleButton
-                    data={editType}
-                    setter={setEditType}
-                    field={"type"}
-                    displayOptions={['Structure', 'Add item']}
-                />
-
                 <form className="dialogForm">
-                    {(editType.type === "Structure") ? (
+                    {(editType.includes("Structure")) ? (
                         <>
                             {Object.entries(structureFields).map(([key, type]) => (
                                 <div key={key}>

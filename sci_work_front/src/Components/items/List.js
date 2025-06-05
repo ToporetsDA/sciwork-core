@@ -40,6 +40,9 @@ const List = ({
 
     const activity = Shared.GetItemById(activities, item._id)
 
+    const project = Shared.GetItemById(projects, state.currentProject)
+    const metaActivity = Shared.FindItemWithParent(project.activities, "_id", activity._id, project).item
+
     const [settings, setSettings] = useState(activity.content?.currentSettings || {})
 
     const allItems = useMemo(() => {
@@ -129,8 +132,72 @@ const List = ({
         )
     }
 
+    const getList = (type) => {
+        switch(type) {
+            case"List": {
+                return (
+                    <>
+                        {/* ordered/unordered */}
+                        <Shared.ToggleButton
+                            data={settings}
+                            setter={setSettings}
+                            field={"type"}
+                            displayOptions={['ul', 'ol']}
+                        />
+                        {(settings.type === "ul")
+                        ? (
+                            <ul>
+                                {getItemTiles()}
+                            </ul>
+                        ) : (
+                            <ol>
+                                {getItemTiles()}
+                            </ol>
+                        )}
+                    </>
+                )
+            }
+            case"Table": {
+                console.log("table, not list")
+                const itemKeys = Object.keys(activity?.content.liStructure).filter(key =>
+                    key !== '_id' && key !== 'deleted' &&
+                    !Array.isArray(activity?.content.liStructure[key])
+                )
+                return (
+                    <>
+                        {Shared.GetDialogButton(
+                            setState,
+                            "edit-structure",
+                            "AddEditContent",
+                            [true, false, false, activity._id, "Add Item"],
+                            "Add Entry"
+                        )}
+                        <Shared.ItemTable
+                            userData={userData}
+                            projects={projects}
+                            activities={activities}
+                            setData={setData}
+                            state={state}
+                            setState={setState}
+                            itemsToDisplay={items}
+                            itemKeys={itemKeys}
+                            itemTypes={activity?.content.liStructure}
+                            rights={rights}
+                            recentActivities={recentActivities}
+                            setRecentActivities={setRecentActivities}
+                        />
+                    </>
+                )
+            }
+            default: {
+                return
+            }
+        }
+    }
+
     return (
         <div className="list-editor-wrapper">
+            {/* activity name */}
             <Items.Text
                 key={item._id}
                 userData={userData}
@@ -143,21 +210,16 @@ const List = ({
                 data={"name"}
                 rights={rights}
             />
-            <Shared.ToggleButton
-                data={settings}
-                setter={setSettings}
-                field={"type"}
-                displayOptions={['ul', 'ol']}
-            />
-            {(settings.type === "ul") ? (
-                <ul>
-                    {getItemTiles()}
-                </ul>
-            ) : (
-                <ol>
-                    {getItemTiles()}
-                </ol>
-            )}
+            {/* EditStructure button */}
+            {Shared.GetDialogButton(
+                setState,
+                "edit-structure",
+                "AddEditContent",
+                [true, false, false, activity._id, "Edit Structure"],
+                "Edit List")
+            }
+            {/* list items */}
+            {getList(metaActivity.type)}
         </div>
     )
 }

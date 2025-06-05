@@ -241,6 +241,7 @@ const App = () => {
             )
             break
           }
+          case "Table":
           case "List": {
             flag(activity._id)
             setter(prevItems => 

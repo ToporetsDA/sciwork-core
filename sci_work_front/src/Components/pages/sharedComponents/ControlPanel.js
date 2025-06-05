@@ -232,16 +232,13 @@ const ControlPanel = ({
                         && ((state.currentProject) ? rights.edit.includes(getAccess(Shared.GetItemById(projects, state.currentProject))) : false))
                         && (
                             <div>
-                            <button className="addItem" onClick={() => {
-                                setState((prevState) => ({
-                                    ...prevState,
-                                    currentDialog: {
-                                        name: 'AddEditUserList',
-                                        params: [true]},
-                                }))
-                            }}>
-                                Add/Edit users
-                            </button>
+                            {Shared.GetDialogButton(
+                                setState,
+                                "addItem",
+                                'AddEditUserList',
+                                [true],
+                                "Add/Edit users")
+                            }
                             </div>
                         )}
                     </div>
@@ -258,16 +255,13 @@ const ControlPanel = ({
             {(rights.edit.includes(userData.genStatus)
             && ["Projects"].includes(state.currentPage))
             && (
-                <button className="addItem" onClick={() => {
-                    setState((prevState) => ({
-                        ...prevState,
-                        currentDialog: {
-                            name: 'AddEditItem',
-                            params: [true, false]}
-                    }))
-                }}>
-                    New Project
-                </button>
+                Shared.GetDialogButton(
+                    setState,
+                    "addItem",
+                    'AddEditItem',
+                    [true, false],
+                    "New Project"
+                )
             )}
         </div>
     )}

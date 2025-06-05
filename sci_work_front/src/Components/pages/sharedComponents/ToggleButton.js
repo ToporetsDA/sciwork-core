@@ -4,7 +4,6 @@ import '../../../css/pages/sharedComponents/ToggleButton.css'
 
 const ToggleButton = ({data, setter, field, displayOptions}) => {
 
-    console.log(data, data[field])
     const [currentOption, setCurrentOption] = useState(data[field])
 
     const handleDisplayOptionSelect = (option) => {
