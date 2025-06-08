@@ -136,6 +136,11 @@ const App = () => {
 
   const [users, setUsers] = useState()
 
+  const updateUsers = (itemId) => {
+
+    console.log("this method will get users's data of users related to Item")
+  }
+
   const updateData = (data) => {
 
     const { action, item } = data
@@ -423,6 +428,7 @@ const App = () => {
                 setData={updateData}
                 rights={rights}
                 users={users}
+                setUsers={updateUsers}
                 itemStructure={defaultItemStructure}
                 defaultStructure={defaultStructure}
                 isCompany={isCompany}

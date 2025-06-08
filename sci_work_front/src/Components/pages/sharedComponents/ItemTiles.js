@@ -15,6 +15,7 @@ const ItemTiles = ({
     containerId,
     containerType,
     rights,
+    users, setUsers,
     recentActivities, setRecentActivities
 }) => {
 
@@ -35,6 +36,8 @@ const ItemTiles = ({
                 containerId={containerId}//
                 containerType={containerType}//
                 rights={rights}
+                users={users}
+                setUsers={setUsers}
                 recentActivities={recentActivities}
                 setRecentActivities={setRecentActivities}
             />

@@ -17,6 +17,7 @@ const Item = ({
     containerId,
     containerType,
     rights,
+    users, setUsers,
     recentActivities, setRecentActivities
 }) => {
 
@@ -52,8 +53,9 @@ const Item = ({
                     type = Items[itemsType]
                     break
                 }
-                case "List":
-                case "Attendance": {
+                case "Attendance":
+                case "Table":
+                case "List": {
                     type = SubItems.ListItem
                     break
                 }
@@ -102,7 +104,7 @@ const Item = ({
             {Shared.GetDialogButton(
                 setState,
                 "add-button",
-                (containerType !== 'List') ? 'AddEditItem' : 'AddEditContent',
+                (!['List', 'Attendance'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',
                 [true, false, index, containerId, "Add Item"],
                 "➕")
             }
@@ -129,6 +131,8 @@ const Item = ({
                         index={index}
                         containerId={containerId}
                         rights={rights}
+                        users={users}
+                        setUsers={setUsers}
                         recentActivities={recentActivities}
                         setRecentActivities={setRecentActivities}
                     />

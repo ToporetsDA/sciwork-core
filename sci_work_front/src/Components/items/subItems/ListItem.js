@@ -14,6 +14,7 @@ const ListItem = ({
     index,
     containerId,
     rights,
+    users, setUsers,
     recentActivities, setRecentActivities
 }) => {
 
@@ -34,7 +35,13 @@ const ListItem = ({
         setData({action: "content", item: {type: "List", activity: updatedActivity}})
     }
 
+    // get now "hh:mm"
+    const getTime = () => {
+        return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }
+
     const getField = (key, type) => {
+        
         switch(type) {
             case "checkbox": {
                 return (
@@ -65,6 +72,60 @@ const ListItem = ({
                         data={`listItems.${index}.${key}`}
                         rights={rights}
                     />
+                )
+            }
+            case "markable": {
+                const markable = activity?.content.listItems[index].markable
+                const markableFields = ["checker" ,"name", "middleName", "surName", "patronimic"]
+                const markableTypes = {
+                    name: 'plain',
+                    middleName: 'plain',
+                    surName: 'plain',
+                    patronimic: 'plain',
+                    checker: 'checker'
+                }
+                console.log("markable item", markable)
+                    
+                return (
+                    <div
+                        key={item._id + '.' + key}
+                    >
+                        <>
+                            Markable for {markable.startTime}-{markable.endTime} on {markable.date}
+                        </>
+                        {(userData._id === item.creatorId) ? (//creator sees if other users left mark
+                            <Shared.ItemTable
+                                userData={userData}
+                                projects={projects}
+                                activities={activities}
+                                setData={setData}
+                                state={state}
+                                setState={setState}
+                                itemsToDisplay={markable.userEntries}
+                                itemKeys={markableFields}
+                                itemTypes={markableTypes}
+                                nested={false}
+                                rights={rights}
+                                recentActivities={recentActivities}
+                                setRecentActivities={setRecentActivities}
+                            />
+                        ) : (//other users see checkbox
+                            <>
+                                {(item[key][0] === false) ? (//if not checked - show checkbox
+                                    <input
+                                        type="checkbox"
+                                        checked={item[key][0] || false}
+                                        onChange={(e) => {saveChanges(key, [e.target.checked, getTime()], activity, index)}}
+                                    />
+                                ) : (//if checked - show time of it being checked
+                                    <>
+                                        {item[key][1]}
+                                    </>
+                                )}
+                            </>
+                        )
+                        }
+                    </div>
                 )
             }
             default: {

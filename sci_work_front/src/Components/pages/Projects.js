@@ -14,6 +14,7 @@ const Projects = ({
     setData,
     itemsToDisplay, setItemsToDisplay,
     rights,
+    users, setUsers,
     recentActivities, setRecentActivities }) => {
 
     const displayOptions = new Map([
@@ -229,6 +230,8 @@ const Projects = ({
                         containerId={state.currentProject}
                         containerType={item}
                         rights={rights}
+                        users={users}
+                        setUsers={setUsers}
                         recentActivities={recentActivities}
                         setRecentActivities={setRecentActivities}
                     />

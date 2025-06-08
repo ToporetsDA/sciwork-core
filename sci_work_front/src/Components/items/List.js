@@ -12,12 +12,33 @@ activity: {
     template
     content: {
         currentSettings: {
-            type
+            type: String
+            markable: Boolean
         }
         listItems: [{
-            text: "list item"   (default)
+            _id                 (required)
+            creatorId           (required)
+            text: "list item"   (example)
+
+            markable: {         (one per list item, not required)
+                name            (required)
+                startTime       (required)
+                endTime         (required)
+                date            (required)
+                userEntries:[{
+                    _id             (required)
+
+                    name            (required)
+                    middleName      (default: "")
+                    surName         (required)
+                    patronimic      (default: "")
+
+                    checker         (default: [false, "--:--"])
+                }]
+            }
         }]
         liStructure: {
+            markable: 'markable'
             text: 'html'
         }
     }
@@ -35,6 +56,7 @@ const List = ({
     containerId,
     containerType,
     rights,
+    users, setUsers,
     recentActivities, setRecentActivities
 }) => {
 
@@ -124,6 +146,8 @@ const List = ({
                         containerId={item._id}
                         containerType={item.type}
                         rights={rights}
+                        users={users}
+                        setUsers={setUsers}
                         recentActivities={recentActivities}
                         setRecentActivities={setRecentActivities}
                     />
@@ -157,8 +181,14 @@ const List = ({
                     </>
                 )
             }
+            case"Attendance" : {
+                return (
+                    <>
+                        {getItemTiles()}
+                    </>
+                )
+            }
             case"Table": {
-                console.log("table, not list")
                 const itemKeys = Object.keys(activity?.content.liStructure).filter(key =>
                     key !== '_id' && key !== 'deleted' &&
                     !Array.isArray(activity?.content.liStructure[key])

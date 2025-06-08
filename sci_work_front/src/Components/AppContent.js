@@ -13,7 +13,7 @@ const AppContent = ({
     activities,
     setData,
     rights,
-    users,
+    users, setUsers,
     itemStructure,
     defaultStructure,
     isCompany,
@@ -87,6 +87,8 @@ const AppContent = ({
                         itemsToDisplay={itemsToDisplay}
                         setItemsToDisplay={setItemsToDisplay}
                         rights={rights}
+                        users={users}
+                        setUsers={setUsers}
                         notifications={notifications}
                         setNotifications={setNotifications}
                         recentActivities={recentActivities}

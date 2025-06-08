@@ -14,7 +14,7 @@ const AppDynamicContent = ({
   activities,
   setData,
   rights,
-  users,
+  users, setUsers,
   itemStructure,
   defaultStructure,
   isCompany,
@@ -99,6 +99,7 @@ const AppDynamicContent = ({
       setData={setData}
       rights={rights}
       users={users}
+      setUsers={setUsers}
       itemStructure={itemStructure}
       defaultStructure={defaultStructure}
       isCompany={isCompany}

@@ -212,8 +212,8 @@ const getActivityContent = (type) => {
   switch(type) {
     case "Group": {
       content = {
-        currentSettings: {},
-        name: "Group name"
+        name: "Group name",
+        currentSettings: {}
       }
       break
     }
@@ -226,12 +226,37 @@ const getActivityContent = (type) => {
     }
     case "List": {
       content = {
+        name: "List name",
         currentSettings: {
             type: "ul"
         },
         listItems: [],
         liStructure: {
-          text: "html"
+          text: "text"
+        }
+      }
+      break
+    }
+    case "Attendance": {
+      content = {
+        name: "Attendance",
+        currentSettings: {
+            markable: true
+        },
+        listItems: [],
+        liStructure: {
+          markable: "markable"
+        }
+      }
+      break
+    }
+    case "Table": {
+      content = {
+        name: "Table name",
+        currentSettings: {},
+        listItems: [],
+        liStructure: {
+          text: "text"
         }
       }
       break
