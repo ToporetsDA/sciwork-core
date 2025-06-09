@@ -18,12 +18,6 @@ const AddEditUserList = ({
 ) => {
 
     /*
-    here will be 2 ItemTable(s) for users with access and without.
-    for projects those are users with access to project and all users in db accordingly
-    for activity those are users with access to activity and users with access to project
-
-    also need to handle buttons and comboboxs in ItemTable
-
     chat will be styled list based activity
     filled with items with buttons to delete(set deleted: true with who and when deleted)
     and Text item with send button to send messages
