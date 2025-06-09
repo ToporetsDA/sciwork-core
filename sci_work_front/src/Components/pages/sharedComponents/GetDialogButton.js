@@ -1,6 +1,9 @@
-const GetDialogButton  = (setState, buttonClass, dialog, params, text) => {
+const GetDialogButton  = (setState, buttonClass, dialog, params, text, stopPropagate) => {
     return (
-        <button className={`${buttonClass}`} onClick={() => {
+        <button className={`${buttonClass}`} onClick={(e) => {
+            if (stopPropagate) {
+                e.stopPropagation()
+            }
             setState((prevState) => ({
                 ...prevState,
                 currentDialog: {

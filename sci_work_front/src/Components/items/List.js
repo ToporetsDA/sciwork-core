@@ -200,7 +200,8 @@ const List = ({
                             "edit-structure",
                             "AddEditContent",
                             [true, false, false, activity._id, "Add Item"],
-                            "Add Entry"
+                            "Add Entry",
+                            false
                         )}
                         <Shared.ItemTable
                             userData={userData}
@@ -212,6 +213,8 @@ const List = ({
                             itemsToDisplay={items}
                             itemKeys={itemKeys}
                             itemTypes={activity?.content.liStructure}
+                            editable={true}
+                            isItem={false}
                             rights={rights}
                             recentActivities={recentActivities}
                             setRecentActivities={setRecentActivities}
@@ -224,6 +227,8 @@ const List = ({
             }
         }
     }
+
+    console.log("list", item, item._id)
 
     return (
         <div className="list-editor-wrapper">
@@ -246,7 +251,9 @@ const List = ({
                 "edit-structure",
                 "AddEditContent",
                 [true, false, false, activity._id, "Edit Structure"],
-                "Edit List")
+                "Edit List",
+                false
+            )
             }
             {/* list items */}
             {getList(metaActivity.type)}

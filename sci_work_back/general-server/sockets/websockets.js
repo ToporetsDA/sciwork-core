@@ -146,12 +146,12 @@ const getData = async (type, login, ws, sessionToken, _id) => {
 
       // Get all accessible metadata entries
       const allActivities = flattenActivities(project.activities)
-      const accessibleMetadata = allActivities.filter(activity =>
-        activity.userList?.some(u => u.id === user._id.toString())
-      )
+      // const accessibleMetadata = allActivities.filter(activity =>
+      //   activity.userList?.some(u => u.id === user._id.toString())
+      // )
 
       // Now fetch *only* the full activity data for those the user can access
-      const activityIds = accessibleMetadata.map(a => a._id)
+      const activityIds = allActivities.map(a => a._id)
       const activities = await Collections.activity.find({
         _id: { $in: activityIds }
       })

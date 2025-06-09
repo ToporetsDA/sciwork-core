@@ -2,37 +2,41 @@ import * as Shared from './'
 
 const ItemActions = ({userData, projects, setData, setState, item, rights}) => {
 
-    const getAccess = (item) => {
-        return item.userList?.find(user => user.id === userData._id)?.access || -1
-    }
+    const parts = item?._id.split('.')
+    const project = Shared.GetItemById(projects, parts[0])
+    const accessibleItem = (parts.length < 3)
+        ? item
+        : Shared.FindItemWithParent(project.activities, "_id", parts[0] + '.' + parts[1], project).item
 
     return (
         <>
-            {!item.deleted && rights.edit.includes(getAccess(item)) && (
+            {!item.deleted && rights.edit.includes(Shared.GetAccess(accessibleItem, userData)) && (
             <div className="actions">
+                {Shared.GetDialogButton(
+                    setState,
+                    "usersButton",
+                    "AddEditUserList",
+                    [item._id],
+                    "👥",
+                    true
+                )}
+                {(parts?.length < 3) &&
+                Shared.GetDialogButton(
+                    setState,
+                    "gearButton",
+                    "AddEditItem",
+                    [item, item._id],
+                    "⚙️",
+                    true
+                )}
                 <button
-                className="gearButton"
-                onClick={(e) => {
-                    e.stopPropagation()
-                    setState((prevState) => ({
-                    ...prevState,
-                    currentDialog: {
-                        name: 'AddEditItem',
-                        params: [item, item._id],
-                    },
-                    }))
-                }}
+                    className="deleteButton"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        Shared.DeleteItem(projects, setData, item._id)
+                    }}
                 >
-                ⚙️
-                </button>
-                <button
-                className="deleteButton"
-                onClick={(e) => {
-                    e.stopPropagation()
-                    Shared.DeleteItem(projects, setData, item._id)
-                }}
-                >
-                🗑️
+                    🗑️
                 </button>
             </div>
             )}

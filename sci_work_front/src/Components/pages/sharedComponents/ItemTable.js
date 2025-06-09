@@ -4,6 +4,12 @@ import { useNavigate } from "react-router-dom"
 import * as Shared from './'
 import * as Items from '../../items'
 
+/* from
+Projects
+List
+AddEditUserList
+*/
+
 const ItemTable = ({
     userData,
     projects,
@@ -13,7 +19,8 @@ const ItemTable = ({
     itemsToDisplay,
     itemKeys,
     itemTypes,
-    nested,
+    editable, //editable content
+    isItem, //is project or activity
     rights,
     recentActivities, setRecentActivities
 }) => {
@@ -88,6 +95,15 @@ const ItemTable = ({
                     </div>
                 )
             }
+            case "button": {
+                return item[key]
+            }
+            case "combobox": {
+                return item[key]
+            }
+            case "access": {
+                return rights.names[Number(item[key])]
+            }
             case "tech": {
                 return
             }
@@ -160,10 +176,10 @@ const ItemTable = ({
                         )}
                     </th>
                 ))}
-                {!state.currentProject &&
+                {isItem &&
                     <th>Status</th>
                 }
-                {!state.currentProject &&
+                {isItem &&
                     <th>Actions</th>
                 }
                 </tr>
@@ -185,24 +201,25 @@ const ItemTable = ({
                         key={index}
                         className={`${isExpiring ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}
                         onClick={() => {
-                            if (!state.currentProject && !nested) {
+                            if (isItem && !state.currentProject) {//for projects
                                 navigate(Shared.GoTo(item, items, recentActivities, setRecentActivities))
                             }
                         }}
                     >
                         {liKeys.map((key) => (
                             <td key={key}>
-                                {!state.currentProject
+                                {!editable
                                     ? item[key] //text
                                     : getTileContent(key, item, i) //editable text
                                 }
                             </td>
                         ))}
-                        {!state.currentProject && <td>{status}</td>}
+                        {isItem && <td>{status}</td>}
                         <td onClick={(e) => e.stopPropagation()}>
                             <Shared.ItemActions
                                 userData={userData}
-                                data={projects}
+                                projects={projects}
+                                activities={activities}
                                 setData={setData}
                                 setState={setState}
                                 item={item}

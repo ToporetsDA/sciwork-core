@@ -18,8 +18,6 @@ const ListItem = ({
     recentActivities, setRecentActivities
 }) => {
 
-    // console.log("List item", item)
-
     const activity = Shared.GetItemById(activities, containerId)
 
     const fieldsToRender = activity.content?.liStructure
@@ -31,7 +29,7 @@ const ListItem = ({
             `listItems.${index}.${key}`,
             value
         )
-
+        console.log("mark", key, value, updatedActivity)
         setData({action: "content", item: {type: "List", activity: updatedActivity}})
     }
 
@@ -84,7 +82,28 @@ const ListItem = ({
                     patronimic: 'plain',
                     checker: 'checker'
                 }
-                console.log("markable item", markable)
+
+                //allow marking if in time window
+                const now = new Date()
+
+                const allowedDay = new Date(markable.date)
+
+                const start = new Date(allowedDay)
+                console.log("markable.startTime", markable.startTime)
+                console.log("markable.startTime", markable.startTime.split(":").map(Number))
+                const [startHours, startMinutes] = markable.startTime.split(":").map(Number)
+                start.setHours(startHours, startMinutes, 0, 0)
+
+                const end = new Date(allowedDay)
+                const [endHours, endMinutes] = markable.endTime.split(":").map(Number)
+                end.setHours(endHours, endMinutes, 0, 0)
+                
+
+                const inTimeWindow = (start < now ) && (now < end)
+
+                const entryIndex = markable.userEntries.findIndex(e => e._id === userData._id)
+                const keyPath = [key, "userEntries", entryIndex, "checker"].join('.')
+                const check = markable?.userEntries[entryIndex]?.checker
                     
                 return (
                     <div
@@ -111,15 +130,16 @@ const ListItem = ({
                             />
                         ) : (//other users see checkbox
                             <>
-                                {(item[key][0] === false) ? (//if not checked - show checkbox
+                                {(!check[0]) ? (//if not checked - show checkbox
                                     <input
                                         type="checkbox"
-                                        checked={item[key][0] || false}
-                                        onChange={(e) => {saveChanges(key, [e.target.checked, getTime()], activity, index)}}
+                                        checked={check[0] || false}
+                                        disabled={!inTimeWindow}
+                                        onChange={(e) => {saveChanges(keyPath, [e.target.checked, getTime()], activity, index)}}
                                     />
                                 ) : (//if checked - show time of it being checked
                                     <>
-                                        {item[key][1]}
+                                        {check[1]}
                                     </>
                                 )}
                             </>

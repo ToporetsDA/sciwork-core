@@ -49,7 +49,7 @@ const Projects = ({
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
         coordinateGetter: sortableKeyboardCoordinates,
-        }),
+        })
     )
 
     if (state.currentProject && containers.length !== Shared.GetItemById(projects, state.currentProject).activities.length) {
@@ -313,7 +313,8 @@ const Projects = ({
                                 itemsToDisplay={projects}
                                 itemKeys={["name", "dndCount", "startDate", "endDate"]}
                                 //itemTypes
-                                nested={false}
+                                editable={false}
+                                isItem={true}
                                 rights={rights}
                                 recentActivities={recentActivities}
                                 setRecentActivities={setRecentActivities}

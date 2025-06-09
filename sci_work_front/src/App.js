@@ -222,8 +222,8 @@ const App = () => {
           if (!target) return
 
           Object.assign(target, item)
-
-          flag(item._id)
+          console.log("now I should have updated activity", project, target, item)
+          flag(project._id)
           setter(prevItems => 
             prevItems.map(i =>
               i._id === project._id ? project : i
@@ -237,16 +237,9 @@ const App = () => {
         const { type, activity } = item
 
         switch(type) {
-          case "Text": {
-            flag(activity._id)
-            setter(prevItems => 
-              prevItems.map(i =>
-                i._id === activity._id ? activity : i
-              )
-            )
-            break
-          }
+          case "Text":
           case "Table":
+          case "Attendance":
           case "List": {
             flag(activity._id)
             setter(prevItems => 

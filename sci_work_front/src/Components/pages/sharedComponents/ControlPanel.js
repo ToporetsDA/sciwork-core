@@ -240,7 +240,9 @@ const ControlPanel = ({
                             "addItem",
                             'AddEditUserList',
                             [true],
-                            "Add/Edit users")
+                            "Add/Edit users",
+                            false
+                        )
                         }
                         </div>
                     )}
@@ -262,7 +264,8 @@ const ControlPanel = ({
                     "addItem",
                     'AddEditItem',
                     [true, false],
-                    "New Project"
+                    "New Project",
+                    false
                 )
             )}
         </div>

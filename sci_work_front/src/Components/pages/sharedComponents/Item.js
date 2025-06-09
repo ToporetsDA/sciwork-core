@@ -36,27 +36,27 @@ const Item = ({
 
     const getComponentType = () => {
         const itemsType = types[item.type] || "Dev"
-        let type
+        let iType
         if (isItem) {
             switch (containerType) {
                 case "Dev": {
-                    type = Items.Dev
+                    iType = Items.Dev
                     break
                 }
                 // Project
                 case "Project": {
-                    type = Items[itemsType]
+                    iType = Items[itemsType]
                     break
                 }
                 // activities
                 case "Group": {
-                    type = Items[itemsType]
+                    iType = Items[itemsType]
                     break
                 }
                 case "Attendance":
                 case "Table":
                 case "List": {
-                    type = SubItems.ListItem
+                    iType = SubItems.ListItem
                     break
                 }
                 // case "Table": separate from ItemTiles
@@ -75,7 +75,7 @@ const Item = ({
                 }
             }
         }
-        return type
+        return iType
     }
     
     const ItemComponent = getComponentType()
@@ -93,6 +93,9 @@ const Item = ({
         opacity: (isDragging) ? 0.5 : 1
     }
 
+    const parts = item._id.split('.')
+    const accessCheck = (parts.length > 2) ? true : item?.userList.some(user => user.id === userData._id)
+
     return (
         <div
             className={'activity-item'}
@@ -106,10 +109,11 @@ const Item = ({
                 "add-button",
                 (!['List', 'Attendance'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',
                 [true, false, index, containerId, "Add Item"],
-                "➕")
-            }
+                "➕",
+                false
+            )}
             <>
-                {isItem &&
+                {isItem && accessCheck &&
                     <>
                     {/* 🔘 DRAG HANDLE (6-dots) */}
                     <div
@@ -119,6 +123,14 @@ const Item = ({
                     >
                         ⋮⋮
                     </div>
+                    <Shared.ItemActions
+                        userData={userData}
+                        projects={projects}
+                        setData={setData}
+                        setState={setState}
+                        item={item}
+                        rights={rights}
+                    />
                     <ItemComponent
                         key={item._id}
                         userData={userData}

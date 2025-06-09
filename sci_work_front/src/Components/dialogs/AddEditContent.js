@@ -126,7 +126,11 @@ const AddEditContent = ({
             let newItem = {
                 ...formValues,
                 _id: activity._id + '.' + listItems.length,
-                creatorId: userData._id
+                creatorId: userData._id,
+                userList: [{
+                    id: userData._id,
+                    access: 0
+                }]
             }
 
             if (activity.content?.currentSettings?.markable) {
