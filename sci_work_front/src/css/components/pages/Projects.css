@@ -1,7 +1,6 @@
 .itemList {
   height: 74vh;
-  margin: 0 0 5vh 0;
-  padding: 5vh 0 0 0;
+  padding: 5vh 0;
   max-height: 74vh;
   overflow-y: auto;
 }

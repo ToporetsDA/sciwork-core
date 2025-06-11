@@ -37,7 +37,7 @@ const Group = ({
     // console.log("item in Group component", activities)
     return (
         <div
-            className='wrapper'    
+            className='wrapper'
         >
             {<Items.Text
                 userData={userData}

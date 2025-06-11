@@ -167,6 +167,14 @@ const ControlPanel = ({
                 placeholder="Search"
                 className="searchInput"
             />
+            {(state.currentPage === "Projects") &&
+                <Shared.ToggleButton
+                    data={userData.currentSettings}
+                    setter={setUserData}
+                    field={"displayProjects"}
+                    displayOptions={displayOptions}
+                />
+            }
             {state.currentPage === "Schedule" &&
                 <div className='scale'>
                     <select
@@ -239,7 +247,7 @@ const ControlPanel = ({
                             setState,
                             "addItem button-mini",
                             'AddEditUserList',
-                            [true],
+                            [state.currentProject],
                             "Add/Edit users",
                             false
                         )
@@ -247,14 +255,6 @@ const ControlPanel = ({
                         </div>
                     )}
                 </>
-            }
-            {(state.currentPage === "Projects") &&
-                <Shared.ToggleButton
-                    data={userData.currentSettings}
-                    setter={setUserData}
-                    field={"displayProjects"}
-                    displayOptions={displayOptions}
-                />
             }
             {(rights.edit.includes(userData.genStatus)
             && ["Projects"].includes(state.currentPage))
