@@ -36,35 +36,34 @@ const Item = ({
 
     const getComponentType = () => {
         const itemsType = types[item.type] || "Dev"
-        let iType
+        let type
         if (isItem) {
             switch (containerType) {
                 case "Dev": {
-                    iType = Items.Dev
+                    type = Items.Dev
                     break
                 }
                 // Project
                 case "Project": {
-                    iType = Items[itemsType]
+                    type = Items[itemsType]
                     break
                 }
                 // activities
                 case "Group": {
-                    iType = Items[itemsType]
+                    type = Items[itemsType]
                     break
                 }
                 case "Attendance":
-                case "Table":
+                case "Table"://separate from ItemTiles
                 case "List": {
-                    iType = SubItems.ListItem
+                    type = SubItems.ListItem
                     break
                 }
-                // case "Table": separate from ItemTiles
-                // case "Report": //maybe stored files
-                // case "Chat": {
-                //     type = SubItems.Message
-                //     break
-                // }
+                case "Chat": {
+                    type = Items[itemsType]
+                    break
+                }
+                // case "Report": //save comment, save files on private server instances to client's storage
                 // case "Test": {
                 //     type = SubItems.Question
                 //     break
@@ -75,7 +74,7 @@ const Item = ({
                 }
             }
         }
-        return iType
+        return type
     }
     
     const ItemComponent = getComponentType()
@@ -142,6 +141,7 @@ const Item = ({
                         item={item}
                         index={index}
                         containerId={containerId}
+                        containerType={containerType}
                         rights={rights}
                         users={users}
                         setUsers={setUsers}

@@ -83,16 +83,31 @@ const ItemTable = ({
                 return item[key]
             }
             case "checker": {
-                return (item[key][0] === false) ? (//if not checked - show checkbox
-                    <input
-                        type="checkbox"
-                        checked={item[key][0] || false}
-                        onChange={(e) => {saveChanges(key, [e.target.checked, getTime()], activity, index)}}
-                    />
-                ) : (//if checked - show time of it being checked
-                    <div>
-                        {item[key][1]}
-                    </div>
+                return (
+                    <>
+                    {(item[key][0] === false) ? (//if not checked - show checkbox
+                        <input
+                            type="checkbox"
+                            checked={item[key][0] || false}
+                            onChange={(e) => {saveChanges(key, [e.target.checked, getTime()], activity, index)}}
+                        />
+                    ) : (//if checked - show time of it being checked
+                        <div>
+                            {item[key][1]}
+                        </div>
+                    )}
+                    {item[key].length === 3 && //add to Text Editable param and pass this
+                        <div className='text-wrapper'>
+                            <div className='text-container'>
+                                <div
+                                    dangerouslySetInnerHTML={{
+                                        __html: item[key][2]
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    }
+                    </>
                 )
             }
             case "button": {

@@ -191,19 +191,6 @@ const getData = async (type, login, ws, sessionToken, _id) => {
   send(ws, "data", sessionToken, type, data)
 }
 
-const templates = {
-  group: {},
-  text: {},
-  list: {
-    attendance: {
-      startTime: "00:00",
-      endTime: "00:00",
-      useLate: false,
-      mark: ["present", "missing"] // if (useLate) ["present", "Late", "missing"]
-    }
-  }
-}
-
 //activities's content
 const getActivityContent = (type) => {
 
@@ -257,6 +244,20 @@ const getActivityContent = (type) => {
         listItems: [],
         liStructure: {
           text: "text"
+        }
+      }
+      break
+    }
+    case "Chat": {
+      content = {
+        name: "Chat name",
+        currentSettings: {},
+        messageCount: 0,
+        listItems: [],
+        liStructure: {
+          sender: "plain",
+          content: "plain",
+          dateTime: "plain"
         }
       }
       break

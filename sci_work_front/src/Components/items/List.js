@@ -182,11 +182,7 @@ const List = ({
                 )
             }
             case"Attendance" : {
-                return (
-                    <>
-                        {getItemTiles()}
-                    </>
-                )
+                return getItemTiles()
             }
             case"Table": {
                 const itemKeys = Object.keys(activity?.content.liStructure).filter(key =>
@@ -222,9 +218,41 @@ const List = ({
                     </>
                 )
             }
+            case"Chat": {
+                return (
+                    <>
+                        {getItemTiles()}
+                        {/* like in schedule show messages from-to date. 2 inputs type date on top...
+                        maybe put in separate component? Yeah, good idea, and from THERE
+                        call List) */}
+                        {/* add element to save value from */}
+                        {/* button to save values */}
+                    </>
+                )
+            }
             default: {
                 return
             }
+        }
+    }
+
+    const getDialog = (type) => {
+        const hasDialogButton = ["List", "Attendance", "Table", /*no Chat*/]
+
+        if (!hasDialogButton.includes(type)) {
+            return
+        }
+        else {
+            return (
+                Shared.GetDialogButton(
+                    setState,
+                    "edit-structure",
+                    "AddEditContent",
+                    [true, false, false, activity._id, "Edit Structure"],
+                    "Edit List",
+                    false
+                )
+            )
         }
     }
 
@@ -246,15 +274,7 @@ const List = ({
                 rights={rights}
             />
             {/* EditStructure button */}
-            {Shared.GetDialogButton(
-                setState,
-                "edit-structure",
-                "AddEditContent",
-                [true, false, false, activity._id, "Edit Structure"],
-                "Edit List",
-                false
-            )
-            }
+            {getDialog(metaActivity.type)}
             {/* list items */}
             {getList(metaActivity.type)}
         </div>

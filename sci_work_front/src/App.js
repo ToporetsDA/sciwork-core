@@ -80,7 +80,7 @@ const App = () => {
     },
     lists: {
       days: { many: true, options: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']},
-      type: { many: false, options: ['Dev', 'Group', 'Text', 'Chat', 'List', 'Table', 'Attendance', 'Report', 'Test']}
+      type: { many: false, options: [/*'Dev',*/ 'Group', 'Text', 'Chat', 'List', 'Table', 'Attendance', 'Report', /*'Test'*/]}
     },
     checks: {
       days:         {val: true, dep: "repeat"},
@@ -247,6 +247,10 @@ const App = () => {
                 i._id === activity._id ? activity : i
               )
             )
+            break
+          }
+          case "Chat": {
+            console.log("send message", item)
             break
           }
           default: {

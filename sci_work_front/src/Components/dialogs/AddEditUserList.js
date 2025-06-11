@@ -130,7 +130,7 @@ const AddEditUserList = ({
         const updatedUserList = [...userList, { id: userId, access: defaultAccess }]
 
         saveChanges(updatedUserList)
-    }, [rights, userList, saveChanges])
+    }, [rights, userList, activity, saveChanges])
 
     const handleRightChange = useCallback((userId, newRight) => {
         const updatedUserList = userList.map(user =>
