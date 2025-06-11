@@ -1,5 +1,5 @@
 import React from 'react'
-import '../../css/pages/Notifications.css'
+import '../../css/components/pages/Notifications.css'
 
 import * as Shared from './sharedComponents/index'
 

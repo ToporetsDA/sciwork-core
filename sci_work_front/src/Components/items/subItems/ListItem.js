@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import '../../../css/items/subItems/ListItem.css'
+import '../../../css/components/items/subItems/ListItem.css'
 
 import * as Shared from '../../pages/sharedComponents'
 import * as Items from '../../items'
@@ -64,8 +64,6 @@ const ListItem = ({
         const allowedDay = new Date(markable.date)
 
         const start = new Date(allowedDay)
-        console.log("markable.startTime", markable.startTime)
-        console.log("markable.startTime", markable.startTime.split(":").map(Number))
         const [startHours, startMinutes] = markable.startTime.split(":").map(Number)
         start.setHours(startHours, startMinutes, 0, 0)
 
@@ -78,8 +76,6 @@ const ListItem = ({
         const entryIndex = markable.userEntries.findIndex(e => e._id === userData._id)
         const keyPath = [key, "userEntries", entryIndex, "checker"].join('.')
         const check = markable?.userEntries[entryIndex]?.checker
-
-        setReportInput()
             
         return (
             <div
@@ -155,6 +151,7 @@ const ListItem = ({
             case "checkbox": {
                 return (
                     <div
+                        className='checkbox-wrapper'
                         key={item._id + '.' + key}
                     >
                         <p>{key}</p>
@@ -193,13 +190,13 @@ const ListItem = ({
     }
 
     return (metaActivity.type === "List") ? (
-        <li className="listItem-wrapper">
+        <li className="wrapper">
             {Object.entries(fieldsToRender).map(([key, type]) => (
                 getField(key, type)
             ))}
         </li>
     ) : (
-        <div className="listItem-wrapper">
+        <div className="wrapper">
             {Object.entries(fieldsToRender).map(([key, type]) => (
                 getField(key, type)
             ))}

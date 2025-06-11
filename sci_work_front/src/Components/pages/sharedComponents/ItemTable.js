@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from "react-router-dom"
+import '../../../css/components/pages/sharedComponents/ItemTable.css'
 
 import * as Shared from './'
 import * as Items from '../../items'
@@ -229,18 +230,22 @@ const ItemTable = ({
                                 }
                             </td>
                         ))}
-                        {isItem && <td>{status}</td>}
-                        <td onClick={(e) => e.stopPropagation()}>
-                            <Shared.ItemActions
-                                userData={userData}
-                                projects={projects}
-                                activities={activities}
-                                setData={setData}
-                                setState={setState}
-                                item={item}
-                                rights={rights}
-                            />
-                        </td>
+                        {isItem &&
+                            <td>{status}</td>
+                        }
+                        {isItem &&
+                            <td onClick={(e) => e.stopPropagation()}>
+                                <Shared.ItemActions
+                                    userData={userData}
+                                    projects={projects}
+                                    activities={activities}
+                                    setData={setData}
+                                    setState={setState}
+                                    item={item}
+                                    rights={rights}
+                                />
+                            </td>
+                        }
                     </tr>
                 )
                 })}

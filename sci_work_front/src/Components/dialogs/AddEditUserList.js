@@ -1,6 +1,5 @@
 import { useMemo, useCallback }  from 'react'
-import '../../css/dialogs/AddEditUserList.css'
-import '../../css/dialogs/dialog.css'
+import '../../css/components/dialogs/AddEditUserList.css'
 
 import * as Shared from '../pages/sharedComponents'
 
@@ -146,7 +145,7 @@ const AddEditUserList = ({
     const getButton = (buttonClass, clickHandler, param, text) => {
         return (
             <button
-                className={`${buttonClass}`}
+                className={`${buttonClass} button-mini`}
                 onClick={() => clickHandler(param)}
             >
                 {text}
@@ -247,7 +246,7 @@ const AddEditUserList = ({
     return (
         <div className="AddEditUserListDialog dialogContainer">
             <div className="dialogContent">
-                <p>Users of {item._id}</p>
+                <p>Users of {currentUserParam.name}</p>
                 <div className="usersWithAccess">
                     <h3>Users with Access</h3>
                     <div className="scrollableList">
@@ -261,7 +260,7 @@ const AddEditUserList = ({
                     </div>
                 </div>
                 <button
-                    className='backButton'
+                    className='button-main'
                     onClick={closeDialog}
                 >
                     Back

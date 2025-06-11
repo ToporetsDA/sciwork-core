@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import '../../css/dialogs/AddEditContent.css'
-import '../../css/dialogs/dialog.css'
+import '../../css/components/dialogs/AddEditContent.css'
 
 import * as Shared from '../pages/sharedComponents'
 
@@ -300,8 +299,18 @@ const AddEditContent = ({
                 </form>
 
                 <div className="dialogButtons">
-                    <button onClick={handleSubmit}>Save</button>
-                    <button onClick={closeDialog}>Close</button>
+                    <button
+                        className='button-main'
+                        onClick={handleSubmit}
+                    >
+                        Save
+                    </button>
+                    <button
+                        className='button-main'
+                        onClick={closeDialog}
+                    >
+                        Close
+                    </button>
                 </div>
             </div>
         </div>

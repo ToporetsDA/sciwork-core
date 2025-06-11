@@ -1,4 +1,3 @@
-export { default as Chats } from './Chats.js'
 export { default as HomePage } from './HomePage.js'
 export { default as Notifications } from './Notifications.js'
 export { default as Profile } from './Profile.js'

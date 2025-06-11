@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-import '../../../css/pages/sharedComponents/ToggleButton.css'
+import '../../../css/components/pages/sharedComponents/ToggleButton.css'
 
 const ToggleButton = ({data, setter, field, displayOptions}) => {
 

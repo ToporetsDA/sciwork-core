@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import '../../css/items/Group.css'
+import '../../css/components/items/Group.css'
 
 import * as Shared from '../pages/sharedComponents'
 import * as Items from './'
@@ -37,7 +37,7 @@ const Group = ({
     // console.log("item in Group component", activities)
     return (
         <div
-            className='group-wrapper'    
+            className='wrapper'    
         >
             {<Items.Text
                 userData={userData}

@@ -1,8 +1,7 @@
 import { Suspense, useState, useEffect }  from 'react'
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners, useSensor, useSensors, } from '@dnd-kit/core'
 import { arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
-import '../../css/pages/Projects.css'
-import ControlPanel from './sharedComponents/ControlPanel'
+import '../../css/components/pages/Projects.css'
 
 import * as Shared from './sharedComponents'
 
@@ -286,7 +285,7 @@ const Projects = ({
 
     return (
         <>
-            <ControlPanel
+            <Shared.ControlPanel
                 userData={userData}
                 setUserData={setUserData}
                 state={state}

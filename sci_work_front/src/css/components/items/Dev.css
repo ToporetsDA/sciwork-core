@@ -1,0 +1,22 @@
+.drag-handle {
+  margin-bottom: 0.5rem;
+  color: #5c5c5c;
+  font-size: 1.3rem;
+  user-select: none;
+  cursor: grab;
+}
+
+.add-button {
+  margin-top: 0.5rem;
+  padding: 0;
+  border: none;
+  color: #0066aa;
+  background: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.add-button:hover {
+  text-decoration: underline;
+}
+
+/*# sourceMappingURL=Dev.css.map */

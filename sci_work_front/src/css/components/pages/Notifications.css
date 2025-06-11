@@ -1,0 +1,26 @@
+.notificationsContainer {
+  max-height: 89vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.notificationsContainer .read {
+  background-color: #cccccc;
+}
+.notificationsContainer .unread .notification-circle {
+  width: 15px;
+  height: 15px;
+  margin: auto 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  color: white;
+  background-color: #ee2211;
+  font-size: 12px;
+}
+.notificationsContainer .list {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+/*# sourceMappingURL=Notifications.css.map */

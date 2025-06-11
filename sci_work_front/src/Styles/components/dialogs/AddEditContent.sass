@@ -1,0 +1,50 @@
+@import '../../../StyleVars.sass'
+@import '../../base/buttons.css'
+@import '../../base/dialog.css'
+
+.toolbar
+    margin-bottom: $space-medium
+    gap: $space-medium
+
+    display: flex
+    
+
+.toolbar button, .toolbar select, .toolbar input[type="color"] 
+    padding: $space-small
+
+    font-size: $font-medium
+
+.editor 
+    min-height: 200px
+
+    margin-bottom: $space-medium
+    padding: $space-medium
+
+    border: 1px solid $tertiary-color
+    
+    background: white
+    
+
+.dialogActions
+    gap: $space-medium
+
+    display: flex
+    justify-content: flex-end
+
+.toolbar button
+    min-width: 32px
+
+    padding: $space-small
+
+    background: none
+
+    border: 1px solid $tertiary-color
+    border-radius: $radius
+    
+    cursor: pointer
+
+.toolbar button:hover 
+    background-color: $main-color
+
+label
+    display: block

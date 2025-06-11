@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
+import '../../css/components/items/List.css'
 
 import * as Shared from '../pages/sharedComponents'
 import * as Items from './'
@@ -156,11 +157,37 @@ const List = ({
         )
     }
 
+    const getDialog = (itemType, type) => {
+        const hasDialogButton = ["List", "Attendance", "Table", /*no Chat*/]
+
+        if (!hasDialogButton.includes(itemType)) {
+            return
+        }
+        else {
+            return (
+                <div
+                    className='list-actions'
+                >
+                {Shared.GetDialogButton(
+                    setState,
+                    "button-mini",
+                    "AddEditContent",
+                    [true, false, false, activity._id, type],
+                    type,
+                    false
+                )}
+                </div>
+            )
+        }
+    }
+
     const getList = (type) => {
         switch(type) {
             case"List": {
                 return (
-                    <>
+                    <div
+                        className='list'
+                    >
                         {/* ordered/unordered */}
                         <Shared.ToggleButton
                             data={settings}
@@ -178,7 +205,7 @@ const List = ({
                                 {getItemTiles()}
                             </ol>
                         )}
-                    </>
+                    </div>
                 )
             }
             case"Attendance" : {
@@ -186,36 +213,26 @@ const List = ({
             }
             case"Table": {
                 const itemKeys = Object.keys(activity?.content.liStructure).filter(key =>
-                    key !== '_id' && key !== 'deleted' &&
+                    key !== '_id' && key !== 'deleted' && key !== 'creatorId' &&
                     !Array.isArray(activity?.content.liStructure[key])
                 )
                 return (
-                    <>
-                        {Shared.GetDialogButton(
-                            setState,
-                            "edit-structure",
-                            "AddEditContent",
-                            [true, false, false, activity._id, "Add Item"],
-                            "Add Entry",
-                            false
-                        )}
-                        <Shared.ItemTable
-                            userData={userData}
-                            projects={projects}
-                            activities={activities}
-                            setData={setData}
-                            state={state}
-                            setState={setState}
-                            itemsToDisplay={items}
-                            itemKeys={itemKeys}
-                            itemTypes={activity?.content.liStructure}
-                            editable={true}
-                            isItem={false}
-                            rights={rights}
-                            recentActivities={recentActivities}
-                            setRecentActivities={setRecentActivities}
-                        />
-                    </>
+                    <Shared.ItemTable
+                        userData={userData}
+                        projects={projects}
+                        activities={activities}
+                        setData={setData}
+                        state={state}
+                        setState={setState}
+                        itemsToDisplay={items}
+                        itemKeys={itemKeys}
+                        itemTypes={activity?.content.liStructure}
+                        editable={true}
+                        isItem={false}
+                        rights={rights}
+                        recentActivities={recentActivities}
+                        setRecentActivities={setRecentActivities}
+                    />
                 )
             }
             case"Chat": {
@@ -236,47 +253,53 @@ const List = ({
         }
     }
 
-    const getDialog = (type) => {
-        const hasDialogButton = ["List", "Attendance", "Table", /*no Chat*/]
-
-        if (!hasDialogButton.includes(type)) {
-            return
-        }
-        else {
-            return (
-                Shared.GetDialogButton(
-                    setState,
-                    "edit-structure",
-                    "AddEditContent",
-                    [true, false, false, activity._id, "Edit Structure"],
-                    "Edit List",
-                    false
-                )
-            )
-        }
-    }
-
     console.log("list", item, item._id)
 
+    const [showLi, setShowLi] = useState(true)
+    const toggleLi = () => {
+        setShowLi(prev => !prev)
+    }
+
     return (
-        <div className="list-editor-wrapper">
+        <div className="wrapper">
             {/* activity name */}
-            <Items.Text
-                key={item._id}
-                userData={userData}
-                projects={projects}
-                activities={activities}
-                setData={setData}
-                state={state}
-                setState={setState}
-                item={item}
-                data={"name"}
-                rights={rights}
-            />
-            {/* EditStructure button */}
-            {getDialog(metaActivity.type)}
-            {/* list items */}
-            {getList(metaActivity.type)}
+            <div
+                className='list-header'
+            >
+                <Items.Text
+                    key={item._id}
+                    userData={userData}
+                    projects={projects}
+                    activities={activities}
+                    setData={setData}
+                    state={state}
+                    setState={setState}
+                    item={item}
+                    data={"name"}
+                    rights={rights}
+                />
+                <button
+                    className="list-toggle-button button-main"
+                    onClick={toggleLi}
+                >
+                    {(showLi) ? "Hide" : "Show"}
+                </button>
+            </div>
+            {showLi &&
+                <>
+                    {/* EditStructure button */}
+                    {getDialog(metaActivity.type, "Edit Structure")}
+                    {metaActivity.type === "Table" &&
+                        getDialog(metaActivity.type, "Add Item")
+                    }
+                    {/* list items */}
+                    <div
+                        className='scrollable-wrapper'
+                    >
+                        {getList(metaActivity.type)}
+                    </div>
+                </>
+            }
         </div>
     )
 }

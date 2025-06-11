@@ -1,6 +1,5 @@
 import React from 'react'
-import '../../css/dialogs/JointEventOverlap.css'
-import '../../css/dialogs/dialog.css'
+import '../../css/components/dialogs/JointEventOverlap.css'
 
 import * as Shared from '../pages/sharedComponents'
 
@@ -36,7 +35,7 @@ const JointEventOverlapDialog = ({ projects, activities, state, setState }) => {
                     list={state.currentDialog.params[0]}
                 />
                 <button
-                    className='backButton'
+                    className='button-main'
                     onClick={handleOutsideClick}
                 >
                     Back

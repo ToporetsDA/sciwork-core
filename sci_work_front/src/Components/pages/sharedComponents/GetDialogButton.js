@@ -1,3 +1,5 @@
+import '../../../css/base/buttons.css'
+
 const GetDialogButton  = (setState, buttonClass, dialog, params, text, stopPropagate) => {
     return (
         <button className={`${buttonClass}`} onClick={(e) => {

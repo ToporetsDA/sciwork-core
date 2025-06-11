@@ -1,0 +1,44 @@
+.wrapper {
+  min-width: 80%;
+  padding: 15px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(17, 17, 17, 0.1411764706);
+}
+
+.scrollable-wrapper {
+  max-height: 37vh;
+  overflow: auto;
+}
+
+.scheduleContainer {
+  max-height: 74vh;
+  padding: 5vh;
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.scheduleContainer .currentMap {
+  width: 7.5%;
+}
+.scheduleContainer .scheduleVMap {
+  width: 90%;
+  margin: 0 0 10px 0;
+  flex-shrink: 0;
+}
+.scheduleContainer .scheduleHMap {
+  width: 7.5%;
+  height: 5vh;
+}
+.scheduleContainer .scheduleHMap .leftLabel {
+  min-height: 99.6px;
+}
+
+.schedule-scrollable {
+  width: 100%;
+  overflow: auto;
+  display: flex;
+}
+
+/*# sourceMappingURL=Schedule.css.map */

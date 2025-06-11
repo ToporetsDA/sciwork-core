@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback }  from 'react'
-import '../../../css/pages/sharedComponents/ControlPanel.css'
+import '../../../css/components/pages/sharedComponents/ControlPanel.css'
 
 import * as Shared from './'
 
@@ -178,13 +178,13 @@ const ControlPanel = ({
                         <option value="month">Month</option>
                         <option value="year">Year</option>
                     </select>
-                    <button className='moveSchedulePage' onClick={() => editIntervalAnchor(-1)}>
+                    <button className='moveSchedulePage button-mini' onClick={() => editIntervalAnchor(-1)}>
                         Prev.
                     </button>
-                    <button className='moveSchedulePage' onClick={() => editIntervalAnchor(0)}>
+                    <button className='moveSchedulePage button-mini' onClick={() => editIntervalAnchor(0)}>
                         To now
                     </button>
-                    <button className='moveSchedulePage' onClick={() => editIntervalAnchor(1)}>
+                    <button className='moveSchedulePage button-mini' onClick={() => editIntervalAnchor(1)}>
                         Next
                     </button>
                 </div>
@@ -195,7 +195,7 @@ const ControlPanel = ({
                     <div className='sortAndFilter'>
                         <div>
                             <button
-                                className="filterButton"
+                                className="filterButton  button-mini"
                                 onClick={() => {setIsSortDropdownOpen(!isSortDropdownOpen)}}
                                 ref={sortDropdownRef}
                             >
@@ -213,7 +213,7 @@ const ControlPanel = ({
                         </div>
                         <div>
                             <button
-                                className="filterButton"
+                                className="filterButton  button-mini"
                                 onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
                                 ref={stateDropdownRef}
                             >
@@ -237,7 +237,7 @@ const ControlPanel = ({
                         <div>
                         {Shared.GetDialogButton(
                             setState,
-                            "addItem",
+                            "addItem button-mini",
                             'AddEditUserList',
                             [true],
                             "Add/Edit users",
@@ -261,7 +261,7 @@ const ControlPanel = ({
             && (
                 Shared.GetDialogButton(
                     setState,
-                    "addItem",
+                    "addItem button-mini",
                     'AddEditItem',
                     [true, false],
                     "New Project",

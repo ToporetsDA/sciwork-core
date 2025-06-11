@@ -1,5 +1,5 @@
 import { useState, Suspense } from 'react'
-import '../css/AppContent.css'
+import '../css/components/AppContent.css'
 import * as Pages from './pages'
 import * as Dialogs from './dialogs'
 

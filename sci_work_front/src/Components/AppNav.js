@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from "react-router-dom"
-import '../css/AppNav.css'
+import '../css/components/AppNav.css'
 
 import * as Shared from './pages/sharedComponents'
 
@@ -94,6 +94,7 @@ const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, rec
           })}
 
           <button
+            className='button-secondary'
             style={{ display: recentActivities.length === 0 ? 'none' : 'block' }}
             onClick={clearRecent}
           >

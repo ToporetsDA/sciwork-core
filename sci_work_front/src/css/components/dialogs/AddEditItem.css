@@ -1,0 +1,37 @@
+@import '../../base/buttons.css';
+@import '../../base/dialog.css';
+.addEditItemDialog .dialogContent {
+  max-height: 75%;
+  overflow-y: auto;
+}
+.addEditItemDialog .dialogContent #itemType {
+  margin-bottom: 5px;
+}
+.addEditItemDialog .dialogContent .formGroup .fieldBox {
+  margin-bottom: 10px;
+}
+.addEditItemDialog .dialogContent .formGroup .fieldBox label {
+  margin-bottom: 5px;
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+}
+.addEditItemDialog .dialogContent .formGroup .checkboxFieldBox {
+  display: flex;
+  gap: 10px;
+}
+.addEditItemDialog .dialogContent .formGroup .listButtons {
+  overflow-y: auto;
+  display: flex;
+  gap: 10px;
+}
+.addEditItemDialog .dialogContent .error {
+  border: 2px solid #ee2211;
+}
+.addEditItemDialog .dialogContent .errorMessage {
+  margin-top: 5px;
+  color: #ee2211;
+  font-size: 14px;
+}
+
+/*# sourceMappingURL=AddEditItem.css.map */

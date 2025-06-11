@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { useNavigate } from "react-router-dom"
-import '../css/AppHeader.css'
+import '../css/components/AppHeader.css'
 import logo from "../logo.svg"
 
 const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLoggedIn, notifications, setNotifications, organisationType}) => {
@@ -16,7 +16,7 @@ const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLogg
     
     const pages = ['Home Page', 'Schedule', (organisationType) ? 'Projects' : 'Subjects']
     const morePages = (userData.genStatus === 0) ? (
-        ['Profile', 'User List', 'Notifications', 'Chats', 'Settings']
+        ['Profile', 'User List', 'Notifications', 'Settings']
     ) : (
         ['Profile', 'Notifications', 'Chats', 'Settings']
     )

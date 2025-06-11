@@ -1,0 +1,32 @@
+.text-wrapper {
+  padding: 5px;
+  position: relative;
+}
+
+.editorArea {
+  min-height: 2em;
+  padding: 5px;
+  border: 1px solid transparent;
+}
+.editorArea:focus {
+  outline: 1px dashed #888;
+  border-color: #aaa;
+  background: #f8f8f8;
+}
+
+.toolbar-popup {
+  padding: 5px 10px;
+  display: flex;
+  gap: 10px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 999999;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(17, 17, 17, 0.1411764706);
+  background: white;
+  transform: translateX(-50%);
+}
+
+/*# sourceMappingURL=Text.css.map */

@@ -1,6 +1,5 @@
 import { useState, useMemo }  from 'react'
-import '../../css/dialogs/AddEditItem.css'
-import '../../css/dialogs/dialog.css'
+import '../../css/components/dialogs/AddEditItem.css'
 
 import { ObjectId } from 'bson'
 
@@ -330,7 +329,7 @@ const AddEditItem = ({
                                                 <button
                                                     key={val}
                                                     type="button"
-                                                    className={formValues[key]?.includes(val) ? 'selected' : ''}
+                                                    className={`button-from-list ${formValues[key]?.includes(val) ? 'selected' : ''}`}
                                                     onClick={() => toggleListSelection(key, val, itemStructure.lists[key].many)}
                                                 >
                                                     {val}
@@ -361,8 +360,8 @@ const AddEditItem = ({
                             </div>
                         ))
                     )}
-                    <button type="button" className="actionButton" onClick={closeDialog}>Cancel</button>
-                    <button type="submit" className="actionButton">Save</button>
+                    <button type="submit" className="button-main">Save</button>
+                    <button type="button" className="button-main" onClick={closeDialog}>Cancel</button>
                 </form>
             </div>
         </div>

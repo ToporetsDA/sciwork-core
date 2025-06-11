@@ -1,0 +1,45 @@
+@import '../../../StyleVars.sass'
+@import '../../base/buttons.css'
+@import '../../base/dialog.css'
+
+.addEditItemDialog
+
+    .dialogContent
+        max-height: 75%
+        overflow-y: auto
+
+        #itemType
+            margin-bottom: $space-small
+
+        .formGroup
+
+            .fieldBox
+                margin-bottom: 10px
+
+                label
+                    margin-bottom: $space-small
+
+                    display: block
+
+                    font-size: $font-medium
+                    font-weight: bold
+            
+            .checkboxFieldBox
+                display: flex
+                gap: $space-medium
+
+            .listButtons
+                overflow-y: auto
+
+                display: flex
+                gap: $space-medium
+        
+        .error
+            border: 2px solid $highlight-color
+
+        .errorMessage
+            margin-top: $space-small
+
+            color: $highlight-color
+
+            font-size: $font-medium

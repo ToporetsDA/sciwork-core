@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useNavigate } from "react-router-dom"
-import '../../../css/pages/specificComponents/ScheduleBoard.css'
+import '../../../css/components/pages/specificComponents/ScheduleBoard.css'
 
 import * as Shared from '../sharedComponents'
 
@@ -348,15 +348,14 @@ const ScheduleBoard = ({
         return (
             <div
                 key={'event-' + group[i].eventId}
-                className="event"
+                className={`event ${(isJoint) ? `overlapBg` : `eventBg`}`}
                 style={{
                     zIndex: `${zIndex}`,
                     width: `${right - left - space}%`,
                     height: `${bottom - top -  space}%`,
                     position: 'absolute',
                     top: `${top}%`,
-                    left: `${left}%`,
-                    backgroundColor: (isJoint) ? `#ff8800` : `#00ff88`
+                    left: `${left}%`
                 }}
                 onClick={() => {
                     (isJoint) ? (

@@ -1,0 +1,89 @@
+@import '../../App.css'
+@import '../../StyleVars.sass'
+
+header
+    width: 100%
+    height: $header-height
+    
+    display: flex
+    align-items: center
+    justify-content: space-between
+    
+    color: $secondary-text-color
+    background-color: $secondary-color
+
+    p
+        padding-right: $space-small
+
+    .logo
+        width: 75px
+        height: auto
+
+        margin: 0
+        padding: $space-medium
+
+        display: block
+
+    li
+        height:  45px
+
+        padding: $space-big
+
+        display: flex
+        align-items: center
+
+        &:hover
+            background-color: $hover-color
+
+    .menu
+        height:  100%
+
+        margin-right: $space-large
+
+        display: flex
+
+        list-style-type: none
+
+    .more
+        padding: 0
+
+        position: absolute
+        top: 60px
+        right: 10px
+        z-index: 1000
+
+        display: block
+        
+        background-color: white
+        border-radius: $radius
+
+        box-shadow: $shadow
+
+        li
+            width: 120px
+
+            padding: $space-small $space-medium
+
+            text-align: left
+
+            &:hover
+                background-color: $hover-color
+        
+        p
+            color: $main-text-color
+
+    .notification-circle
+
+        width: $space-big
+        height: $space-big
+        
+        border-radius: $circle
+
+        display: flex
+        justify-content: center
+        align-items: center
+
+        color: $secondary-text-color
+        background-color: $highlight-color
+
+        font-size: $font-small

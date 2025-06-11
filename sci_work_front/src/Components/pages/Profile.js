@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import '../../css/pages/Profile.css'
+import '../../css/components/pages/Profile.css'
 
 const Profile = ({ userData, setUserData, profileData, rights }) => {
 
@@ -35,7 +35,7 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
     
     return (
         <div className="accountPage">
-            <h2>Account Details</h2>
+            <h2>Profile Details</h2>
             {/* <div className='accountImage'>
                 {userData.photo !== undefined &&
                     <></>
@@ -74,11 +74,26 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
             <div className="accountActions">
                 {editMode ? (
                     <>
-                        <button onClick={saveChanges}>Save</button>
-                        <button onClick={() => setEditMode(false)}>Cancel</button>
+                        <button
+                            className='button-main'
+                            onClick={saveChanges}
+                        >
+                            Save
+                        </button>
+                        <button
+                            className='button-main'
+                            onClick={() => setEditMode(false)}
+                        >
+                            Cancel
+                        </button>
                     </>
                 ) : (
-                    <button onClick={() => setEditMode(true)}>Edit Profile</button>
+                    <button
+                        className='button-main'
+                        onClick={() => setEditMode(true)}
+                    >
+                        Edit Profile
+                    </button>
                 )}
             </div>
         </div>

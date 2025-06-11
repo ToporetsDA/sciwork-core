@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import '../../css/dialogs/LogIn.css'
-import '../../css/dialogs/dialog.css'
+import '../../css/components/dialogs/LogIn.css'
+import '../../css/base/dialog.css'
 
 
 const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
@@ -30,7 +30,7 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
         loginToServer(formValues)
     }
 
-    const handleOutsideClick = (e) => {
+    const closeDialog = (e) => {
         if (e.target === e.currentTarget) {
             setState((prevState) => ({
                 ...prevState,
@@ -45,7 +45,7 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
     return (
         <>
             {!isLoggedIn &&
-            <div className="AuthDialog dialogContainer"  onClick={handleOutsideClick}>
+            <div className="AuthDialog dialogContainer">
                 <div className="dialogContent">
                     <form onSubmit={handleSubmit}>
                         {/* Server Selection */}
@@ -99,15 +99,20 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
                         />
 
                         {/* Submit Button */}
-                        <button type="submit" className="submitButton">
-                            Log In
-                        </button>
-                        <button
-                            className='backButton'
-                            onClick={handleOutsideClick}
-                        >
-                            Back
-                        </button>
+                        <div>
+                            <button
+                                type="submit"
+                                className="button-main"
+                            >
+                                Log In
+                            </button>
+                            <button
+                                className='button-main'
+                                onClick={closeDialog}
+                            >
+                                Back
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useState } from 'react'
 
 import * as Shared from '../pages/sharedComponents'
 import * as Items from './'
@@ -18,10 +18,8 @@ const List = ({
     recentActivities, setRecentActivities
 }) => {
 
-    const activity = Shared.GetItemById(activities, item._id)
-
-    const project = Shared.GetItemById(projects, state.currentProject)
-    const metaActivity = Shared.FindItemWithParent(project.activities, "_id", activity._id, project).item
+    // const activity = Shared.GetItemById(activities, item._id)
+    //will need to save tmp message as "sending..."
 
     const [chatInput, setChatInput] = useState("")
 
@@ -60,7 +58,7 @@ const List = ({
 
     return (
         <div className="chat-editor-wrapper">
-            <Shared.List
+            <Items.List
                 key={item._id}
                 userData={userData}
                 projects={projects}

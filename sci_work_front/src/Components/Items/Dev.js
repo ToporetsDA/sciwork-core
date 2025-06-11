@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import '../../css/items/Dev.css'
+import '../../css/components/items/Dev.css'
 
 import * as Shared from '../pages/sharedComponents'
 
@@ -21,7 +21,7 @@ const Dev = ({
         <div
             key={index}
             className={`
-            card
+            wrapper
             ${(new Date(item.endDate) - new Date()) / (24 * 60 * 60 * 1000) < 30 ? 'expiring' : ''}
             ${(new Date(item.endDate) < new Date()) ? 'expired' : ''}
             `}
@@ -33,15 +33,6 @@ const Dev = ({
             <p className="timeLimit">
                 Dev type Activity. Testing ONLY
             </p>
-            <Shared.ItemActions
-                userData={userData}
-                projects={projects}
-                activities={activities}
-                setData={setData}
-                setState={setState}
-                item={item}
-                rights={rights}
-            />
         </div>
     )
 }

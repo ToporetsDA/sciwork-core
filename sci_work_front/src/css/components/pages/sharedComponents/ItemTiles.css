@@ -1,0 +1,9 @@
+.item-tiles {
+  width: 100%;
+  height: 74vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/*# sourceMappingURL=ItemTiles.css.map */

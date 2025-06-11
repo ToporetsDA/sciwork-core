@@ -1,6 +1,6 @@
 import React  from 'react'
 import { SortableContext } from '@dnd-kit/sortable'
-import '../../../css/pages/sharedComponents/ItemTiles.css'
+import '../../../css/components/pages/sharedComponents/ItemTiles.css'
 
 import * as Shared from './'
 import * as Items from '../../items'

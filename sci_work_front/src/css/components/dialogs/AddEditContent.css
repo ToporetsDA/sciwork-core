@@ -1,0 +1,45 @@
+@import '../../base/buttons.css';
+@import '../../base/dialog.css';
+.toolbar {
+  margin-bottom: 10px;
+  gap: 10px;
+  display: flex;
+}
+
+.toolbar button, .toolbar select, .toolbar input[type=color] {
+  padding: 5px;
+  font-size: 14px;
+}
+
+.editor {
+  min-height: 200px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #5c5c5c;
+  background: white;
+}
+
+.dialogActions {
+  gap: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.toolbar button {
+  min-width: 32px;
+  padding: 5px;
+  background: none;
+  border: 1px solid #5c5c5c;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.toolbar button:hover {
+  background-color: #f8f8f8;
+}
+
+label {
+  display: block;
+}
+
+/*# sourceMappingURL=AddEditContent.css.map */

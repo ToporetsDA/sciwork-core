@@ -1,0 +1,48 @@
+@import '../../../StyleVars.sass'
+@import '../../base/buttons.sass'
+
+.accountPage
+    margin: $space-large
+
+    display: flex
+    flex-direction: column
+    align-items: center
+
+    h2
+        font-size: $font-large
+        margin-bottom: $space-big
+
+    .accountInfo
+        width: 100%
+        max-width: 600px
+        
+        display: flex
+        flex-direction: column
+        gap: $space-big
+
+        .accountField
+            display: flex
+            justify-content: space-between
+            align-items: center
+
+            label
+                display: flex
+                font-weight: bold
+                flex: 1
+
+                .required
+                    color: red
+
+            span, input, .fixed
+                flex: 2
+                padding: $space-medium
+                border-radius: $radius
+                border: 1px solid #ccc
+
+                &:disabled
+                    background-color: $main-color
+
+    .accountActions
+        margin-top: $space-big
+        display: flex
+        gap: $space-big

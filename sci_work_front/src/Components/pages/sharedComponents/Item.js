@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import '../../../css/pages/sharedComponents/Item.css'
+import '../../../css/components/pages/sharedComponents/Item.css'
 
 import * as Shared from "./"
 import * as Items from '../../items'
@@ -102,26 +102,33 @@ const Item = ({
             {...attributes}
             style={style}
         >
-            {/* ➕ Add below button */}
-            {Shared.GetDialogButton(
-                setState,
-                "add-button",
-                (!['List', 'Attendance'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',
-                [true, false, index, containerId, "Add Item"],
-                "➕",
-                false
-            )}
-            <>
+            <div
+                className='item-actions'
+            >
+                {/* ➕ Add below button */}
+                {Shared.GetDialogButton(
+                    setState,
+                    "add-button button-tool",
+                    (!['List', 'Attendance'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',
+                    [true, false, index, containerId, "Add Item"],
+                    "➕",
+                    false
+                )}
                 {isItem && accessCheck &&
                     <>
-                    {/* 🔘 DRAG HANDLE (6-dots) */}
-                    <div
-                        className="drag-handle"
-                        {...listeners}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        ⋮⋮
-                    </div>
+                        {/* 🔘 DRAG HANDLE (6-dots) */}
+                        <div
+                            className="drag-handle button-tool"
+                            {...listeners}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            ⋮⋮
+                        </div>
+                    </>
+                }
+            </div>
+            {isItem && accessCheck &&
+                <>
                     <Shared.ItemActions
                         userData={userData}
                         projects={projects}
@@ -149,8 +156,7 @@ const Item = ({
                         setRecentActivities={setRecentActivities}
                     />
                 </>
-                }
-            </>
+            }
         </div>
     )
 }

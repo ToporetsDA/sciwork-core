@@ -1,7 +1,6 @@
 import { useMemo }  from 'react'
 import { useNavigate } from "react-router-dom"
-import '../../../css/pages/sharedComponents/LinkList.css'
-import '../../../css/pages/Notifications.css'
+import '../../../css/components/pages/sharedComponents/LinkList.css'
 import * as Shared from './index'
 
 const LinkList = ({ projects, activities, state, setState, list, setList, recentActivities, setRecentActivities }) => {

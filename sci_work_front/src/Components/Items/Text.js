@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect} from 'react'
-import '../../css/items/Text.css'
+import '../../css/components/items/Text.css'
 
 import * as Shared from '../pages/sharedComponents'
 

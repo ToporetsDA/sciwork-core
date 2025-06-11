@@ -1,7 +1,9 @@
 import { useState, useCallback, useMemo } from 'react'
-import '../../css/pages/Schedule.css'
-import ControlPanel from './sharedComponents/ControlPanel'
+import '../../css/components/pages/Schedule.css'
+
 import ScheduleBoard from './specificComponents/ScheduleBoard'
+
+import * as Shared from './sharedComponents'
 
 const Schedule = ({
     userData, setUserData,
@@ -149,7 +151,7 @@ const Schedule = ({
 
     return (
         <>
-            <ControlPanel
+            <Shared.ControlPanel
                 userData={userData}
                 setUserData={setUserData}
                 state={state}
@@ -175,27 +177,31 @@ const Schedule = ({
                     {scheduleVMap}
                 </div>
                 <div
-                    className="scheduleHMap"
-                    style={{
-                        display: 'grid',
-                        gridTemplateRows: scheduleBoard.gridTemplateRows
-                    }}
+                    className='schedule-scrollable'
                 >
-                    {scheduleHMap}
+                    <div
+                        className="scheduleHMap"
+                        style={{
+                            display: 'grid',
+                            gridTemplateRows: scheduleBoard.gridTemplateRows
+                        }}
+                    >
+                        {scheduleHMap}
+                    </div>
+                    <ScheduleBoard
+                        projects={projects}
+                        state={state}
+                        setState={setState}
+                        currentScale={currentScale}
+                        setCurrentScale={setCurrentScale}
+                        gridValues={gridValues}
+                        setGridValues={setGridValues}
+                        intervalAnchor={intervalAnchor}
+                        scheduleBoard={scheduleBoard}
+                        recentActivities={recentActivities}
+                        setRecentActivities={setRecentActivities}
+                    />
                 </div>
-                <ScheduleBoard
-                    projects={projects}
-                    state={state}
-                    setState={setState}
-                    currentScale={currentScale}
-                    setCurrentScale={setCurrentScale}
-                    gridValues={gridValues}
-                    setGridValues={setGridValues}
-                    intervalAnchor={intervalAnchor}
-                    scheduleBoard={scheduleBoard}
-                    recentActivities={recentActivities}
-                    setRecentActivities={setRecentActivities}
-                />
             </div>
         </>
     )}
