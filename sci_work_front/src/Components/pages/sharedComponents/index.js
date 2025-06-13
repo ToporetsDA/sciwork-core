@@ -1,6 +1,5 @@
 //components
 export { default as ControlPanel } from './ControlPanel.js'
-export { default as LinkList } from './LinkList.js'
 export { default as ItemTiles } from './ItemTiles.js'
 export { default as ItemTable } from './ItemTable.js'
 export { default as Item } from './Item.js'

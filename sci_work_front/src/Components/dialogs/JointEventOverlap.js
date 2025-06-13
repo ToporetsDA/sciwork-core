@@ -47,6 +47,7 @@ const JointEventOverlapDialog = ({
                     //itemTypes
                     editable={false}
                     isItem={false}
+                    //linkActions
                     rights={rights}
                     recentActivities={recentActivities}
                     setRecentActivities={setRecentActivities}

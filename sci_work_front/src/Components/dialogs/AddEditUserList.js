@@ -236,6 +236,7 @@ const AddEditUserList = ({
                 itemTypes={itemTypes}
                 editable={true}
                 isItem={false}
+                //linkActions
                 rights={rights}
                 // recentActivities={recentActivities}
                 // setRecentActivities={setRecentActivities}

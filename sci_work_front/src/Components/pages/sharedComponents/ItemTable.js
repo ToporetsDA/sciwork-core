@@ -9,6 +9,8 @@ import * as Items from '../../items'
 Projects
 List
 AddEditUserList
+JointEventOverlap
+Notifications
 */
 
 const ItemTable = ({
@@ -22,6 +24,7 @@ const ItemTable = ({
     itemTypes,
     editable, //editable content
     isItem, //is project or activity
+    linkActions,
     rights,
     recentActivities, setRecentActivities
 }) => {
@@ -217,7 +220,10 @@ const ItemTable = ({
                             key={index}
                             className={`${isExpiring ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}
                             onClick={() => {
-                                if (!state.currentProject) {//for projects
+                                if (!state.currentProject) {//for links
+                                    if (linkActions) {
+                                        linkActions(item._id)
+                                    }
                                     navigate(Shared.GoTo(item, items, recentActivities, setRecentActivities))
                                 }
                             }}

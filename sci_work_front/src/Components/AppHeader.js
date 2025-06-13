@@ -22,8 +22,9 @@ const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLogg
     )
 
     const notificationsMark = useMemo(() => {
+        console.log("notes from header", notifications)
         if (isLoggedIn === true) {
-        return notifications.filter(notification => notification.state === "unseen").length
+            return notifications.filter(notification => notification.state === "unseen").length
         }
         return -1
     }, [notifications, isLoggedIn])

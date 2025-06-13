@@ -229,6 +229,7 @@ const List = ({
                         itemTypes={activity?.content.liStructure}
                         editable={true}
                         isItem={false}
+                        //linkActions
                         rights={rights}
                         recentActivities={recentActivities}
                         setRecentActivities={setRecentActivities}

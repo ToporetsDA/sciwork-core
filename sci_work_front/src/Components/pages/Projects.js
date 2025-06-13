@@ -14,7 +14,8 @@ const Projects = ({
     itemsToDisplay, setItemsToDisplay,
     rights,
     users, setUsers,
-    recentActivities, setRecentActivities }) => {
+    recentActivities, setRecentActivities
+}) => {
 
     const displayOptions = new Map([
         ['tiles', 'grid'],
@@ -314,6 +315,7 @@ const Projects = ({
                                 //itemTypes
                                 editable={false}
                                 isItem={true}
+                                //linkActions
                                 rights={rights}
                                 recentActivities={recentActivities}
                                 setRecentActivities={setRecentActivities}
