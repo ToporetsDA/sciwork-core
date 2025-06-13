@@ -5,8 +5,10 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  z-index: 100;
   color: #eeeeee;
   background-color: #0066aa;
+  box-shadow: 0 2px 5px rgba(17, 17, 17, 0.1411764706);
 }
 header p {
   padding-right: 5px;

@@ -33,6 +33,8 @@ const Item = ({
     }
 
     const isItem = (item !== true)
+    //if there are no Items in project - ➕ Add below button is always visible
+    const classCondition = (!isItem && index === 0)
 
     const getComponentType = () => {
         const itemsType = types[item.type] || "Dev"
@@ -92,8 +94,10 @@ const Item = ({
         opacity: (isDragging) ? 0.5 : 1
     }
 
-    const parts = item._id.split('.')
-    const accessCheck = (parts.length > 2) ? true : item?.userList.some(user => user.id === userData._id)
+    const accessCheck = () => {
+        const parts = item._id.split('.')
+        return (parts.length > 2) ? true : item?.userList.some(user => user.id === userData._id)
+    }
 
     return (
         <div
@@ -108,13 +112,13 @@ const Item = ({
                 {/* ➕ Add below button */}
                 {Shared.GetDialogButton(
                     setState,
-                    "add-button button-tool",
+                    `add-button ${classCondition ? 'button-mini' : 'button-tool'}`,
                     (!['List', 'Attendance'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',
                     [true, false, index, containerId, "Add Item"],
                     "➕",
                     false
                 )}
-                {isItem && accessCheck &&
+                {isItem && accessCheck() &&
                     <>
                         {/* 🔘 DRAG HANDLE (6-dots) */}
                         <div
@@ -127,7 +131,7 @@ const Item = ({
                     </>
                 }
             </div>
-            {isItem && accessCheck &&
+            {isItem && accessCheck() &&
                 <>
                     <Shared.ItemActions
                         userData={userData}

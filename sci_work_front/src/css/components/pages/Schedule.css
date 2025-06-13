@@ -7,13 +7,27 @@
 }
 
 .scrollable-wrapper {
-  max-height: 37vh;
+  max-height: 37.5vh;
   overflow: auto;
 }
 
+.page-wrapper {
+  height: 75vh;
+  max-height: 75vh;
+  padding: 3.5vh 0;
+  overflow-y: auto;
+}
+
+.page-wrapper-no-cp {
+  height: 75vh;
+  max-height: 75vh;
+  padding: 3.5vh 0;
+  overflow-y: auto;
+}
+
 .scheduleContainer {
-  max-height: 74vh;
-  padding: 5vh;
+  padding-left: 3.5vh;
+  padding-right: 3.5vh;
   display: flex;
   flex-wrap: wrap;
   overflow-y: auto;
@@ -29,7 +43,7 @@
 }
 .scheduleContainer .scheduleHMap {
   width: 7.5%;
-  height: 5vh;
+  height: 7vh;
 }
 .scheduleContainer .scheduleHMap .leftLabel {
   min-height: 99.6px;

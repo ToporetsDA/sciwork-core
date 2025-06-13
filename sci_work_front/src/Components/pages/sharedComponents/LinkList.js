@@ -20,21 +20,6 @@ const LinkList = ({ projects, activities, state, setState, list, setList, recent
         return list.flatMap((item, i) => {
 
             switch(state.currentPage) {
-            case "Schedule": {
-                const start = new Date(`${item.startDate}T${item.startTime || "01:00"}`).toLocaleString()
-                const end = new Date(`${item.endDate}T${item.endTime || "02:45"}`).toLocaleString()
-                return (
-                    <div key={i} className='item' onClick={() => {
-                        navigate(goTo(item, projects, setRecentActivities))
-                    }}>
-                        <div className='content'>
-                            <p>{`${item.name}`}</p>
-                            <p>{`Start at ${start}`}</p>
-                            <p>{`\nEnd at${end}`}</p>
-                        </div>
-                    </div>
-                )
-            }
             case "Notifications": {
 
                 const tmpItem = (!item._id.includes(".")) ? findEl(projects, item._id) : findEl(findEl(projects,  projectId(item._id)).activities, item._id)

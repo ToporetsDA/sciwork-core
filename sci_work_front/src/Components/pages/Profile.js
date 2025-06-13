@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import '../../css/components/pages/Profile.css'
 
+import * as Shared from './sharedComponents'
+
 const Profile = ({ userData, setUserData, profileData, rights }) => {
 
     const [editMode, setEditMode] = useState(false)
@@ -34,7 +36,7 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
     }
     
     return (
-        <div className="accountPage">
+        <div className="accountPage .page-wrapper-no-cp">
             <h2>Profile Details</h2>
             {/* <div className='accountImage'>
                 {userData.photo !== undefined &&
@@ -44,29 +46,39 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
             <div className="accountInfo">
                 {Object.entries(profileData.basic).map(([key, [isRequired, type]]) => (
                     <div className="accountField" key={key}>
-                        <label>
-                            
-                            {isRequired && editMode && !profileData.fixed.includes(key) &&
-                                <p className='required'>'*'</p>
-                            }
-                            {key}
-                        </label>
-                        {(editMode && !profileData.fixed.includes(key)) ? (
-                            <input
-                                type={type === 'mail' ? 'email' : 'text'}
-                                value={tmpUserData[key] || ''}
-                                onChange={(e) => {
-                                    if (!profileData.fixed.includes(key)) {
-                                        handleInputChange(key, e.target.value)
-                                    }
-                                }}
-                                disabled={profileData.fixed.includes(key)}
-                            />
+                        {(editMode) ? (
+                            <>
+                                {Shared.GetInput(
+                                    key,
+                                    "text",
+                                    key === 'statusName'
+                                        ? (rights.names[userData.genStatus] || ' ')
+                                        : (tmpUserData[key] || ' '),
+                                        false,
+                                    (e) => {
+                                        if (!profileData.fixed.includes(key)) {
+                                            handleInputChange(key, e.target.value)
+                                        }
+                                    },
+                                    profileData.fixed.includes(key),
+                                    80
+                                )}
+                                <p className='required'>
+                                    {isRequired && editMode && !profileData.fixed.includes(key) && '*'}
+                                </p>
+                            </>
                         ) : (
-                            <p className='fixed'>
-                                {key === 'statusName' ? (rights.names[userData.genStatus] || '.') : (tmpUserData[key] || '.')}
-                            </p>
-                            
+                            Shared.GetInput(
+                                key,
+                                "text",
+                                key === 'statusName'
+                                    ? (rights.names[userData.genStatus] || ' ')
+                                    : (tmpUserData[key] || ' '),
+                                false,
+                                null,
+                                true,
+                                80
+                            )
                         )}
                     </div>
                 ))}
@@ -82,7 +94,10 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
                         </button>
                         <button
                             className='button-main'
-                            onClick={() => setEditMode(false)}
+                            onClick={() => {
+                                setTempData({ ...userData })
+                                setEditMode(false)
+                            }}
                         >
                             Cancel
                         </button>

@@ -40,7 +40,11 @@ const AppDynamicContent = ({
         ...prevState,
         currentPage: page,
         currentProject: project,
-        currentActivity: activity
+        currentActivity: activity,
+        currentDialog: {
+          name: undefined,
+          params: []
+        }
       }))
     }
 

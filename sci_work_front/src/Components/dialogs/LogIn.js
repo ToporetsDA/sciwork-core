@@ -2,6 +2,8 @@ import { useState } from 'react'
 import '../../css/components/dialogs/LogIn.css'
 import '../../css/base/dialog.css'
 
+import * as Shared from '../pages/sharedComponents'
+
 
 const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
 
@@ -66,39 +68,10 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
                                 </option>
                             ))}
                         </select>
-                        <datalist id="serverList">
-                            {servers.length > 0 ? (
-                                servers.map((server) => (
-                                    <option key={server.id} value={server.id}>
-                                        {server.name}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="No servers available" disabled />
-                            )}
-                        </datalist>
 
-                        {/* Login Input */}
-                        <label htmlFor="login">Login</label>
-                        <input
-                            id="login"
-                            name="login"
-                            type="text"
-                            value={formValues.login}
-                            onChange={handleInputChange}
-                        />
+                        {Shared.GetInput("Login", "text", formValues.login, false, handleInputChange, false, 60)}
+                        {Shared.GetInput("Password", "text", formValues.password, false, handleInputChange, false, 60)}
 
-                        {/* Password Input */}
-                        <label htmlFor="password">Password</label>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            value={formValues.password}
-                            onChange={handleInputChange}
-                        />
-
-                        {/* Submit Button */}
                         <div>
                             <button
                                 type="submit"

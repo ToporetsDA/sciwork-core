@@ -3,11 +3,21 @@ import '../../css/components/dialogs/JointEventOverlap.css'
 
 import * as Shared from '../pages/sharedComponents'
 
-const JointEventOverlapDialog = ({ projects, activities, state, setState }) => {
+const JointEventOverlapDialog = ({
+    userData, setUserData,
+    projects,
+    activities,
+    setData,
+    state, setState,
+    rights,
+    users,
+    recentActivities, setRecentActivities,
+    isCompany
+}) => {
 
     // Close the dialog
 
-    const handleOutsideClick = (e) => {
+    const closeDialog = (e) => {
         if (e.target === e.currentTarget) {
             setState((prevState) => ({
                 ...prevState,
@@ -19,24 +29,31 @@ const JointEventOverlapDialog = ({ projects, activities, state, setState }) => {
         }
     }
 
-    const ItemList = Shared.LinkList
-
     return (
         <div
             className="JointEventOverlapDialog dialogContainer"
-            onClick={handleOutsideClick}
+            onClick={closeDialog}
         >
             <div className="dialogContent">
-                <ItemList
+                <Shared.ItemTable
+                    userData={userData}
                     projects={projects}
                     activities={activities}
+                    setData={setData}
                     state={state}
                     setState={setState}
-                    list={state.currentDialog.params[0]}
+                    itemsToDisplay={projects}
+                    itemKeys={["name", "startDate", "endDate"]}
+                    //itemTypes
+                    editable={false}
+                    isItem={false}
+                    rights={rights}
+                    recentActivities={recentActivities}
+                    setRecentActivities={setRecentActivities}
                 />
                 <button
                     className='button-main'
-                    onClick={handleOutsideClick}
+                    onClick={closeDialog}
                 >
                     Back
                 </button>

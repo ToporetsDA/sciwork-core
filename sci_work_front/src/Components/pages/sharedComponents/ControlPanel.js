@@ -10,8 +10,7 @@ const ControlPanel = ({
     activities,
     rights,
     setItemsToDisplay,
-    currentScale,
-    setCurrentScale,
+    currentScale, setCurrentScale,
     editIntervalAnchor }) => {
 
     const filterOptions = {
@@ -160,20 +159,16 @@ const ControlPanel = ({
 
     return (
         <div className='controlPanel'>
-            <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search"
-                className="searchInput"
-            />
             {(state.currentPage === "Projects") &&
-                <Shared.ToggleButton
-                    data={userData.currentSettings}
-                    setter={setUserData}
-                    field={"displayProjects"}
-                    displayOptions={displayOptions}
-                />
+                <>
+                    {Shared.GetInput("Search", "text", searchQuery, false, (e) => setSearchQuery(e.target.value), false, 25)}
+                    <Shared.ToggleButton
+                        data={userData.currentSettings}
+                        setter={setUserData}
+                        field={"displayProjects"}
+                        displayOptions={displayOptions}
+                    />
+                </>
             }
             {state.currentPage === "Schedule" &&
                 <div className='scale'>

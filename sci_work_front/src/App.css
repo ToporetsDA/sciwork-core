@@ -13,9 +13,3 @@
   min-height: 100%;
   display: flex;
 }
-
-input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}

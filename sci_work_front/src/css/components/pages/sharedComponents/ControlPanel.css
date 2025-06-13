@@ -190,9 +190,10 @@
 }
 
 .controlPanel {
-  height: 5vh;
+  height: 7vh;
   display: flex;
   align-items: center;
+  background-color: #f8f8f8;
 }
 .controlPanel .dropdown li {
   min-width: 100px;

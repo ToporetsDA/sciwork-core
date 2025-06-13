@@ -202,52 +202,52 @@ const ItemTable = ({
             </thead>
             <tbody>
                 {sortedItems.map((item, index) => {
-                const daysLeft = (new Date(item.endDate) - new Date()) / (24 * 60 * 60 * 1000)
-                const isExpiring = daysLeft < 30
-                const isExpired = new Date(item.endDate) < new Date()
-                const status = isExpired ? 'Expired' : isExpiring ? 'Expiring' : 'Active'
+                    const daysLeft = (new Date(item.endDate) - new Date()) / (24 * 60 * 60 * 1000)
+                    const isExpiring = daysLeft < 30
+                    const isExpired = new Date(item.endDate) < new Date()
+                    const status = isExpired ? 'Expired' : isExpiring ? 'Expiring' : 'Active'
 
-                const items = (!state.currentProject) ? projects : activities
+                    const items = (!state.currentProject) ? projects : activities
 
-                const idParts = item._id.split('.')
-                const i = parseInt(idParts[idParts.length - 1], 10)
+                    const idParts = item._id.split('.')
+                    const i = parseInt(idParts[idParts.length - 1], 10)
 
-                return (
-                    <tr
-                        key={index}
-                        className={`${isExpiring ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}
-                        onClick={() => {
-                            if (isItem && !state.currentProject) {//for projects
-                                navigate(Shared.GoTo(item, items, recentActivities, setRecentActivities))
-                            }
-                        }}
-                    >
-                        {liKeys.map((key) => (
-                            <td key={key}>
-                                {!editable
-                                    ? item[key] //text
-                                    : getTileContent(key, item, i) //editable text
+                    return (
+                        <tr
+                            key={index}
+                            className={`${isExpiring ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}
+                            onClick={() => {
+                                if (!state.currentProject) {//for projects
+                                    navigate(Shared.GoTo(item, items, recentActivities, setRecentActivities))
                                 }
-                            </td>
-                        ))}
-                        {isItem &&
-                            <td>{status}</td>
-                        }
-                        {isItem &&
-                            <td onClick={(e) => e.stopPropagation()}>
-                                <Shared.ItemActions
-                                    userData={userData}
-                                    projects={projects}
-                                    activities={activities}
-                                    setData={setData}
-                                    setState={setState}
-                                    item={item}
-                                    rights={rights}
-                                />
-                            </td>
-                        }
-                    </tr>
-                )
+                            }}
+                        >
+                            {liKeys.map((key) => (
+                                <td key={key}>
+                                    {!editable
+                                        ? item[key] //text
+                                        : getTileContent(key, item, i) //editable text
+                                    }
+                                </td>
+                            ))}
+                            {isItem &&
+                                <td>{status}</td>
+                            }
+                            {isItem &&
+                                <td onClick={(e) => e.stopPropagation()}>
+                                    <Shared.ItemActions
+                                        userData={userData}
+                                        projects={projects}
+                                        activities={activities}
+                                        setData={setData}
+                                        setState={setState}
+                                        item={item}
+                                        rights={rights}
+                                    />
+                                </td>
+                            }
+                        </tr>
+                    )
                 })}
             </tbody>
         </table>

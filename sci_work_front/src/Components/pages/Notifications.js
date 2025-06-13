@@ -14,7 +14,7 @@ const Notifications = ({
     const ItemList = Shared.LinkList
 
     return (
-        <div className="notificationsContainer">
+        <div className="notificationsContainer .page-wrapper-no-cp">
             <ItemList
                 data={projects}
                 state={state}

@@ -295,7 +295,7 @@ const Projects = ({
                 rights={rights}
                 setItemsToDisplay={setItemsToDisplay}
             />
-            <div className={`itemList ${displayOptions.get(userData.currentSettings.displayProjects)}`}>
+            <div className={`page-wrapper ${displayOptions.get(userData.currentSettings.displayProjects)}`}>
                 {(state.currentPage === "Projects") ? (
                     <Suspense fallback={<div>Loading projects...</div>}>
                         {displayOptions.get(userData.currentSettings.displayProjects) !== 'table' ?

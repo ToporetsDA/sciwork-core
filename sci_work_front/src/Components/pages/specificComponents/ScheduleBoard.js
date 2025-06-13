@@ -129,16 +129,12 @@ const ScheduleBoard = ({
     // ranged data for current scale
     const scaledData = useMemo(() => {
         if (!projects) return []
-
-        const { start, end } = rangeToDisplay[currentScale]
     
-        // Filter and process activities Math.floor(event._id / 1000000000)
         const filteredActivities = projects
-            .flatMap(project => project.activities)
+            .flatMap(project => Shared.TreeToArray(project.activities, "activities"))
             .flatMap(activity => {
     
-                if (activity.startDate === activity.endDate) {
-                    // Single-day activity
+                if (activity.startDate === activity.endDate) {// Single-day activity
                     return [{
                         ...activity,
                         eventId: activity._id
@@ -163,7 +159,9 @@ const ScheduleBoard = ({
                     eventId: activity._id + '.end'
                 }
 
-                let repeatItems = [startItem]
+                let repeatItems = []
+
+                repeatItems.push(startItem)
 
                 if (activity.repeat === true) {
                     let start = new Date(activity.startDate)
@@ -183,7 +181,7 @@ const ScheduleBoard = ({
                     })
             
                     // Loop through the days between startDate and endDate
-                    for (let d = new Date(start); d < end; d.setDate(d.getDate() + 1)) {
+                    for (let d = new Date(start + 1); d < end; d.setDate(d.getDate() + 1)) {
                         // Check if the day is one of the repeating days
                         if (daysOfWeek.includes(d.getDay())) {
 
@@ -204,40 +202,44 @@ const ScheduleBoard = ({
                 repeatItems.push(endItem)
     
                 return repeatItems
-            });
+            })
+
+        const filteredProjects = projects.flatMap(project => {
     
-        // Filter and process projects for 'year' scale
-        const filteredProjects = currentScale === 'year'
-            ? projects
-                .flatMap(project => {
-    
-                    const startItem = {
-                        ...project,
-                        name: `${project.name} - Start`,
-                        startDate: project.startDate,
-                        endDate: project.startDate,
-                        type: 'project',
-                        eventId: project._id + '_0',
-                        page: true
-                    }
-                    const endItem = {
-                        ...project,
-                        name: `${project.name} - End`,
-                        startDate: project.endDate,
-                        endDate: project.endDate,
-                        type: 'project',
-                        eventId: project._id + '_1',
-                        page: true
-                    }
-    
-                    return [startItem, endItem]
-                })
-            : [];
-        
-        const rangedData = filteredActivities.concat(filteredProjects)
-            .filter(project => {
-                const projectStart = new Date(project.startDate)
-                const projectEnd = new Date(project.endDate)
+            const startItem = {
+                ...project,
+                name: `${project.name} - Start`,
+                startDate: project.startDate,
+                endDate: project.startDate,
+                type: 'project',
+                eventId: project._id + '_0',
+                page: true
+            }
+            const endItem = {
+                ...project,
+                name: `${project.name} - End`,
+                startDate: project.endDate,
+                endDate: project.endDate,
+                type: 'project',
+                eventId: project._id + '_1',
+                page: true
+            }
+
+            return [startItem, endItem]
+        })
+
+        const { start, end } = rangeToDisplay[currentScale]
+
+        const dataForScale = (currentScale === 'week') ? (
+            filteredActivities.filter(activity => activity?.isTimed === true)
+        ) : (
+            [ ...filteredActivities, ...filteredProjects]
+        )
+
+        const rangedData = dataForScale
+            .filter(event => {
+                const projectStart = new Date(event.startDate)
+                const projectEnd = new Date(event.endDate)
                 return projectEnd >= start && projectStart <= end
             })
     
@@ -286,12 +288,12 @@ const ScheduleBoard = ({
     // events rendered as <div></div>s
     const renderEvents = useCallback((group, i, content, isJoint, zIndex) => {
 
-        const eventStart = new Date(`${group[i].startDate}T${group[i].startTime || "01:00"}`)
+        const eventStart = new Date(`${group[i].startDate}T${group[i].startTime || "00:00"}`)
         const tmp = group
         if (currentScale === "week" && group.length > 3) {
             tmp.sort((a, b) => (b.endTime - a.endTime))
         }
-        const eventEnd = new Date(`${tmp[i].endDate}T${tmp[i].endTime || "02:45"}`)
+        const eventEnd = new Date(`${tmp[i].endDate}T${tmp[i].endTime || "00:00"}`)
         
         const dayOfWeek = ((eventStart.getDay() === 0) ? 7 : eventStart.getDay()) - 1 // 0-6 (Monday - Sunday)
         const dayOfMonth = eventStart.getDate() // 1 - 28-31
@@ -303,10 +305,7 @@ const ScheduleBoard = ({
 
         let part = (isJoint) ? 1 : group.length //size of group element
 
-        let top
-        let left
-        let bottom
-        let right
+        let top, left, bottom, right
 
         let space
 
@@ -379,55 +378,48 @@ const ScheduleBoard = ({
     //schedule events as <div></div>s to display
     const eventsToDisplay = useMemo(() => {
 
+        const getContent = (item, showStartEnd, start, end) => {
+            let content = ``
+
+            if (item?.type === 'activity') {
+                content += `${Shared.GetItemById(projects, projectId(item._id)).name}: `
+            }
+
+            content += `${item.name}\n`
+
+            if (showStartEnd) {
+                content += `Start at ${item[start]}\nEnd at${item[end]}`
+            }
+            return content
+        }
+
         const eventDivs = scaledDataWithOverlaps.flatMap((group, i) => {
 
-            if (group.length === 2) { // overlaps both events are visible
+            const isTimed = group[i]?.startTime && group[i]?.endTime
+
+            if (group.length <= 2) {// event, overlaps of 2 events events
 
                 const groupDivs = group.flatMap((event, i) => {
-                    // event data to display
-                    let content = ``
-                    if (group[i].type === 'activity') {
-                        content += `${projects.find(p => p._id === projectId(group[0]._id)).name}: `
-                    }
                     
-                    if (currentScale === 'week') {
-                        content += `${group[i].name}\nStart at ${group[i].startTime}\nEnd at${group[i].endTime}`
-                    }
-                    else {
-                        content += `${group[i].name}\nStart at ${group[i].startDate}\nEnd at${group[i].endDate}`
-                    }
+                    const content = (currentScale === 'week') ? (
+                        getContent(group[i], isTimed, "startTime", "endTime")
+                    ) : (
+                        getContent(group[i], true, "startDate", "endDate")
+                    )
                     
                     return renderEvents(group, i, content, false, 2)
                 })
                 
                 return groupDivs
             }
-            else if (group.length === 1 || group.length > 2) { // Normal activity or Joint block
+            else if (group.length > 2) { // Joint block
 
-                // event data to display
-                let content = ``;
-                if (group.length === 1) {//event
-                    if (group[0].type === 'activity') {
-                        content += `${projects.find(p => p._id === projectId(group[0]._id)).name}: `
-                    }
-                    
-                    if (currentScale === 'week') {
-                        content += `${group[0].name}\nStart at ${group[0].startTime}\nEnd at${group[0].endTime}`
-                    }
-                    else {
-                        content += `${group[0].name}\nStart at ${group[0].startDate}\nEnd at${group[0].endDate}`
-                    }
-                }
-                else {//joint block
-                    group.forEach((event, i) => {
-                        if (event.type === 'activity') {
-                            content += `${projects.find(p => p._id === projectId(event._id)).name}: `
-                        }
-                        content += `${event.name}\n`
-                    })
-                }
+                let content = ``
+                group.forEach((event, i) => {
+                    content += getContent(event, false)
+                })
 
-                return [renderEvents(group, 0, content, (group.length === 1) ? false : true, (group.length === 1) ? 1 : 3)]
+                return [renderEvents(group, 0, content, true, 3)]
             }
             else {
                 return []

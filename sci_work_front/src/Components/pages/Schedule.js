@@ -164,7 +164,7 @@ const Schedule = ({
                 setCurrentScale={setCurrentScale}
                 editIntervalAnchor={editIntervalAnchor}
             />
-            <div className='scheduleContainer'>
+            <div className='scheduleContainer page-wrapper'>
                 <p className='currentMap'>
                 {currentScale!=='year' && months[intervalAnchor.getMonth()]} {intervalAnchor.getFullYear()}
                 </p>

@@ -243,6 +243,8 @@ const AddEditItem = ({
         const project = Shared.GetItemById(projects, state.currentProject)
         const formattedFormValues = formatFormValues(formValues)
 
+        const { item: parent } = Shared.FindItemWithParent(project.activities, "_id", containerId, project)
+
         let newItem = {
             ...formattedFormValues,
             _id: currentItemId
@@ -251,10 +253,12 @@ const AddEditItem = ({
                     ? new ObjectId().toHexString()
                     : project._id + '.' + project.dndCount,
             activities: [],
-            userList: [{
-                id: userData._id,
-                access: 0
-            }],
+            userList: selectedType === "Project"
+                ? [{
+                    id: userData._id,
+                    access: 0
+                }]
+                : parent.userList,
             ...(selectedType === "Project"
                 ? { dndCount: 0 }
                 : { dnd: project.dndCount })
@@ -343,7 +347,17 @@ const AddEditItem = ({
                                     <div
                                         className={`fieldBox ${currentStructure[key] === 'checkbox' && 'checkboxFieldBox'}`}
                                     >
-                                        <label htmlFor={key}>{formatLabel(key)}</label>
+                                        {Shared.GetInput(
+                                            formatLabel(key),
+                                            currentStructure[key],
+                                            currentStructure[key] === 'checkbox' ? formValues[key] : undefined,
+                                            formValues[key] || '',
+                                            handleInputChange,
+                                            false,
+                                            60,
+
+                                        )}
+                                        {/* <label htmlFor={key}>{formatLabel(key)}</label>
                                         <input
                                         id={key}
                                         name={key}
@@ -351,7 +365,7 @@ const AddEditItem = ({
                                         value={formValues[key] || ''}
                                         checked={currentStructure[key] === 'checkbox' ? formValues[key] : undefined}
                                         onChange={handleInputChange}
-                                        />
+                                        /> */}
                                     </div>
                                     }
                                 </>
