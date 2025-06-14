@@ -8,10 +8,6 @@ const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, rec
   
   const navigate = useNavigate()
 
-  const projectId = (id) => {
-    return id.split('.')[0]
-  }
-
   //project.name and activity.name pairs
   const clearRecent = () => {
     setRecentActivities([])
@@ -21,16 +17,84 @@ const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, rec
     return (
       <li
         key={activity._id}
-        onClick={() => {navigate(Shared.GoTo(activity, projects, recentActivities, setRecentActivities))}}
-        className={state.currentActivity === undefined ? 'active' : ''}
-        style={{
-          fontWeight: state.currentPage === undefined ? 'bold' : 'normal',
-          pointerEvents: state.currentPage === undefined ? 'none' : 'auto',
-          opacity: state.currentPage === undefined ? 0.5 : 1,
+        onClick={
+          () => {navigate(Shared.GoTo(activity, projects, recentActivities, setRecentActivities))}
+        }
+        className={
+          state.currentActivity === activity._id ? 'active' : ''
+        }
+        style={state.currentActivity === activity._id ? {
+          fontWeight: 'bold',
+          pointerEvents: 'none',
+          opacity: 0.5,
+        } : {
+          fontWeight: 'normal',
+          pointerEvents: 'auto',
+          opacity: 1,
         }}
       >
         {activity.name}
       </li>
+    )
+  }
+
+  const isInRecent = (item) => {
+    return recentActivities.filter(recent => (recent._id.includes(item._id))).length > 0
+  }
+
+  const getList = (list, itemsField, isListField, checkVal, comparator) => {
+
+    const filteredList = (comparator)
+      ? list[itemsField].filter(item => {
+          const val = (item[isListField] === checkVal) ? (
+            !!getList(item, itemsField, isListField, checkVal, comparator) || comparator(item)
+          ) : (
+            comparator(item)
+          )
+          return val
+        })
+      : list[itemsField]
+
+    if (filteredList.length === 0) {
+      return false
+    }
+    
+    return (
+      <ul
+        key={list._id}
+      >
+        {filteredList.map((item) => {
+          if (item[isListField] === checkVal) {
+            const list = getList(item, itemsField, isListField, checkVal, comparator)
+
+            if (!list) {
+              if (comparator(item)) {
+                return (
+                  <div key={item._id}>
+                    {getLi(item)}
+                  </div>
+                )
+              }
+              else {
+                return <div key={item._id}></div>
+              }
+            }
+            else {
+              return (
+                <div key={item._id}>
+                  {getLi(item)}
+                  <ul>
+                    {list}
+                  </ul>
+                </div>
+              )
+            }
+          }
+          else {
+            return getLi(item)
+          }
+        })}
+      </ul>
     )
   }
   
@@ -38,7 +102,7 @@ const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, rec
     <nav>
       {isLoggedIn === true &&
       <>
-        <ul className="projects">
+        <ul className="nav-items">
           <h4
             className={state.currentPage === 'Projects' ? 'active' : ''}
             style={{
@@ -54,36 +118,21 @@ const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, rec
             <li key={project._id}>
               <details>
                 <summary>{project.name}</summary>
-                <ul>
-                  {project.activities.map((activity) => (
-                    getLi(activity)
-                  ))}
-                </ul>
+                {getList(project, "activities", "type", "Group")}
               </details>
             </li>
             ))}
         </ul>
           
-        <ul className="recent">
+        <ul className="nav-items">
           <h4>Recent</h4>
           {projects.map((project) => {
-            const projectRecentActivities = recentActivities.filter(recent => projectId(recent._id) === project._id)
-            
-            if (projectRecentActivities.length > 0) {
-
+            if (isInRecent(project)) {
               return (
                 <li key={project._id}>
                   <details>
                     <summary>{project.name}</summary>
-                    <ul>
-                      {project.activities.map((activity) => {
-                        const recentActivity = recentActivities.filter(recent => recent._id === activity._id)
-                        if (recentActivity.length > 0) {
-                          return getLi(activity)
-                        }
-                        return null
-                    })}
-                    </ul>
+                    {getList(project, "activities", "type", "Group", isInRecent)}
                   </details>
                 </li>
               )
@@ -98,7 +147,7 @@ const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, rec
             style={{ display: recentActivities.length === 0 ? 'none' : 'block' }}
             onClick={clearRecent}
           >
-            Close all
+            Clear recent
           </button>
         </ul>
       </>

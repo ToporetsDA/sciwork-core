@@ -190,13 +190,13 @@ const ListItem = ({
     }
 
     return (metaActivity.type === "List") ? (
-        <li className="wrapper">
+        <li className="wrapper listItem">
             {Object.entries(fieldsToRender).map(([key, type]) => (
                 getField(key, type)
             ))}
         </li>
     ) : (
-        <div className="wrapper">
+        <div className="wrapper listItem">
             {Object.entries(fieldsToRender).map(([key, type]) => (
                 getField(key, type)
             ))}

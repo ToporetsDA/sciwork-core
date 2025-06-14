@@ -15,10 +15,15 @@ const Notifications = ({
     recentActivities, setRecentActivities
 }) => {
     
-    //need to set all unseen notifications as seen on component close/unmount (user uses navigate through whatever way)
-    // useEffect(() => {
-    //     setNotifications
-    // }, [])
+    useEffect(() => {
+        return () => {
+            setNotifications(prev => (
+                prev.map(n => n.state === "unseen"
+                    ? { ...n, state: "seen" }
+                    : n)
+            ))
+        }
+    }, [])
 
     const changeNotificationState = (id) => {
         setNotifications((prevNotifications) => ([
@@ -37,9 +42,22 @@ const Notifications = ({
         ]))
     }
 
+    const getStateDiv = (state) => {
+        return (
+            <div className={`notification-state ${state}`}>
+                {(state === "unread") &&
+                    <div className="notification-circle"></div>
+                }
+                {state}
+            </div>
+        )
+    }
+
     const notificationsToDisplay = notifications.map(n => {
-        //here replace state field with div of style=n.state
-        return n
+        return {
+            ...n,
+            state: getStateDiv(n.state)
+        }
     })
 
     return (
@@ -62,7 +80,7 @@ const Notifications = ({
                 setRecentActivities={setRecentActivities}
             />
         </div>
-    );
+    )
 }
 
 export default Notifications

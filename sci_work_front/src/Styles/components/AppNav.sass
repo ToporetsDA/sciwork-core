@@ -2,12 +2,13 @@
 @import '../base/buttons.sass'
 
 nav
-    width: 15%
+    width: 30%
+    max-width: 250px
     height: $main-height
 
     display: flex
     flex-direction: column
-    overflow: hidden auto
+    overflow: auto
 
     background-color: $tertiary-color
 
@@ -34,7 +35,7 @@ nav
             display: flex
             flex-direction: column
 
-    .projects
+    .nav-items
         details
             width: 100%
 
@@ -45,34 +46,17 @@ nav
                 cursor: pointer
 
             ul
-                width: 100%
+                width: calc(100% - $space-medium)
 
                 padding-left: $space-medium
 
                 li
-                    width: 100%
+                    width: calc(100% - 2 * $space-small)
 
-                    color: $tertiary-color
+                    color: $secondary-text-color
                     
-                    font-size: 13px
+                    font-size: $font-small
                     cursor: pointer
 
                     &:hover
                         background-color: $hover-color
-                        color: $secondary-text-color
-
-    .recent
-
-        width:100%
-
-        border-top: 1px solid $tertiary-color
-
-        li
-            color: $tertiary-color
-
-            font-size: $font-medium
-            cursor: pointer
-
-            &:hover
-                color: $secondary-text-color
-                background-color: $hover-color

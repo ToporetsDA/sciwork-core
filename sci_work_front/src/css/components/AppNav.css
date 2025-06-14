@@ -190,11 +190,12 @@
 }
 
 nav {
-  width: 15%;
+  width: 30%;
+  max-width: 250px;
   height: 89vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden auto;
+  overflow: auto;
   background-color: #5c5c5c;
 }
 nav h4 {
@@ -215,39 +216,25 @@ nav ul li {
   display: flex;
   flex-direction: column;
 }
-nav .projects details {
+nav .nav-items details {
   width: 100%;
 }
-nav .projects details summary {
+nav .nav-items details summary {
   color: #eeeeee;
   font-size: 14px;
   cursor: pointer;
 }
-nav .projects details ul {
-  width: 100%;
+nav .nav-items details ul {
+  width: calc(100% - 10px);
   padding-left: 10px;
 }
-nav .projects details ul li {
-  width: 100%;
-  color: #5c5c5c;
-  font-size: 13px;
+nav .nav-items details ul li {
+  width: calc(100% - 10px);
+  color: #eeeeee;
+  font-size: 12px;
   cursor: pointer;
 }
-nav .projects details ul li:hover {
-  background-color: rgba(17, 17, 17, 0.1411764706);
-  color: #eeeeee;
-}
-nav .recent {
-  width: 100%;
-  border-top: 1px solid #5c5c5c;
-}
-nav .recent li {
-  color: #5c5c5c;
-  font-size: 14px;
-  cursor: pointer;
-}
-nav .recent li:hover {
-  color: #eeeeee;
+nav .nav-items details ul li:hover {
   background-color: rgba(17, 17, 17, 0.1411764706);
 }
 

@@ -449,8 +449,9 @@ const startWebSocketServer = (port) => {
             const {page, isId} = parsedMessage.data
             clients.get(sessionToken).page = page
             if (isId) {
+              console.log("go to item", page, page.split('.')[0])
               const login = clients.get(sessionToken).login
-              getData("activities", {login}, ws, sessionToken, page)
+              getData("activities", {login}, ws, sessionToken, page.split('.')[0])
             }
             break
           }

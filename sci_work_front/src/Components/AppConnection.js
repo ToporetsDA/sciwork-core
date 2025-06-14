@@ -172,13 +172,22 @@ const Connection = ({
     }, [projects, setProjects, activities, setActivities, setLoggedIn, setRights, setUsers, setUserData])
 
     //send update ONLY when page changes
-    const lastSentProject = useRef(null)
+    const lastSentPage = useRef({
+        currentPage: 'HomePage',
+        currentProject: undefined,
+        currentActivity: undefined
+    })
     useEffect(() => {
-        if (lastSentProject.current === state.currentPage || !isLoggedIn) return
-            const location = state.currentProject || state.currentPage
-            sendMsg("goTo", { page: format(location), isId: (!!state.currentProject)})
-        lastSentProject.current = state.currentPage
-    }, [sendMsg, state.currentPage, state.currentProject, state.currentActivity, isLoggedIn])
+        if (
+            (lastSentPage.current.currentPage === state.currentPage && lastSentPage.current.currentProject === state.currentProject)
+            || !isLoggedIn
+        ) {
+            return
+        }
+        const location = state.currentProject || state.currentPage
+        sendMsg("goTo", { page: format(location), isId: (!!state.currentProject)})
+        lastSentPage.current = state
+    }, [sendMsg, state, isLoggedIn])
 
     // Track user-initiated changes to data
     const updateByUser = useCallback((item, toDo, itemType) => {

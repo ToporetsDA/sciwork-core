@@ -31,7 +31,7 @@ const Text = ({
     const activity = Shared.GetItemById(activities, activityId)
 
     const project = Shared.GetItemById(projects, state.currentProject)
-    const metaActivity = Shared.FindItemWithParent(project.activities, "_id", activity._id, project).item
+    const { item: metaActivity } = Shared.FindItemWithParent(project.activities, "_id", activity._id, project)
 
     const [isEditing, setIsEditing] = useState(false)
     const [savedHtml, setSavedHtml] = useState('')
@@ -103,8 +103,10 @@ const Text = ({
         }
     }
 
+    let itemToEdit = (metaActivity?.userData) ? metaActivity : project
+
     return (
-        (rights.edit.includes(Shared.GetAccess(metaActivity, userData))) ? (
+        (rights.edit.includes(Shared.GetAccess(itemToEdit, userData))) ? (
             <div className='text-wrapper' style={{ position: 'relative' }}>
                 {isEditing && (
                     <div ref={toolbarRef} className="toolbar-popup">

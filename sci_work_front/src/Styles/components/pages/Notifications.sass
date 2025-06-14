@@ -7,28 +7,31 @@
 
     scrollbar-width: none
 
-    .read
-        background-color: #cccccc
+.notification-state
+    display: flex
 
-    .unread
-        .notification-circle
-            width: $space-big
-            height: $space-big
+.read
+    //background-color: $tertiary-color
 
-            margin: auto $space-large
+.unread
+    .notification-circle
+        width: $space-big
+        height: $space-big
 
-            display: flex
-            justify-content: center
-            align-items: center
+        margin-right: $space-small
 
-            border-radius: $circle
-
-            color: white
-            background-color: $highlight-color
-            
-            font-size: $font-small
-    
-    .list
         display: flex
-        flex-direction: column-reverse
+        justify-content: center
+        align-items: center
+
+        border-radius: $circle
+
+        color: white
+        background-color: $highlight-color
+        
+        font-size: $font-small
+
+.list
+    display: flex
+    flex-direction: column-reverse
         

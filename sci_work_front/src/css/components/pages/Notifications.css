@@ -30,13 +30,15 @@
   overflow-y: auto;
   scrollbar-width: none;
 }
-.notificationsContainer .read {
-  background-color: #cccccc;
+
+.notification-state {
+  display: flex;
 }
-.notificationsContainer .unread .notification-circle {
+
+.unread .notification-circle {
   width: 15px;
   height: 15px;
-  margin: auto 25px;
+  margin-right: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -45,7 +47,8 @@
   background-color: #ee2211;
   font-size: 12px;
 }
-.notificationsContainer .list {
+
+.list {
   display: flex;
   flex-direction: column-reverse;
 }

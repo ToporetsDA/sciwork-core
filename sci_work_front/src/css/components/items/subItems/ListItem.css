@@ -25,7 +25,7 @@
   overflow-y: auto;
 }
 
-li {
+.listItem li {
   margin-left: 25px;
 }
 
