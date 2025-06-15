@@ -208,8 +208,8 @@ const updateItemFields = async (userId, updatedItem, itemId, type) => {
     }
   }
   else {//item edit
-    if (!metaItem) {
-      return "Not found item" + item.name + " with id " + item._id + " item for edit"
+    if (!metaItem && type === "activity") {
+      return "Not found activity" + item.name + " with id " + item._id + " item for edit"
     }
     else {
       //proceed without changes
