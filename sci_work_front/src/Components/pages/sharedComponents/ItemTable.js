@@ -220,7 +220,7 @@ const ItemTable = ({
                             key={index}
                             className={`${isExpiring ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}
                             onClick={() => {
-                                if (!state.currentProject) {//for links
+                                if (isItem) {//for links
                                     if (linkActions) {
                                         linkActions(item._id)
                                     }

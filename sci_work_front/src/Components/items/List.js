@@ -254,8 +254,6 @@ const List = ({
         }
     }
 
-    console.log("list", item, item._id)
-
     const [showLi, setShowLi] = useState(true)
     const toggleLi = () => {
         setShowLi(prev => !prev)

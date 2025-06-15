@@ -194,7 +194,7 @@ const Connection = ({
 
         if (readyState === 1) { // Check if WebSocket is open
             sendMsg(toDo, item)
-            console.log("Sent update:", item)
+            console.log("Sent update:")
         } else {
             console.error(`WebSocket is not open. Cannot send ${itemType} update.`)
         }

@@ -143,6 +143,7 @@ const AddEditContent = ({
         }
         else {
             updatedActivity.content.liStructure = { ...structureFields }
+            console.log("I updated structure")
         }
 
         console.log("updatedActivity", updatedActivity)
@@ -171,6 +172,7 @@ const AddEditContent = ({
                                             <option value="checkbox">checkbox</option>
                                         </select>
                                         <button
+                                            className="button-mini"
                                             type="button"
                                             onClick={() => {
                                                 setStructureFields(prev => {
@@ -179,7 +181,6 @@ const AddEditContent = ({
                                                     return updated
                                                 })
                                             }}
-                                            className="deleteFieldBtn"
                                         >
                                             X
                                         </button>
@@ -188,12 +189,15 @@ const AddEditContent = ({
                                 </div>
                             ))}
                             <div className="add-field-form">
-                                <input
-                                    type="text"
-                                    placeholder="Field name"
-                                    value={newField.name}
-                                    onChange={e => setNewField(prev => ({ ...prev, name: e.target.value }))}
-                                />
+                                {Shared.GetInput(
+                                    "Field name",
+                                    "text",
+                                    newField.name,
+                                    undefined,
+                                    e => setNewField(prev => ({ ...prev, name: e.target.value })),
+                                    false,
+                                    50
+                                )}
                                 <select
                                     value={newField.type}
                                     onChange={e => setNewField(prev => ({ ...prev, type: e.target.value }))}
@@ -202,6 +206,7 @@ const AddEditContent = ({
                                     <option value="checkbox">checkbox</option>
                                 </select>
                                 <button
+                                    className="button-mini"
                                     type="button"
                                     onClick={() => {
                                         const { name, type } = newField
