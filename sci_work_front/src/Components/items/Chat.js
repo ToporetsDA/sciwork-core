@@ -57,19 +57,17 @@ const List = ({
 
 
     return (
-        <div className="chat-editor-wrapper">
-            <Items.List
-                key={item._id}
+        <div className="wrapper">
+            <Shared.ItemTiles
                 userData={userData}
                 projects={projects}
                 activities={activities}
                 setData={setData}
                 state={state}
                 setState={setState}
-                item={item}
-                index={index}
-                containerId={containerId}
-                containerType={containerType}
+                itemsToDisplay={[]}
+                containerId={state.currentProject}
+                containerType={item}
                 rights={rights}
                 users={users}
                 setUsers={setUsers}
@@ -84,7 +82,12 @@ const List = ({
                     placeholder="Enter message"
                     style={{ flexGrow: 1 }}
                 />
-                <button onClick={handleAddMessage}>Send</button>
+                <button
+                    className='button-main'
+                    onClick={handleAddMessage}
+                >
+                    Send
+                </button>
             </div>
         </div>
     )

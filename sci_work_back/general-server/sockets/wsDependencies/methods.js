@@ -172,60 +172,92 @@ const getActivityContent = (type) => {
 
 const updateItemFields = async (userId, updatedItem, itemId, type) => {
 
-    const existingItem = await db.Collections[type].findById(itemId)
-    if (!existingItem) return console.error("Not found")
+  // 1. Check if item exist and user has right to update
 
-    const incomingVersion = updatedItem.__v ?? 0
-    const existingVersion = existingItem.__v ?? 0
+  const existingItem = await db.Collections[type].findById(itemId)
+  if (!existingItem) return console.error("Not found")
 
-    console.log("userId in updateItemFields is ", userId, updatedItem)
+  const incomingVersion = updatedItem.__v ?? 0
+  const existingVersion = existingItem.__v ?? 0
 
-    const organisation = await db.Collections.organisation.findById(db.organisationId)
-    const rights = organisation?.rights || { fullView: [], interact: [], edit: [], names: [] }
+  const organisation = await db.Collections.organisation.findById(db.organisationId)
+  const rights = organisation?.rights || { fullView: [], interact: [], edit: [], names: [] }
 
-    const parts = updatedItem._id.split('.')
-    const project = await db.Collections.project.findById(parts[0])
-    const { item: metaItem } = findItemWithParent(project.activities, "_id", updatedItem._id, project)
+  const parts = updatedItem._id.split('.')
+  const project = await db.Collections.project.findById(parts[0])
+  if (!project) {
+    return "Project not found. Can not add/edit"
+  }
 
-    const accessLevel = getAccess(metaItem, userId)
-    const existingAccess = getAccess(existingItem?.lastModifiedBy?.userId || 0) || rights.names.length - 1
+  // 2. Check if update should be discarded or adjusted
+  // based on action
 
-    // if fields overlap
-    const overlap = (incomingVersion < existingVersion) ? hasOverlappingFields(updatedItem, existingItem) : false
-    const allow = shouldApplyUpdate(incomingVersion, existingVersion, overlap, accessLevel, existingAccess, rights)
+  let item = updatedItem
+  const { item: metaItem } = findItemWithParent(project.activities, "_id", updatedItem._id, project)
 
-    // user is not supposed to reach here
-    if (allow === null) {
-        const msg = "User " + userId + " has no right to update item " + existingItem._id + " !"
-        console.warn(msg)
-        return msg
+  if (incomingVersion === 0) {//item creation
+    if (metaItem) {//already created by another user, then adjust _id
+      const project = await db.Collections.project.findById(parts[0])
+      return {
+        ...updatedItem,
+        _id: project._id + '.' + project.dndCount
+      }
     }
-
-    // skip due to overlap
-    if (allow === false) {
-        const msg = "Update skipped due to priority/overlap"
-        console.warn(msg)
-        return msg
+    else {
+      //proceed without changes
     }
+  }
+  else {//item edit
+    if (!metaItem) {
+      return "Not found item" + item.name + " with id " + item._id + " item for edit"
+    }
+    else {
+      //proceed without changes
+    }
+  }
 
-    // apply only the fields that changed
-    const changedFields = getChangedFields(updatedItem, existingItem)
+  // 3. Check if update should be discarded on overlap
+  // based on rights
 
-    await db.Collections[type].updateOne(
-        { _id: itemId },
-        {
-        $set: {
-            ...changedFields,
-            lastModifiedBy: {
-                userId,
-                timestamp: Date.now()
-            }
-        },
-        $inc: { __v: 1 }
-        }
-    )
+  const accessLevel = getAccess(metaItem, userId)
+  const existingAccess = getAccess(existingItem?.lastModifiedBy?.userId || 0) || rights.names.length - 1
 
-    return await db.Collections[type].findById(itemId)
+  // if fields overlap
+  const overlap = (incomingVersion < existingVersion) ? hasOverlappingFields(item, existingItem) : false
+  const allow = shouldApplyUpdate(incomingVersion, existingVersion, overlap, accessLevel, existingAccess, rights)
+
+  // user is not supposed to reach here
+  if (allow === null) {
+    const msg = "User " + userId + " has no right to update item " + existingItem._id + " !"
+    console.warn(msg)
+    return msg
+  }
+
+  // skip due to overlap
+  if (allow === false) {
+    const msg = "Update skipped due to priority/overlap"
+    console.warn(msg)
+    return msg
+  }
+
+  // 4. apply only the fields that changed
+  const changedFields = getChangedFields(item, existingItem)
+
+  await db.Collections[type].updateOne(
+    { _id: itemId },
+    {
+    $set: {
+      ...changedFields,
+      lastModifiedBy: {
+        userId,
+        timestamp: Date.now()
+      }
+    },
+    $inc: { __v: 1 }
+    }
+  )
+
+  return await db.Collections[type].findById(itemId)
 }
 
 const send = (ws, message, sessionToken, type, data) => {

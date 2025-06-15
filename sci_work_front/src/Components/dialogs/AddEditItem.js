@@ -24,6 +24,15 @@ const AddEditItem = ({
 
     const selectedType = state.currentProject ? "Activity" : "Project"
 
+    const formatLabel = (key) => key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())
+
+    const unformatLabel = (label) => {
+        return label
+            .replace(/ ([a-zA-Z])/g, (_, c) => c.toUpperCase())
+            .replace(/ /g, '')
+            .replace(/^./, (c) => c.toLowerCase())
+    }
+
     // Initialize form values based on default type
 
     const initializeFormValues = (defaultValues, structure) => {
@@ -53,7 +62,7 @@ const AddEditItem = ({
         const { name, type, checked, value } = e.target
         setFormValues((prev) => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [unformatLabel(name)]: type === 'checkbox' ? checked : value
         }))
     }
 
@@ -210,7 +219,6 @@ const AddEditItem = ({
 
         for (const key in values) {
             const value = values[key]
-            console.log("itemStructure", itemStructure)
             const field = itemStructure.lists[key]
 
             if (!field) {
@@ -243,7 +251,7 @@ const AddEditItem = ({
         const project = Shared.GetItemById(projects, state.currentProject)
         const formattedFormValues = formatFormValues(formValues)
 
-        const { item: parent } = Shared.FindItemWithParent(project.activities, "_id", containerId, project)
+        const { item: parent } = Shared.FindItemWithParent(project?.activities || [], "_id", containerId, project)
 
         let newItem = {
             ...formattedFormValues,
@@ -253,7 +261,7 @@ const AddEditItem = ({
                     ? new ObjectId().toHexString()
                     : project._id + '.' + project.dndCount,
             activities: [],
-            userList: selectedType === "Project"
+            userList: (selectedType === "Project" || !parent?.userList)
                 ? [{
                     id: userData._id,
                     access: 0
@@ -308,8 +316,6 @@ const AddEditItem = ({
         closeDialog()
     }
 
-    const formatLabel = (key) => key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())
-
     const currentStructure = itemStructure[selectedType.toLowerCase()]
 
     return (
@@ -350,22 +356,13 @@ const AddEditItem = ({
                                         {Shared.GetInput(
                                             formatLabel(key),
                                             currentStructure[key],
-                                            currentStructure[key] === 'checkbox' ? formValues[key] : undefined,
-                                            formValues[key] || '',
+                                            currentStructure[key] !== 'checkbox' ? formValues[key] : undefined,
+                                            currentStructure[key] === 'checkbox' ? formValues[key] : false,
                                             handleInputChange,
                                             false,
                                             60,
 
                                         )}
-                                        {/* <label htmlFor={key}>{formatLabel(key)}</label>
-                                        <input
-                                        id={key}
-                                        name={key}
-                                        type={currentStructure[key]}
-                                        value={formValues[key] || ''}
-                                        checked={currentStructure[key] === 'checkbox' ? formValues[key] : undefined}
-                                        onChange={handleInputChange}
-                                        /> */}
                                     </div>
                                     }
                                 </>

@@ -7,19 +7,29 @@ const handleAddEdit = async (clients, sessionToken, updatedItem, itemId, type) =
     const socket = clients.get(sessionToken).socket
     const login = clients.get(sessionToken).login
     
-    // 1. Fetch the original project BEFORE updating
+    // 1. Fetch the original project BEFORE updating (add project handled here)
 
-    const originalProject = await db.Collections.project.findById(itemId.split('.')[0])
+    const parts = itemId.split('.')
+    const originalProject = await db.Collections.project.findById(parts[0])
     if (!originalProject) {
-      console.error(`Original project with ID ${itemId} not found.`)
-      return
+      if(parts.length === 1 && updatedItem?.activities?.length === 0) {//if _id of project and it's empty
+        await db.Collections.project.create(updatedItem)
+        console.log(`Project ${itemId} created.`)
+        return
+      }
+      else {
+        console.error(`Original project with ID ${itemId} not found.`)
+        return
+      }
     }
-    const originalDndCount = originalProject.dndCount
+    const originalDndCount = originalProject?.dndCount
 
     // 2. Perform the update
 
     const user = await db.Collections.user.findOne({ login: clients.get(sessionToken).login })
     const item = await methods.updateItemFields(user._id, updatedItem, itemId, type)
+    
+    //handle update result
     if (typeof item === "string") {
       methods.send(socket, "data", sessionToken, "error", item)
     }
@@ -41,8 +51,8 @@ const handleAddEdit = async (clients, sessionToken, updatedItem, itemId, type) =
       // Use the metadata tree to locate the new activity
       const { item: newMetaActivity } = methods.findItemWithParent(updatedItem.activities, '_id', newActivityId, updatedItem)
 
-      if (newMetaActivity) {
-        // 4. Insert a new document into the activity collection
+      if (newMetaActivity) {// 4. Insert a new document into the activity collection
+        
         await db.Collections.activity.create({
           _id: newMetaActivity._id,
           name: newMetaActivity.name,
@@ -61,8 +71,9 @@ const handleAddEdit = async (clients, sessionToken, updatedItem, itemId, type) =
       }
     }
 
-    let userList = null
+    let userList = []
 
+    //set userList let value
     if (type === "project") {
       userList = item.userList
     }
@@ -88,7 +99,7 @@ const handleAddEdit = async (clients, sessionToken, updatedItem, itemId, type) =
 
     for (const user of userList) {
 
-      const objectId = new ObjectId(user.id)
+      const objectId = new db.ObjectId(user.id)
       const userData = await db.Collections.user.findById(objectId)
 
       if (!userData) {

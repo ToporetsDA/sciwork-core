@@ -54,10 +54,10 @@ const startWebSocketServer = (port) => {
             break
           }
           case "addEditData": {
-            const updatedItem = parsedMessage.data
-            const itemId = updatedItem._id || new mongoose.Types.ObjectId()
+            const item = parsedMessage.data
+            const itemId = item._id || new mongoose.Types.ObjectId()
             
-            handlers.handleAddEdit(clients, sessionToken, updatedItem, itemId, "project")
+            handlers.handleAddEdit(clients, sessionToken, item, itemId, "project")
             break
           }
           case "addEditContent": {

@@ -17,7 +17,6 @@ const GetInput = (fieldName, type, value, checked = false, handler, disabled = f
                 placeholder={fieldName}
                 name={name}
                 id={name}
-                required
                 disabled={disabled}
                 value={value}
                 checked={checked}

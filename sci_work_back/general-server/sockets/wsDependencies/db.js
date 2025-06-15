@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb')
 const User = require("../../models/User")
 const Project = require("../../models/Project")
 const Organisation = require("../../models/Organisation")
@@ -13,4 +14,4 @@ const Collections = {
   activity: Activity
 }
 
-module.exports = { Collections, organisationId }
+module.exports = { Collections, organisationId, ObjectId }
