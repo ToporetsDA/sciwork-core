@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import '../../css/components/pages/Notifications.css'
 
-import * as Shared from './sharedComponents'
+import * as Shared from './shared'
 
 const Notifications = ({
     userData, setUserData,
@@ -23,7 +23,7 @@ const Notifications = ({
                     : n)
             ))
         }
-    }, [])
+    }, [setNotifications])
 
     const changeNotificationState = (id) => {
         setNotifications((prevNotifications) => ([
@@ -61,7 +61,7 @@ const Notifications = ({
     })
 
     return (
-        <div className="notificationsContainer .page-wrapper-no-cp">
+        <div className="notifications-container .page-wrapper-no-cp">
             <Shared.ItemTable
                 userData={userData}
                 projects={projects}

@@ -1,7 +1,7 @@
 import React from 'react'
 import '../../css/components/dialogs/JointEventOverlap.css'
 
-import * as Shared from '../pages/sharedComponents'
+import * as Shared from '../pages/shared'
 
 const JointEventOverlapDialog = ({
     userData, setUserData,
@@ -31,10 +31,10 @@ const JointEventOverlapDialog = ({
 
     return (
         <div
-            className="JointEventOverlapDialog dialogContainer"
+            className="dialog-container"
             onClick={closeDialog}
         >
-            <div className="dialogContent">
+            <div className="dialog-content">
                 <Shared.ItemTable
                     userData={userData}
                     projects={projects}

@@ -1,4 +1,4 @@
-const SetFieldValue = (activity, dataPath, value) => {
+const setFieldValue = (activity, dataPath, value) => {
     const parts = dataPath.split('.')
     const newContent = structuredClone(activity.content) // deep clone
     let curr = newContent
@@ -21,4 +21,4 @@ const SetFieldValue = (activity, dataPath, value) => {
     return { ...activity, content: newContent }
 }
 
-export default SetFieldValue
+export default setFieldValue

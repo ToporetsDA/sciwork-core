@@ -3,7 +3,7 @@ import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners,
 import { arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
 import '../../css/components/pages/Projects.css'
 
-import * as Shared from './sharedComponents'
+import * as Shared from './shared'
 
 const Projects = ({
     userData, setUserData,
@@ -29,7 +29,7 @@ const Projects = ({
     const [containers, setContainers] = useState([])
     useEffect(() => {
         if (state.currentProject) {
-            const project = Shared.GetItemById(projects, state.currentProject)
+            const project = Shared.getItemById(projects, state.currentProject)
             if (activities.length === project.dndCount) {
                 setContainers([...project.activities])
             }
@@ -38,7 +38,7 @@ const Projects = ({
 
     const saveDndUpdate = () => {
         const project = {
-            ...Shared.GetItemById(projects, state.currentProject),
+            ...Shared.getItemById(projects, state.currentProject),
             activities: containers
         }
         setData({action: "edit", item: project})
@@ -52,7 +52,7 @@ const Projects = ({
         })
     )
 
-    if (state.currentProject && containers.length !== Shared.GetItemById(projects, state.currentProject).activities.length) {
+    if (state.currentProject && containers.length !== Shared.getItemById(projects, state.currentProject).activities.length) {
         return (
             <>Loading Activities</>
         )

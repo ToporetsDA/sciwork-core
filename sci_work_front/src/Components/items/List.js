@@ -3,7 +3,7 @@ import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, } fro
 import { arrayMove, SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import '../../css/components/items/List.css'
 
-import * as Shared from '../pages/sharedComponents'
+import * as Shared from '../pages/shared'
 import * as Items from './'
 
 /*structure
@@ -61,10 +61,10 @@ const List = ({
     recentActivities, setRecentActivities
 }) => {
 
-    const activity = Shared.GetItemById(activities, item._id)
+    const activity = Shared.getItemById(activities, item._id)
 
-    const project = Shared.GetItemById(projects, state.currentProject)
-    const metaActivity = Shared.FindItemWithParent(project.activities, "_id", activity._id, project).item
+    const project = Shared.getItemById(projects, state.currentProject)
+    const metaActivity = Shared.findItemWithParent(project.activities, "_id", activity._id, project).item
 
     const [settings, setSettings] = useState(activity.content?.currentSettings || {})
 
@@ -90,9 +90,9 @@ const List = ({
     }, [activity, allItems])
 
     useEffect(() => {
-        const parent = Shared.GetItemById(projects, containerId)
-        const metaItem = Shared.FindItemWithParent(parent.activities, "_id", activity._id, parent)
-        const access = Shared.GetAccess(metaItem.item, userData)
+        const parent = Shared.getItemById(projects, containerId)
+        const metaItem = Shared.findItemWithParent(parent.activities, "_id", activity._id, parent)
+        const access = Shared.getAccess(metaItem.item, userData)
 
         const change = (activity.content?.currentSettings?.type !== settings?.type) && settings?.type
 
@@ -168,7 +168,7 @@ const List = ({
                 <div
                     className='list-actions'
                 >
-                {Shared.GetDialogButton(
+                {Shared.getDialogButton(
                     setState,
                     "button-mini",
                     "AddEditContent",

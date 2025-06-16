@@ -1,5 +1,5 @@
 // In localStorage data:[{userId, data:[]}]
-const LocalStorage = (get, name, _id, val) => {
+const getFromLocalStorage = (get, name, _id, val) => {
 
     if (get === true) {
         const saved = localStorage.getItem(name)
@@ -25,4 +25,4 @@ const LocalStorage = (get, name, _id, val) => {
     }
 }
 
-export default LocalStorage
+export default getFromLocalStorage

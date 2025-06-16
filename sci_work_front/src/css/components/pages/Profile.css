@@ -216,7 +216,7 @@
   overflow-y: auto;
 }
 
-.accountPage {
+.account-page {
   height: 75vh;
   padding: 7vh 0;
   max-height: 75vh;
@@ -225,38 +225,38 @@
   flex-direction: column;
   align-items: center;
 }
-.accountPage h2 {
+.account-page h2 {
   font-size: 28px;
   margin-bottom: 15px;
 }
-.accountPage .accountInfo {
+.account-page .account-info {
   width: 100%;
   max-width: 600px;
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
-.accountPage .accountInfo .accountField {
+.account-page .account-info .account-field {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.accountPage .accountInfo .accountField label {
+.account-page .account-info .account-field label {
   display: flex;
   font-weight: bold;
   flex: 1;
 }
-.accountPage .accountInfo .accountField span, .accountPage .accountInfo .accountField input, .accountPage .accountInfo .accountField .fixed {
+.account-page .account-info .account-field span, .account-page .account-info .account-field input, .account-page .account-info .account-field .fixed {
   flex: 2;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
-.accountPage .accountInfo .accountField span:disabled, .accountPage .accountInfo .accountField input:disabled, .accountPage .accountInfo .accountField .fixed:disabled {
+.account-page .account-info .account-field span:disabled, .account-page .account-info .account-field input:disabled, .account-page .account-info .account-field .fixed:disabled {
   background-color: #f8f8f8;
 }
 
-.accountActions {
+.account-actions {
   margin-top: 15px;
   display: flex;
   gap: 15px;

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import '../../css/components/dialogs/LogIn.css'
 import '../../css/base/dialog.css'
 
-import * as Shared from '../pages/sharedComponents'
+import * as Shared from '../pages/shared'
 
 
 const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
@@ -47,8 +47,8 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
     return (
         <>
             {!isLoggedIn &&
-            <div className="AuthDialog dialogContainer">
-                <div className="dialogContent">
+            <div className="auth-dialog dialog-container">
+                <div className="dialog-content">
                     <form onSubmit={handleSubmit}>
                         {/* Server Selection */}
                         <label htmlFor="server">Server</label>
@@ -69,8 +69,8 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
                             ))}
                         </select>
 
-                        {Shared.GetInput("Login", "text", formValues.login, false, handleInputChange, false, 60)}
-                        {Shared.GetInput("Password", "text", formValues.password, false, handleInputChange, false, 60)}
+                        {Shared.getInput("Login", "text", formValues.login, false, handleInputChange, false, 60)}
+                        {Shared.getInput("Password", "text", formValues.password, false, handleInputChange, false, 60)}
 
                         <div>
                             <button

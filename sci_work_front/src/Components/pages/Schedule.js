@@ -3,7 +3,7 @@ import '../../css/components/pages/Schedule.css'
 
 import ScheduleBoard from './specificComponents/ScheduleBoard'
 
-import * as Shared from './sharedComponents'
+import * as Shared from './shared'
 
 const Schedule = ({
     userData, setUserData,
@@ -86,14 +86,14 @@ const Schedule = ({
                 const formattedDate = `${String(dayDate.getDate()).padStart(2, '0')}.${String(dayDate.getMonth() + 1).padStart(2, '0')}`
                 
                 return (
-                    <div key={'v-' + index} className="topLabel">
+                    <div key={'v-' + index} className="top-label">
                         {day} {(currentScale === 'week') && formattedDate}
                     </div>
                 )
             })
         }
         if (currentScale === 'year') {
-            return months.map((month, index) => <div key={'v-' + index} className="topLabel">{month}</div>)
+            return months.map((month, index) => <div key={'v-' + index} className="top-label">{month}</div>)
         }
         return []
     }, [currentScale, intervalAnchor, daysOfWeek, months])
@@ -141,7 +141,7 @@ const Schedule = ({
             }
 
             return (
-                <div key={`h-${index}`} className="leftLabel">
+                <div key={`h-${index}`} className="left-label">
                     {itemInfo}
                 </div>
             )
@@ -164,12 +164,12 @@ const Schedule = ({
                 setCurrentScale={setCurrentScale}
                 editIntervalAnchor={editIntervalAnchor}
             />
-            <div className='scheduleContainer page-wrapper'>
-                <p className='currentMap'>
+            <div className='schedule-container page-wrapper'>
+                <p className='current-map'>
                 {currentScale!=='year' && months[intervalAnchor.getMonth()]} {intervalAnchor.getFullYear()}
                 </p>
                 <div
-                    className="scheduleVMap"
+                    className="schedule-v-map"
                     style={{
                         display: 'grid',
                         gridTemplateColumns: scheduleBoard.gridTemplateColumns
@@ -180,7 +180,7 @@ const Schedule = ({
                     className='schedule-scrollable'
                 >
                     <div
-                        className="scheduleHMap"
+                        className="schedule-h-map"
                         style={{
                             display: 'grid',
                             gridTemplateRows: scheduleBoard.gridTemplateRows

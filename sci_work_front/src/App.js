@@ -2,14 +2,14 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
 
-import { useTimer } from './Components/pages/sharedComponents'
+import { useTimer } from './Components/pages/shared'
 
 import AppConnection from './Components/AppConnection'
 import AppHeader from './Components/AppHeader'
 import AppNav from './Components/AppNav'
 import AppDynamicContent from './Components/AppDynamicContent'
 
-import * as Shared from './Components/pages/sharedComponents'
+import * as Shared from './Components/pages/shared'
 
 const App = () => {
 
@@ -180,13 +180,13 @@ const App = () => {
         else {
           const {containerId, index, activity} = item
 
-          let clone = Shared.GetItemById(projects, state.currentProject)
+          let clone = Shared.getItemById(projects, state.currentProject)
           clone.dndCount++
 
           const project = clone
           if (!project) return // fallback in case project is not found
 
-          const { parent: container } = Shared.FindItemWithParent(project.activities, "_id", containerId, project)
+          const { parent: container } = Shared.findItemWithParent(project.activities, "_id", containerId, project)
           if (!container) return // fallback in case container is not found
 
           if (!container.activities) {
@@ -223,10 +223,10 @@ const App = () => {
         }
         //activity
         else {
-          const project = Shared.GetItemById(projects, state.currentProject)
+          const project = Shared.getItemById(projects, state.currentProject)
           if (!project) return
 
-          const { item: target } = Shared.FindItemWithParent(project.activities, "_id", item._id, project)
+          const { item: target } = Shared.findItemWithParent(project.activities, "_id", item._id, project)
           if (!target) return
 
           Object.assign(target, item)
@@ -364,12 +364,12 @@ const App = () => {
       return
     }
 
-    const loaded = Shared.LocalStorage(true, "SciWork notifications", userData._id, null)
+    const loaded = Shared.getFromLocalStorage(true, "SciWork notifications", userData._id, null)
     if (loaded) {
 
       //delete old notifications
       const recentNotifications = loaded.filter(notification => {
-        return Shared.DaysTillEvent(1, notification.generationDate, notification.generationTime)
+        return Shared.daysTillEvent(1, notification.generationDate, notification.generationTime)
       })
       notificationsRef.current = recentNotifications
       setNotifications(recentNotifications)
@@ -385,7 +385,7 @@ const App = () => {
 
     notificationsRef.current = notifications
 
-    const parsed = Shared.LocalStorage(true, "SciWork notifications", null, null)
+    const parsed = Shared.getFromLocalStorage(true, "SciWork notifications", null, null)
     const updated = parsed.filter(entry => entry.userId !== userData._id)
 
     // Add fresh data
@@ -393,11 +393,26 @@ const App = () => {
       userId: userData._id,
       data: notifications
     })
-    Shared.LocalStorage(false, "SciWork notifications", null, updated)
+    Shared.getFromLocalStorage(false, "SciWork notifications", null, updated)
   }, [notifications, isLoggedIn, userData._id])
   
   // Run the timer hook every set minutes
   useTimer(checkActivities, period, delay, isLoggedIn)
+
+  /*!!! for beta-version !!!
+
+  profile image (optional)
+
+  locale related settings
+  last login dateTime
+
+  account status          (active, disabled, suspended)
+
+  list of devices         (optional, may be required)
+  list of allowed devices (optional)
+
+  more organisation data  (like class, department) (optional)
+  */
 
   //Html
   return (

@@ -3,7 +3,7 @@ import useWebSocket from 'react-use-websocket'
 
 import LogIn from './dialogs/LogIn'
 
-import * as Shared from './pages/sharedComponents'
+import * as Shared from './pages/shared'
 
 const Connection = ({
     state, setState,
@@ -135,7 +135,7 @@ const Connection = ({
                     }
                     case "activity": {
                         //edit
-                        if (Shared.GetItemById(activities, data._id)?._id) {
+                        if (Shared.getItemById(activities, data._id)?._id) {
                             setActivities(prevActivities =>
                                 prevActivities.map(act =>
                                     act._id === data._id ? data : act
@@ -149,7 +149,7 @@ const Connection = ({
                         break
                     }
                     case "delete": {//just _id
-                        Shared.DeleteItem(currentData, setProjects, data._id)
+                        Shared.deleteItem(currentData, setProjects, data._id)
                         break
                     }
                     case "organisation": {
@@ -255,10 +255,10 @@ const Connection = ({
     // Trigger user-initiated updates
     useEffect(() => {
         if (isUserUpdatingProjects) {
-            updateByUser(Shared.GetItemById(projects, isUserUpdatingProjects), "addEditData", "metadata")
+            updateByUser(Shared.getItemById(projects, isUserUpdatingProjects), "addEditData", "metadata")
         }
         if (isUserUpdatingActivities) {
-            updateByUser(Shared.GetItemById(activities, isUserUpdatingActivities), "addEditContent", "content")
+            updateByUser(Shared.getItemById(activities, isUserUpdatingActivities), "addEditContent", "content")
         }
         if (isUserUpdatingUserData) {
             updateByUser(userData, "addEditUser", "user")

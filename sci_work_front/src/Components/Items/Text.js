@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect} from 'react'
 import '../../css/components/items/Text.css'
 
-import * as Shared from '../pages/sharedComponents'
+import * as Shared from '../pages/shared'
 
 /* structure
 {
@@ -28,10 +28,10 @@ const Text = ({
 
     const parts = item._id.split('.')
     const activityId = parts[0] + '.' + parts[1]
-    const activity = Shared.GetItemById(activities, activityId)
+    const activity = Shared.getItemById(activities, activityId)
 
-    const project = Shared.GetItemById(projects, state.currentProject)
-    const { item: metaActivity } = Shared.FindItemWithParent(project.activities, "_id", activity._id, project)
+    const project = Shared.getItemById(projects, state.currentProject)
+    const { item: metaActivity } = Shared.findItemWithParent(project.activities, "_id", activity._id, project)
 
     const [isEditing, setIsEditing] = useState(false)
     const [savedHtml, setSavedHtml] = useState('')
@@ -74,7 +74,7 @@ const Text = ({
 
     const handleSave = () => {
         const newHtml = editorRef.current.innerHTML
-        const updatedActivity = Shared.SetFieldValue(activity, data, newHtml)
+        const updatedActivity = Shared.setFieldValue(activity, data, newHtml)
 
         setData({ action: "content", item: { type: "Text", activity: updatedActivity } })
         setIsEditing(false)
@@ -106,7 +106,7 @@ const Text = ({
     let itemToEdit = (metaActivity?.userData) ? metaActivity : project
 
     return (
-        (rights.edit.includes(Shared.GetAccess(itemToEdit, userData))) ? (
+        (rights.edit.includes(Shared.getAccess(itemToEdit, userData))) ? (
             <div className='text-wrapper' style={{ position: 'relative' }}>
                 {isEditing && (
                     <div ref={toolbarRef} className="toolbar-popup">
@@ -123,7 +123,7 @@ const Text = ({
                 )}
                 <div
                     ref={editorRef}
-                    className='editorArea'
+                    className='editor-area'
                     contentEditable={isEditing}
                     onClick={handleEditorClick}
                     onBlur={handleBlur}

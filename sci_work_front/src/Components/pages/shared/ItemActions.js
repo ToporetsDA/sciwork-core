@@ -5,10 +5,10 @@ import '../../../css/components/pages/sharedComponents/ItemActions.css'
 const ItemActions = ({userData, projects, setData, setState, item, rights}) => {
 
     const parts = item?._id.split('.')
-    const project = Shared.GetItemById(projects, parts[0])
+    const project = Shared.getItemById(projects, parts[0])
     const accessibleItem = (parts.length < 3)
         ? item
-        : Shared.FindItemWithParent(project.activities, "_id", parts[0] + '.' + parts[1], project).item
+        : Shared.findItemWithParent(project.activities, "_id", parts[0] + '.' + parts[1], project).item
     
     const condition = (parts.length === 1)
     const buttonClass = (condition) ? "button-mini" : "button-mini button-tool"
@@ -16,11 +16,11 @@ const ItemActions = ({userData, projects, setData, setState, item, rights}) => {
     
     return (
         <>
-            {!item.deleted && rights.edit.includes(Shared.GetAccess(accessibleItem, userData)) && (
+            {!item.deleted && rights.edit.includes(Shared.getAccess(accessibleItem, userData)) && (
             <div
                 className={wrapperClass}
             >
-                {Shared.GetDialogButton(
+                {Shared.getDialogButton(
                     setState,
                     buttonClass,
                     "AddEditUserList",
@@ -29,7 +29,7 @@ const ItemActions = ({userData, projects, setData, setState, item, rights}) => {
                     true
                 )}
                 {(parts?.length < 3) &&
-                Shared.GetDialogButton(
+                Shared.getDialogButton(
                     setState,
                     buttonClass,
                     "AddEditItem",
@@ -41,7 +41,7 @@ const ItemActions = ({userData, projects, setData, setState, item, rights}) => {
                     className={buttonClass}
                     onClick={(e) => {
                         e.stopPropagation()
-                        Shared.DeleteItem(projects, setData, item._id)
+                        Shared.deleteItem(projects, setData, item._id)
                     }}
                 >
                     🗑️

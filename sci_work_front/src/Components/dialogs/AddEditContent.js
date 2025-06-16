@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import '../../css/components/dialogs/AddEditContent.css'
 
-import * as Shared from '../pages/sharedComponents'
+import * as Shared from '../pages/shared'
 
 const AddEditContent = ({
     userData, setUserData,
@@ -17,7 +17,7 @@ const AddEditContent = ({
     const containerId = state.currentDialog.params[3]
     const editType =  state.currentDialog.params[4]
 
-    const activity = Shared.GetItemById(activities, containerId)
+    const activity = Shared.getItemById(activities, containerId)
     const listStructure = activity.content?.liStructure || {}
     const listItems = activity.content?.listItems || []
 
@@ -157,9 +157,9 @@ const AddEditContent = ({
     }
 
     return (
-        <div className="addEditContentDialog dialogContainer">
-            <div className="dialogContent">
-                <form className="dialogForm">
+        <div className="dialog-container">
+            <div className="dialog-content">
+                <form className="dialog-form">
                     {(editType.includes("Structure")) ? (
                         <>
                             {Object.entries(structureFields).map(([key, type]) => (
@@ -189,7 +189,7 @@ const AddEditContent = ({
                                 </div>
                             ))}
                             <div className="add-field-form">
-                                {Shared.GetInput(
+                                {Shared.getInput(
                                     "Field name",
                                     "text",
                                     newField.name,
@@ -303,7 +303,7 @@ const AddEditContent = ({
                     )}
                 </form>
 
-                <div className="dialogButtons">
+                <div className="dialog-actions">
                     <button
                         className='button-main'
                         onClick={handleSubmit}

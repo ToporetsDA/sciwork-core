@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import '../../css/components/pages/Profile.css'
 
-import * as Shared from './sharedComponents'
+import * as Shared from './shared'
 
 const Profile = ({ userData, setUserData, profileData, rights }) => {
 
@@ -36,19 +36,19 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
     }
     
     return (
-        <div className="accountPage .page-wrapper-no-cp">
+        <div className="account-page .page-wrapper-no-cp">
             <h2>Profile Details</h2>
             {/* <div className='accountImage'>
                 {userData.photo !== undefined &&
                     <></>
                 }
             </div> */}
-            <div className="accountInfo">
+            <div className="account-info">
                 {Object.entries(profileData.basic).map(([key, [isRequired, type]]) => (
-                    <div className="accountField" key={key}>
+                    <div className="account-field" key={key}>
                         {(editMode) ? (
                             <>
-                                {Shared.GetInput(
+                                {Shared.getInput(
                                     key,
                                     "text",
                                     key === 'statusName'
@@ -68,7 +68,7 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
                                 </p>
                             </>
                         ) : (
-                            Shared.GetInput(
+                            Shared.getInput(
                                 key,
                                 "text",
                                 key === 'statusName'
@@ -83,7 +83,7 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
                     </div>
                 ))}
             </div>
-            <div className="accountActions">
+            <div className="account-actions">
                 {editMode ? (
                     <>
                         <button
@@ -116,20 +116,3 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
 }
 
 export default Profile
-
-/*!!! for beta-version !!!
-
-permission list
-
-profile image
-
-locale related settings
-last login dateTime
-
-account status          (active, disabled, suspended)
-
-list of devices         (optional, may be required)
-list of allowed devices (optional)
-
-more organisation data  (like class, department) (optional)
-*/

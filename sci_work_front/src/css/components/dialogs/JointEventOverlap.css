@@ -1,6 +1,6 @@
 @import '../../base/buttons.css';
 @import '../../base/dialog.css';
-.dialogContent {
+.dialog-content {
   overflow-y: auto;
   scrollbar-width: none;
 }

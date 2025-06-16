@@ -1,7 +1,7 @@
 import { useMemo, useCallback }  from 'react'
 import '../../css/components/dialogs/AddEditUserList.css'
 
-import * as Shared from '../pages/sharedComponents'
+import * as Shared from '../pages/shared'
 
 const AddEditUserList = ({
     userData, setUserData,
@@ -29,9 +29,9 @@ const AddEditUserList = ({
 
     //get item
     const parts = state.currentDialog.params[0].split('.')
-    const project = Shared.GetItemById(projects, parts[0])
-    const metaActivity = Shared.FindItemWithParent(project.activities, "_id", (parts[0] + '.' + parts[1]), project).item
-    const activity = Shared.GetItemById(activities, metaActivity?._id)
+    const project = Shared.getItemById(projects, parts[0])
+    const metaActivity = Shared.findItemWithParent(project.activities, "_id", (parts[0] + '.' + parts[1]), project).item
+    const activity = Shared.getItemById(activities, metaActivity?._id)
 
     //cant give yourself access
     let usersData = users
@@ -59,7 +59,7 @@ const AddEditUserList = ({
     console.log("from AddEditUserList", parts, project, metaActivity, activity, item)
 
     const currentUserParam = (parts.length < 2) ? item : metaActivity
-    const currentUserAccess = Shared.GetAccess(currentUserParam, userData)
+    const currentUserAccess = Shared.getAccess(currentUserParam, userData)
 
     const userList = (parts.length < 3) ? item.userList : activity.content.listItems[parts[2]].userList
 
@@ -169,7 +169,7 @@ const AddEditUserList = ({
     const getSelect = useCallback((listItem, user) => {
         return (
             <select
-                className="accessLevel"
+                className="access-level"
                 value={listItem.access}
                 onChange={(e) => handleRightChange(user._id, parseInt(e.target.value))}
             >
@@ -207,7 +207,7 @@ const AddEditUserList = ({
                     select = rights.names[listItem.access]
                 }
                 //cant edit users with higher access
-                if (currentUserAccess > Shared.GetAccess(item, user)) {
+                if (currentUserAccess > Shared.getAccess(item, user)) {
                     select = rights.names[listItem.access]
                 }
 
@@ -257,18 +257,18 @@ const AddEditUserList = ({
     }
 
     return (
-        <div className="AddEditUserListDialog dialogContainer">
-            <div className="dialogContent">
+        <div className="dialog-container">
+            <div className="dialog-content">
                 <p>Users of {currentUserParam.name}</p>
-                <div className="usersWithAccess">
+                <div className="users-with-access">
                     <h3>Users with Access</h3>
-                    <div className="scrollableList">
+                    <div className="scrollable-list">
                         {getTable(usersWithAccess)}
                     </div>
                 </div>
-                <div className="usersWithoutAccess">
+                <div className="users-without-access">
                     <h3>Users without Access</h3>
-                    <div className="scrollableList">
+                    <div className="scrollable-list">
                         {getTable(usersWithoutAccess)}
                     </div>
                 </div>

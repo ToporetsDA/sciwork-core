@@ -1,6 +1,6 @@
 import '../../../css/base/input.css'
 
-const GetInput = (fieldName, type, value, checked = false, handler, disabled = false, width = 50) => {
+const getInput = (fieldName, type, value, checked = false, handler, disabled = false, width = 50) => {
 
     const name = fieldName.toLowerCase()
 
@@ -32,4 +32,4 @@ const GetInput = (fieldName, type, value, checked = false, handler, disabled = f
     )
 }
 
-export default GetInput
+export default getInput

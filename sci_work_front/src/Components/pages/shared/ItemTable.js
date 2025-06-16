@@ -35,14 +35,14 @@ const ItemTable = ({
     //find activity if activities
     const parts = (itemsToDisplay.length > 0) ? itemsToDisplay[0]._id.split('.') : []
     parts.pop()
-    const activity = Shared.GetItemById(activities, parts.join('.'))
+    const activity = Shared.getItemById(activities, parts.join('.'))
 
     //column types for activities
     const liKeys = itemKeys.filter(val => val !== 'tech')
 
     const saveChanges = (key, value, activity, index) => {
     
-        const updatedActivity = Shared.SetFieldValue(
+        const updatedActivity = Shared.setFieldValue(
             activity,
             `listItems.${index}.${key}`,
             value
@@ -224,7 +224,7 @@ const ItemTable = ({
                                     if (linkActions) {
                                         linkActions(item._id)
                                     }
-                                    navigate(Shared.GoTo(item, items, recentActivities, setRecentActivities))
+                                    navigate(Shared.goTo(item, items, recentActivities, setRecentActivities))
                                 }
                             }}
                         >

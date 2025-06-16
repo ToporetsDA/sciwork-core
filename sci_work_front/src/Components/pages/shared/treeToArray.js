@@ -1,11 +1,11 @@
-const TreeToArray = (list, field, result = []) => {
+const treeToArray = (list, field, result = []) => {
     for (const item of list) {
         result.push(item)
         if (item[field]?.length) {
-            TreeToArray(item[field], result)
+            treeToArray(item[field], result)
         }
     }
     return result
 }
 
-export default TreeToArray
+export default treeToArray

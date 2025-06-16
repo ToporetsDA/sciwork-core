@@ -1,6 +1,6 @@
 import '../../../css/base/buttons.css'
 
-const GetDialogButton  = (setState, buttonClass, dialog, params, text, stopPropagate) => {
+const getDialogButton  = (setState, buttonClass, dialog, params, text, stopPropagate) => {
     return (
         <button className={`${buttonClass}`} onClick={(e) => {
             if (stopPropagate) {
@@ -19,4 +19,4 @@ const GetDialogButton  = (setState, buttonClass, dialog, params, text, stopPropa
     )
 }
 
-export default GetDialogButton
+export default getDialogButton

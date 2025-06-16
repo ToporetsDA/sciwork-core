@@ -19,7 +19,7 @@
   background: white;
 }
 
-.dialogActions {
+.dialog-actions {
   gap: 10px;
   display: flex;
   justify-content: flex-end;

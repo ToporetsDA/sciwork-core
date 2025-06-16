@@ -3,7 +3,7 @@ import '../../css/components/dialogs/AddEditItem.css'
 
 import { ObjectId } from 'bson'
 
-import * as Shared from '../pages/sharedComponents'
+import * as Shared from '../pages/shared'
 
 const AddEditItem = ({
     userData, setUserData,
@@ -86,10 +86,10 @@ const AddEditItem = ({
     //show item-fields
     const showItemFields = useMemo(() => {
         const isSchedule = state.currentPage === 'Schedule'
-        const project = Shared.GetItemById(projects, state.currentProject)
+        const project = Shared.getItemById(projects, state.currentProject)
         const itemWithUserList = (state.currentProject)
-            ? Shared.FindItemWithParent(project.activities, "_id", currentItemId, project)?.item
-            : Shared.GetItemById(projects, currentItemId)
+            ? Shared.findItemWithParent(project.activities, "_id", currentItemId, project)?.item
+            : Shared.getItemById(projects, currentItemId)
             
         let canEdit = userData.genStatus
         //edit
@@ -99,8 +99,8 @@ const AddEditItem = ({
         //add
         else if (containerId && currentItemId) {
             const item = (!containerId.includes('.'))
-                ? Shared.GetItemById(projects, containerId)
-                : Shared.FindItemWithParent(project.activities, "_id", currentItemId, project).item
+                ? Shared.getItemById(projects, containerId)
+                : Shared.findItemWithParent(project.activities, "_id", currentItemId, project).item
             
             canEdit = item.userList.find(user => user.id === userData._id)?.access
         }
@@ -174,7 +174,7 @@ const AddEditItem = ({
             }
 
             if (selectedType === 'Activity') {
-                const project = Shared.GetItemById(projects, Shared.GetItemById(projects, state.currentProject))
+                const project = Shared.getItemById(projects, Shared.getItemById(projects, state.currentProject))
                 
                 if (startDate < project.startDate || startDate >= project.endDate) {
                     errors.startDate = "Start date must be within project's lifetime."
@@ -248,10 +248,10 @@ const AddEditItem = ({
             return
         }
 
-        const project = Shared.GetItemById(projects, state.currentProject)
+        const project = Shared.getItemById(projects, state.currentProject)
         const formattedFormValues = formatFormValues(formValues)
 
-        const { item: parent } = Shared.FindItemWithParent(project?.activities || [], "_id", containerId, project)
+        const { item: parent } = Shared.findItemWithParent(project?.activities || [], "_id", containerId, project)
 
         let newItem = {
             ...formattedFormValues,
@@ -290,7 +290,7 @@ const AddEditItem = ({
         else if (selectedType === "Activity") {
             //edit
             if (currentItemId) {
-                const { parent: container } = Shared.FindItemWithParent(project.activities, "_id", currentItemId, project)
+                const { parent: container } = Shared.findItemWithParent(project.activities, "_id", currentItemId, project)
                 
                 const target = container.activities.find(act => act._id === currentItemId)
                 if (target) {
@@ -319,8 +319,8 @@ const AddEditItem = ({
     const currentStructure = itemStructure[selectedType.toLowerCase()]
 
     return (
-        <div className="addEditItemDialog dialogContainer">
-            <div className="dialogContent">
+        <div className="add-edit-item-dialog dialog-container">
+            <div className="dialog-content">
                 <h2>{currentItem === true 
                     ? (state.currentProject ? 'Add new Activity' : 'Add New Project')
                     : `Edit: ${currentItem.name}`}
@@ -329,12 +329,12 @@ const AddEditItem = ({
                 <form onSubmit={handleSubmit}>
                     {(showItemFields) && (
                         Object.keys(currentStructure).map((key) => (
-                            <div key={key} className="formGroup">
+                            <div key={key} className="form-group">
                                 {(currentStructure[key] === "list") ? (
                                     fieldConditionCheck(key) &&
-                                    <div className='listFieldBox'>
+                                    <div className='list-field-box'>
                                         <label htmlFor={key}>{formatLabel(key)}</label>
-                                        <div className={`fieldBox listButtons`}>
+                                        <div className={`field-box list-buttons`}>
                                             {itemStructure.lists[key].options.map((val) => (
                                                 <button
                                                     key={val}
@@ -351,9 +351,9 @@ const AddEditItem = ({
                                 <>
                                     {fieldConditionCheck(key) &&
                                     <div
-                                        className={`fieldBox ${currentStructure[key] === 'checkbox' && 'checkboxFieldBox'}`}
+                                        className={`field-box ${currentStructure[key] === 'checkbox' && 'checkbox-field-box'}`}
                                     >
-                                        {Shared.GetInput(
+                                        {Shared.getInput(
                                             formatLabel(key),
                                             currentStructure[key],
                                             currentStructure[key] !== 'checkbox' ? formValues[key] : undefined,
@@ -367,7 +367,7 @@ const AddEditItem = ({
                                     }
                                 </>
                                 )}
-                                {errors[key] && <span className="errorMessage">{errors[key]}</span>}
+                                {errors[key] && <span className="error-message">{errors[key]}</span>}
                             </div>
                         ))
                     )}

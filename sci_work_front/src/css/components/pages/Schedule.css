@@ -25,7 +25,7 @@
   overflow-y: auto;
 }
 
-.scheduleContainer {
+.schedule-container {
   padding-left: 3.5vh;
   padding-right: 3.5vh;
   display: flex;
@@ -33,19 +33,19 @@
   overflow-y: auto;
   scrollbar-width: none;
 }
-.scheduleContainer .currentMap {
+.schedule-container .current-map {
   width: 7.5%;
 }
-.scheduleContainer .scheduleVMap {
+.schedule-container .schedule-v-map {
   width: 90%;
   margin: 0 0 10px 0;
   flex-shrink: 0;
 }
-.scheduleContainer .scheduleHMap {
+.schedule-container .schedule-h-map {
   width: 7.5%;
   height: 7vh;
 }
-.scheduleContainer .scheduleHMap .leftLabel {
+.schedule-container .schedule-h-map .left-label {
   min-height: 99.6px;
 }
 

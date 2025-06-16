@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import '../../css/components/items/Group.css'
 
-import * as Shared from '../pages/sharedComponents'
+import * as Shared from '../pages/shared'
 import * as Items from './'
 
 /*structure

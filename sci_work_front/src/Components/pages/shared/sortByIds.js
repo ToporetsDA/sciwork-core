@@ -1,4 +1,4 @@
-const SortByIds = (array, ids, fullArr) => {
+const sortByIds = (array, ids, fullArr) => {
     let sortedArray = []
     for (let i = 0; i < ids.length; i++) {
         let item = array.find(a => a._id === ids[i])
@@ -11,4 +11,4 @@ const SortByIds = (array, ids, fullArr) => {
     return sortedArray
 }
 
-export default SortByIds
+export default sortByIds

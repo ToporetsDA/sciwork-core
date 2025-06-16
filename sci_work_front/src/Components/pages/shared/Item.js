@@ -117,7 +117,7 @@ const Item = ({
                 className='item-actions'
             >
                 {/* ➕ Add below button */}
-                {Shared.GetDialogButton(
+                {Shared.getDialogButton(
                     setState,
                     `add-button ${classCondition ? 'button-mini' : 'button-tool'}`,
                     (!['List', 'Attendance'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',

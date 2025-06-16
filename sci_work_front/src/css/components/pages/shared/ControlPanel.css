@@ -189,22 +189,22 @@
   color: #fff;
 }
 
-.controlPanel {
+.control-panel {
   height: 7vh;
   display: flex;
   align-items: center;
   background-color: #f8f8f8;
 }
-.controlPanel .dropdown li {
+.control-panel .dropdown li {
   min-width: 100px;
   min-height: 25px;
   background-color: #f8f8f8;
 }
-.controlPanel .sortAndFilter {
+.control-panel .sort-and-filter {
   display: flex;
   z-index: 2;
 }
-.controlPanel .sortAndFilter div {
+.control-panel .sort-and-filter div {
   display: block;
 }
 

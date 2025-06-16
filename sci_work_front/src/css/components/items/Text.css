@@ -3,12 +3,12 @@
   position: relative;
 }
 
-.editorArea {
+.editor-area {
   min-height: 2em;
   padding: 5px;
   border: 1px solid transparent;
 }
-.editorArea:focus {
+.editor-area:focus {
   outline: 1px dashed #888;
   border-color: #aaa;
   background: #f8f8f8;

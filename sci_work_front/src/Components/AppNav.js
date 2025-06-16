@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate } from "react-router-dom"
 import '../css/components/AppNav.css'
 
-import * as Shared from './pages/sharedComponents'
+import * as Shared from './pages/shared'
 
 const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, recentActivities, setRecentActivities }) => {
   
@@ -18,7 +18,7 @@ const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, rec
       <li
         key={activity._id}
         onClick={
-          () => {navigate(Shared.GoTo(activity, projects, recentActivities, setRecentActivities))}
+          () => {navigate(Shared.goTo(activity, projects, recentActivities, setRecentActivities))}
         }
         className={
           state.currentActivity === activity._id ? 'active' : ''

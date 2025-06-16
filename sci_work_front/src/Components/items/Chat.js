@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import * as Shared from '../pages/sharedComponents'
+import * as Shared from '../pages/shared'
 import * as Items from './'
 
 const List = ({

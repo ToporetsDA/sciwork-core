@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import '../../css/components/items/Dev.css'
 
-import * as Shared from '../pages/sharedComponents'
+import * as Shared from '../pages/shared'
 
 const Dev = ({
     userData, setUserData,
@@ -26,11 +26,11 @@ const Dev = ({
             ${(new Date(item.endDate) < new Date()) ? 'expired' : ''}
             `}
             onClick={() => {
-                navigate(Shared.GoTo(item, projects, recentActivities, setRecentActivities))
+                navigate(Shared.goTo(item, projects, recentActivities, setRecentActivities))
             }}
         >
             <h3 className="name">{item.name}</h3>
-            <p className="timeLimit">
+            <p className="time-limit">
                 Dev type Activity. Testing ONLY
             </p>
         </div>

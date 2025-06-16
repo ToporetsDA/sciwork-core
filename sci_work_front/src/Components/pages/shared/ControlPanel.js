@@ -143,7 +143,7 @@ const ControlPanel = ({
     }, [projects, filterItems, sortItems])
 
     const activitiesToDisplay = useMemo(() => {
-        const activities = Shared.GetItemById(projects, state.currentProject).activities
+        const activities = Shared.getItemById(projects, state.currentProject).activities
         return Array.isArray(activities)
             ? filterItems(sortItems([...activities]))
             : []
@@ -158,10 +158,10 @@ const ControlPanel = ({
     }, [projectsToDisplay, activitiesToDisplay, setItemsToDisplay])
 
     return (
-        <div className='controlPanel'>
+        <div className='control-panel'>
             {(state.currentPage === "Projects") &&
                 <>
-                    {Shared.GetInput("Search", "text", searchQuery, false, (e) => setSearchQuery(e.target.value), false, 25)}
+                    {Shared.getInput("Search", "text", searchQuery, false, (e) => setSearchQuery(e.target.value), false, 25)}
                     <Shared.ToggleButton
                         data={userData.currentSettings}
                         setter={setUserData}
@@ -181,13 +181,13 @@ const ControlPanel = ({
                         <option value="month">Month</option>
                         <option value="year">Year</option>
                     </select>
-                    <button className='moveSchedulePage button-mini' onClick={() => editIntervalAnchor(-1)}>
+                    <button className='move-schedule-page button-mini' onClick={() => editIntervalAnchor(-1)}>
                         Prev.
                     </button>
-                    <button className='moveSchedulePage button-mini' onClick={() => editIntervalAnchor(0)}>
+                    <button className='move-schedule-page button-mini' onClick={() => editIntervalAnchor(0)}>
                         To now
                     </button>
-                    <button className='moveSchedulePage button-mini' onClick={() => editIntervalAnchor(1)}>
+                    <button className='move-schedule-page button-mini' onClick={() => editIntervalAnchor(1)}>
                         Next
                     </button>
                 </div>
@@ -195,10 +195,10 @@ const ControlPanel = ({
             {(state.currentPage === "Projects" || state.currentPage === "Project"  || state.currentPage === "Activity") &&
                 <>
                     {userData.currentSettings.displayProjects !== "table" &&
-                    <div className='sortAndFilter'>
+                    <div className='sort-and-filter'>
                         <div>
                             <button
-                                className="filterButton  button-mini"
+                                className="filter-button  button-mini"
                                 onClick={() => {setIsSortDropdownOpen(!isSortDropdownOpen)}}
                                 ref={sortDropdownRef}
                             >
@@ -216,7 +216,7 @@ const ControlPanel = ({
                         </div>
                         <div>
                             <button
-                                className="filterButton  button-mini"
+                                className="filter-button  button-mini"
                                 onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
                                 ref={stateDropdownRef}
                             >
@@ -235,12 +235,12 @@ const ControlPanel = ({
                     </div>
                     }
                     {((state.currentPage !== "Projects")
-                    && ((state.currentProject) ? rights.edit.includes(getAccess(Shared.GetItemById(projects, state.currentProject))) : false))
+                    && ((state.currentProject) ? rights.edit.includes(getAccess(Shared.getItemById(projects, state.currentProject))) : false))
                     && (
                         <div>
-                        {Shared.GetDialogButton(
+                        {Shared.getDialogButton(
                             setState,
-                            "addItem button-mini",
+                            "add-item button-mini",
                             'AddEditUserList',
                             [state.currentProject],
                             "Add/Edit users",
@@ -254,9 +254,9 @@ const ControlPanel = ({
             {(rights.edit.includes(userData.genStatus)
             && ["Projects"].includes(state.currentPage))
             && (
-                Shared.GetDialogButton(
+                Shared.getDialogButton(
                     setState,
-                    "addItem button-mini",
+                    "add-item button-mini",
                     'AddEditItem',
                     [true, false],
                     "New Project",

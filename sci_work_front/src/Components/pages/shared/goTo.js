@@ -1,6 +1,6 @@
 //item here is either Activity or Project Object
 
-const GoTo = (destination, data, recentActivities, setRecentActivities) => {
+const goTo = (destination, data, recentActivities, setRecentActivities) => {
     
     const projectId = (id) => {
         return id.split('.')[0]
@@ -33,4 +33,4 @@ const GoTo = (destination, data, recentActivities, setRecentActivities) => {
     }
 }
 
-export default GoTo
+export default goTo

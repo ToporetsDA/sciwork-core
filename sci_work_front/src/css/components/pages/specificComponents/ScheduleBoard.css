@@ -4,11 +4,11 @@
   gap: 0;
   border: 1px solid black;
 }
-.schedule .scheduleCell {
+.schedule .schedule-cell {
   border: inherit;
   min-height: 98px;
 }
-.schedule .scheduleItem {
+.schedule .schedule-item {
   padding: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -35,10 +35,10 @@
   border: 1px solid #5c5c5c;
   white-space: pre-line;
 }
-.schedule .eventBg {
+.schedule .event-bg {
   background-color: rgba(0, 102, 170, 0.2);
 }
-.schedule .overlapBg {
+.schedule .overlap-bg {
   background-color: rgba(238, 34, 17, 0.2);
 }
 

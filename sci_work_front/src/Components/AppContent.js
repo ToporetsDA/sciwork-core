@@ -3,7 +3,7 @@ import '../css/components/AppContent.css'
 import * as Pages from './pages'
 import * as Dialogs from './dialogs'
 
-import * as Shared from '../Components/pages/sharedComponents'
+import * as Shared from './pages/shared'
 
 const AppContent = ({
     userData, setUserData,
@@ -48,7 +48,7 @@ const AppContent = ({
 
     // more for pages
 
-    const project = Shared.GetItemById(projects, state.currentProject)
+    const project = Shared.getItemById(projects, state.currentProject)
 
     const [itemsToDisplay, setItemsToDisplay] = useState({
         projects: projects || [],

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 
 import AppContent from './AppContent'
 
-import * as Shared from './pages/sharedComponents'
+import * as Shared from './pages/shared'
 
 const AppDynamicContent = ({
   userData, setUserData,
@@ -67,15 +67,15 @@ const AppDynamicContent = ({
         break
       }
       case 2: {
-        const project = Shared.GetItemById(projects, pathParts[1]) || undefined
+        const project = Shared.getItemById(projects, pathParts[1]) || undefined
         page = pathParts[0]
         pr = project._id
         act = undefined
         break
       }
       case 3: {
-        const project = Shared.GetItemById(projects, pathParts[1]) || undefined
-        const activity = (project) ? Shared.GetItemById(project.activities, pathParts[2]) || undefined : undefined
+        const project = Shared.getItemById(projects, pathParts[1]) || undefined
+        const activity = (project) ? Shared.getItemById(project.activities, pathParts[2]) || undefined : undefined
 
         if (state.currentProject !== project) {
           page = pathParts[0]

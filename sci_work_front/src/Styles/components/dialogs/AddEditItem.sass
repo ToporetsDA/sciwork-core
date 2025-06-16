@@ -3,18 +3,18 @@
 @import '../../base/dialog.css'
 @import '../../base/input.css'
 
-.addEditItemDialog
+.add-edit-item-dialog
 
-    .dialogContent
+    .dialog-content
         max-height: 75%
         overflow-y: auto
 
-        #itemType
+        .item-type
             margin-bottom: $space-small
 
-        .formGroup
+        .form-group
 
-            .fieldBox
+            .field-box
                 margin-bottom: 10px
 
                 label
@@ -25,11 +25,11 @@
                     font-size: $font-medium
                     font-weight: bold
             
-            .checkboxFieldBox
+            .checkbox-field-box
                 display: flex
                 gap: $space-medium
 
-            .listButtons
+            .list-buttons
                 overflow-y: auto
 
                 display: flex
@@ -38,7 +38,7 @@
         .error
             border: 2px solid $highlight-color
 
-        .errorMessage
+        .error-message
             margin-top: $space-small
 
             color: $highlight-color

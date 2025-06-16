@@ -1,6 +1,6 @@
 @import '../../base/buttons.css';
 @import '../../base/dialog.css';
-.AuthDialog form {
+.auth-dialog form {
   display: flex;
   flex-direction: column;
 }

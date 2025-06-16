@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import '../../../css/components/items/subItems/ListItem.css'
 
-import * as Shared from '../../pages/sharedComponents'
+import * as Shared from '../../pages/shared'
 import * as Items from '../../items'
 
 const ListItem = ({
@@ -19,11 +19,11 @@ const ListItem = ({
     recentActivities, setRecentActivities
 }) => {
 
-    const activity = Shared.GetItemById(activities, containerId)
+    const activity = Shared.getItemById(activities, containerId)
 
     const parts = containerId.split('.')
-    const project = Shared.GetItemById(projects, parts[0])
-    const {item: metaActivity} = Shared.FindItemWithParent(project.activities, "_id", containerId, project)
+    const project = Shared.getItemById(projects, parts[0])
+    const {item: metaActivity} = Shared.findItemWithParent(project.activities, "_id", containerId, project)
 
     const fieldsToRender = activity.content?.liStructure
 
@@ -32,7 +32,7 @@ const ListItem = ({
 
     const saveChanges = (key, value, activity, index) => {
 
-        const updatedActivity = Shared.SetFieldValue(
+        const updatedActivity = Shared.setFieldValue(
             activity,
             `listItems.${index}.${key}`,
             value
@@ -190,13 +190,13 @@ const ListItem = ({
     }
 
     return (metaActivity.type === "List") ? (
-        <li className="wrapper listItem">
+        <li className="wrapper list-item">
             {Object.entries(fieldsToRender).map(([key, type]) => (
                 getField(key, type)
             ))}
         </li>
     ) : (
-        <div className="wrapper listItem">
+        <div className="wrapper list-item">
             {Object.entries(fieldsToRender).map(([key, type]) => (
                 getField(key, type)
             ))}

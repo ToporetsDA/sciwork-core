@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useNavigate } from "react-router-dom"
 import '../../../css/components/pages/specificComponents/ScheduleBoard.css'
 
-import * as Shared from '../sharedComponents'
+import * as Shared from '../shared'
 
 const ScheduleBoard = ({
     projects,
@@ -15,7 +15,7 @@ const ScheduleBoard = ({
 }) => {
 
     const navigate = useNavigate()
-    const goTo = Shared.GoTo
+    const goTo = Shared.goTo
 
     const projectId = (id) => {
         return id.split('.')[0]
@@ -75,7 +75,7 @@ const ScheduleBoard = ({
     const scheduleCells = Array.from({ length: gridValues.rows * gridValues.columns }).map((_, index) => (
         <div
             key={'cell-' + index}
-            className="scheduleCell"
+            className="schedule-cell"
             style={{
                 backgroundColor: (currentScale === 'week')
                 ? ''
@@ -131,7 +131,7 @@ const ScheduleBoard = ({
         if (!projects) return []
     
         const filteredActivities = projects
-            .flatMap(project => Shared.TreeToArray(project.activities, "activities"))
+            .flatMap(project => Shared.treeToArray(project.activities, "activities"))
             .flatMap(activity => {
     
                 if (activity.startDate === activity.endDate) {// Single-day activity
@@ -347,7 +347,7 @@ const ScheduleBoard = ({
         return (
             <div
                 key={'event-' + group[i].eventId}
-                className={`event ${(isJoint) ? `overlapBg` : `eventBg`}`}
+                className={`event ${(isJoint) ? `overlap-bg` : `event-bg`}`}
                 style={{
                     zIndex: `${zIndex}`,
                     width: `${right - left - space}%`,
@@ -382,7 +382,7 @@ const ScheduleBoard = ({
             let content = ``
 
             if (item?.type === 'activity') {
-                content += `${Shared.GetItemById(projects, projectId(item._id)).name}: `
+                content += `${Shared.getItemById(projects, projectId(item._id)).name}: `
             }
 
             content += `${item.name}\n`
