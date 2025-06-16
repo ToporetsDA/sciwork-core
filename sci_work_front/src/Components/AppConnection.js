@@ -220,7 +220,7 @@ const Connection = ({
         } catch (error) {
             console.error("Error processing message:", error.message)
         }
-    }, [projects, setProjects, activities, setActivities, setLoggedIn, setRights, setUsers, userData._id, setUserData])
+    }, [projects, setProjects, activities, setActivities, setLoggedIn, setRights, setUsers, userData._id, setUserData, previousVersionsRef])
 
     //send update ONLY when page changes
     const lastSentPage = useRef({
