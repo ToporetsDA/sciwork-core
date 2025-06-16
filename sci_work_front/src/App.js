@@ -183,7 +183,9 @@ const App = () => {
           const { parent: container } = Shared.FindItemWithParent(project.activities, "_id", containerId, project)
           if (!container) return // fallback in case container is not found
 
-          if (!container.activities) container.activities = []
+          if (!container.activities) {
+            container.activities = []
+          }
 
           if (index === false || index === null || index >= container.activities.length) {
             // push to the end
@@ -193,7 +195,7 @@ const App = () => {
             container.activities.splice(index + 1, 0, activity)
           }
           
-          flag(clone._id)
+          flag(project._id)
           setter(prevItems => 
             prevItems.map(i =>
               i._id === clone._id ? clone : i

@@ -24,6 +24,7 @@ const Item = ({
     const types = {
         Dev: "Dev",
         Group: "Group",
+        Text: "Text",
         List: "List",
         Table: "List",
         Attendance: "List",
@@ -38,6 +39,7 @@ const Item = ({
 
     const getComponentType = () => {
         const itemsType = types[item.type] || "Dev"
+        console.log(item, "is?", item.type)
         let type
         if (isItem) {
             switch (containerType) {
@@ -52,6 +54,11 @@ const Item = ({
                 }
                 // activities
                 case "Group": {
+                    type = Items[itemsType]
+                    break
+                }
+                case "Text": {
+                    console.log(item._id, "is text")
                     type = Items[itemsType]
                     break
                 }

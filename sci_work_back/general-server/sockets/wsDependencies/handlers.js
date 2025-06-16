@@ -46,7 +46,7 @@ const handleAddEdit = async (clients, sessionToken, updatedItem, itemId, type) =
       typeof originalDndCount === "number" &&
       item.dndCount === originalDndCount + 1
     ) {
-      const newActivityId = item._id + '.' + (item.dndCount - 1)
+      const newActivityId = parts[0] + '.' + (item.dndCount - 1)
 
       // Use the metadata tree to locate the new activity
       const { item: newMetaActivity } = methods.findItemWithParent(updatedItem.activities, '_id', newActivityId, updatedItem)

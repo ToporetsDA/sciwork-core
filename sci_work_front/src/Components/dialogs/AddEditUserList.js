@@ -61,6 +61,8 @@ const AddEditUserList = ({
     const currentUserParam = (parts.length < 2) ? item : metaActivity
     const currentUserAccess = Shared.GetAccess(currentUserParam, userData)
 
+    const userList = (parts.length < 3) ? item.userList : activity.content.listItems[parts[2]].userList
+
     const closeDialog = useCallback(() => {
         setState((prevState) => ({
             ...prevState,
@@ -85,22 +87,34 @@ const AddEditUserList = ({
         else {
             console.log("activity update", )
             updatedItem = structuredClone(activity)
-            updatedItem.content.listItems[parts[2]].userList = updatedUserList
+            const listItem = updatedItem.content.listItems[parts[2]]
+            listItem.userList = updatedUserList
 
-            const userList = updatedItem.content.listItems[parts[2]].userList
+            console.log("updatedUserList", listItem.userList)
+
+            const userList = listItem.userList
             const addedUser = usersData.find(user => user._id === userList[userList.length - 1].id)
-            
-            updatedItem.content.listItems[parts[2]].markable.userEntries = [
-                ...updatedItem.content.listItems[parts[2]].markable.userEntries,
-                {
-                    _id: addedUser._id,
-                    name: addedUser.name,
-                    middleName: addedUser.middleName,
-                    surName: addedUser.surName,
-                    patronimic: addedUser.patronimic,
-                    checker: [false, "--:--"]
-                }
-            ]
+
+            console.log("addedUser", usersData.find(user => user._id === userList[userList.length - 1].id))
+
+            const entries = listItem.markable.userEntries
+
+            if (addedUser) {
+                listItem.markable.userEntries = [
+                    ...entries,
+                    {
+                        _id: addedUser._id,
+                        name: addedUser.name,
+                        middleName: addedUser.middleName,
+                        surName: addedUser.surName,
+                        patronimic: addedUser.patronimic,
+                        checker: [false, "--:--"]
+                    }
+                ]
+            }
+            else {
+                listItem.markable.userEntries = entries.filter(e => userList.some(u => u._id === e._id))
+            }
 
             setData({
                 action: "content",
@@ -114,8 +128,6 @@ const AddEditUserList = ({
         console.log("updatedItem", parts.length < 3, updatedItem, updatedUserList)
         
     }, [usersData, item, metaActivity, activity, parts, setData])
-
-    const userList = (parts.length < 3) ? item.userList : activity.content.listItems[parts[2]].userList
 
     const handleRemoveUser = useCallback((userId) => {
         const updatedUserList = userList.filter(item => item.id !== userId)

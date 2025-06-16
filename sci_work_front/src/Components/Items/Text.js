@@ -22,7 +22,7 @@ const Text = ({
     setData,
     state, setState,
     item,
-    data,
+    data = "text",
     rights
 }) => {
 
