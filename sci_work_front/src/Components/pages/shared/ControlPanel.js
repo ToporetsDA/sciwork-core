@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback }  from 'react'
-import '../../../css/components/pages/sharedComponents/ControlPanel.css'
+import '../../../css/components/pages/shared/ControlPanel.css'
 
 import * as Shared from './'
 

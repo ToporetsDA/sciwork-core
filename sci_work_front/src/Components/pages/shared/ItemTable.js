@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from "react-router-dom"
-import '../../../css/components/pages/sharedComponents/ItemTable.css'
+import '../../../css/components/pages/shared/ItemTable.css'
 
 import * as Shared from './'
 import * as Items from '../../items'

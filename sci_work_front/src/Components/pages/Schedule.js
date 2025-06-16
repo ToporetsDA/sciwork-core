@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react'
 import '../../css/components/pages/Schedule.css'
 
-import ScheduleBoard from './specificComponents/ScheduleBoard'
+import ScheduleBoard from './specific/ScheduleBoard'
 
 import * as Shared from './shared'
 

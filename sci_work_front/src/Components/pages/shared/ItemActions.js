@@ -1,6 +1,6 @@
 import * as Shared from './'
 
-import '../../../css/components/pages/sharedComponents/ItemActions.css'
+import '../../../css/components/pages/shared/ItemActions.css'
 
 const ItemActions = ({userData, projects, setData, setState, item, rights}) => {
 

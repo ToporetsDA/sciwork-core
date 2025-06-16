@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import '../../../css/components/pages/sharedComponents/Item.css'
+import '../../../css/components/pages/shared/Item.css'
 
 import * as Shared from "./"
 import * as Items from '../../items'
