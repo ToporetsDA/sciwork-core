@@ -147,6 +147,29 @@ const getChangedFields = (updated, original, type = null) => {
     return false
   }
 
+  const getUpdatedSubfields = (newObj, oldObj, path = "") => {
+    const changes = {}
+
+    for (const key in newObj) {
+      if (!(key in oldObj)) {
+        continue
+      }
+
+      const newVal = newObj[key]
+      const oldVal = oldObj[key]
+
+      if (typeof newVal === "object" && newVal !== null && typeof oldVal === "object" && oldVal !== null) {
+        const nestedChanges = getUpdatedSubfields(newVal, oldVal, `${path}.${key}`)
+        Object.assign(changes, nestedChanges)
+      }
+      else if (newVal !== oldVal) {
+        changes[`${path}.${key}`] = newVal
+      }
+    }
+
+    return changes
+  }
+
   for (const key in updated) {
     if (excluded.includes(key)) {
       continue
@@ -185,9 +208,13 @@ const getChangedFields = (updated, original, type = null) => {
             }
           }
 
-          if (subVal.length > oldSubVal.length) {
-            contentChanges[subKey] = subVal // full safe array
+          if (subVal.length > oldSubVal.length) { // full safe array
+            contentChanges[subKey] = subVal
           }
+        }
+        else if (subKey === 'currentSettings' && isObject(subVal) && isObject(oldSubVal)) {
+          const updatedSettings = getUpdatedSubfields(subVal, oldSubVal, 'content.currentSettings')
+          Object.assign(changed, updatedSettings)
         }
         else if (!deepEqual(subVal, oldSubVal)) {
           contentChanges[subKey] = subVal
@@ -198,7 +225,14 @@ const getChangedFields = (updated, original, type = null) => {
         changed[key] = { ...oldVal, ...contentChanges }
       }
     }
-    // 3. Deep compare for other objects (non-content)
+
+    // 3. Special case: precise object handling
+    else if (key === 'currentSettings' && isObject(newVal) && isObject(oldVal)) {
+      const updatedSettings = getUpdatedSubfields(newVal, oldVal, 'currentSettings')
+      Object.assign(changed, updatedSettings)
+    }
+
+    // 4. Deep compare for other objects (non-content)
     else if (!deepEqual(newVal, oldVal)) {
       changed[key] = newVal
     }
@@ -244,7 +278,10 @@ const findItemWithParent = (items, field, target, parent) => {
 // export
 const updateItemFields = async (userId, updatedItem, itemId, type) => {
 
-  // 1. Check if item exist and user has right to update
+  // 1.1. Check if item exist
+
+  let item = updatedItem
+  let updatedMetaItem = null
 
   const existingItem = await db.Collections[type].findById(itemId)
   if (!existingItem) {
@@ -254,82 +291,88 @@ const updateItemFields = async (userId, updatedItem, itemId, type) => {
   const incomingVersion = updatedItem.__v ?? 0
   const existingVersion = existingItem.__v ?? 0
 
-  const organisation = await db.Collections.organisation.findById(db.organisationId)
-  const rights = organisation?.rights || { fullView: [], interact: [], edit: [], names: [] }
+  // only user and admins can update user -> low frequency, except currentSettings
+  if (type !== "user") {
 
-  const parts = updatedItem._id.split('.')
-  const existingProject = await db.Collections.project.findById(parts[0])
-  if (!existingProject) {
-    return "Project not found. Can not add/edit"
-  }
+    // 1.2. Check if user has right to update
 
-  // 2. Check if update should be discarded or adjusted
-  // based on action
+    const organisation = await db.Collections.organisation.findById(db.organisationId)
+    const rights = organisation?.rights || { fullView: [], interact: [], edit: [], names: [] }
 
-  let item = updatedItem
-  const updatedMeta = findItemWithParent(existingProject.activities, "_id", updatedItem._id, existingProject)
-  const updatedMetaItem = (type === "activity") ? updatedMeta.item : updatedItem
-
-  //updatedMeta.item exist only for update activity,
-  //updatedMetaItem === updatedItem for create/update project
-  if (!updatedMeta.item && updatedMetaItem !== updatedItem) {//result: only create activity
-
-    if (updatedMetaItem) { // already created by another user
-      const newId = `${existingProject._id}.${existingProject.dndCount}`
-      const newMetaActivity = {
-        ...updatedMetaItem,
-        _id: newId
-      }
-
-      // Insert new activity into the meta parent’s activities
-      const existingMeta = findItemWithParent(existingProject.activities, "_id", item._id, existingProject)
-      const parent = existingMeta.parent //existingMeta.parent and updatedMeta.parent are the same for creation
-
-      if (!parent.activities) {
-        parent.activities = []
-      }
-      parent.activities.push(newMetaActivity)
-
-      item = {
-        ...item,
-        activities: existingProject.activities,
-        dndCount: existingProject.dndCount + 1
-      }
-    } else {
-      // proceed without changes
+    const parts = updatedItem._id.split('.')
+    const existingProject = await db.Collections.project.findById(parts[0])
+    if (!existingProject) {
+      return "Project not found. Can not add/edit"
     }
-  }
-  else {//item edit
-    if (!updatedMetaItem && type === "activity") {
-      return "Not found activity" + item.name + " with id " + item._id + " item for edit"
+
+    // 2. Check if update should be discarded or adjusted
+    // based on action
+
+    const updatedMeta = findItemWithParent(existingProject.activities, "_id", updatedItem._id, existingProject)
+    updatedMetaItem = (type === "activity") ? updatedMeta.item : updatedItem
+
+    //updatedMeta.item exist only for update activity,
+    //updatedMetaItem === updatedItem for create/update project
+    if (!updatedMeta.item && updatedMetaItem !== updatedItem) {//result: only create activity
+
+      if (updatedMetaItem) { // already created by another user
+        const newId = `${existingProject._id}.${existingProject.dndCount}`
+        const newMetaActivity = {
+          ...updatedMetaItem,
+          _id: newId
+        }
+
+        // Insert new activity into the meta parent’s activities
+        const existingMeta = findItemWithParent(existingProject.activities, "_id", item._id, existingProject)
+        const parent = existingMeta.parent //existingMeta.parent and updatedMeta.parent are the same for creation
+
+        if (!parent.activities) {
+          parent.activities = []
+        }
+        parent.activities.push(newMetaActivity)
+
+        item = {
+          ...item,
+          activities: existingProject.activities,
+          dndCount: existingProject.dndCount + 1
+        }
+      } else {
+        // proceed without changes
+      }
     }
-    else {
-      //proceed without changes
+    else {//item edit
+      if (!updatedMetaItem && type === "activity") {
+        return "Not found activity" + item.name + " with id " + item._id + " item for edit"
+      }
+      else {
+        //proceed without changes
+      }
     }
-  }
 
-  // 3. Check if update should be discarded on overlap
-  // based on rights
+    // 3. Check if update should be discarded on overlap
+    // based on rights
 
-  const accessLevel = getAccess(updatedMetaItem, userId)
-  const existingAccess = getAccess(existingItem?.lastModifiedBy?.userId || 0) || rights.names.length - 1
+    const accessLevel = getAccess(updatedMetaItem, userId)
+    const existingAccess = getAccess(existingItem?.lastModifiedBy?.userId || 0) || rights.names.length - 1
+  
+    // if fields overlap
+    const overlap = (incomingVersion < existingVersion) ? hasOverlappingFields(item, existingItem) : false
+    const allow = shouldApplyUpdate(incomingVersion, existingVersion, overlap, accessLevel, existingAccess, rights, type)
 
-  // if fields overlap
-  const overlap = (incomingVersion < existingVersion) ? hasOverlappingFields(item, existingItem) : false
-  const allow = shouldApplyUpdate(incomingVersion, existingVersion, overlap, accessLevel, existingAccess, rights, type)
+    // user is not supposed to reach here
+    if (allow === null) {
+      const msg = "User " + userId + " has no right to update item " + existingItem._id + " !"
+      console.warn(msg)
+      return msg
+    }
 
-  // user is not supposed to reach here
-  if (allow === null) {
-    const msg = "User " + userId + " has no right to update item " + existingItem._id + " !"
-    console.warn(msg)
-    return msg
-  }
+    // skip due to overlap
+    if (allow === false) {
+      const msg = "Update skipped due to priority/overlap"
+      console.warn(msg)
+      return msg
+    }
 
-  // skip due to overlap
-  if (allow === false) {
-    const msg = "Update skipped due to priority/overlap"
-    console.warn(msg)
-    return msg
   }
 
   // 4. apply only the fields that changed
@@ -488,18 +531,18 @@ const getData = async (type, login, ws, sessionToken, _id) => {
       data = activity
       break
     }
-      case "organisation": {
-        // Fetch organisation with name "default"
-        const organisation = await db.Collections.organisation.findOne({ name: "default" })
-        if (!organisation) {
-          throw new Error("Organisation with name 'default' not found")
-        }
-        data = organisation
-        break
+    case "organisation": {
+      // Fetch organisation with name "default"
+      const organisation = await db.Collections.organisation.findOne({ name: "default" })
+      if (!organisation) {
+        throw new Error("Organisation with name 'default' not found")
       }
-      default: {
+      data = organisation
+      break
+    }
+    default: {
       throw new Error(`Invalid type: ${type}`)
-      }
+    }
   }
   send(ws, "data", sessionToken, type, data)
 }

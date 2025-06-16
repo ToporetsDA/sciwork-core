@@ -15,7 +15,8 @@ const Connection = ({
     setUsers,
     isUserUpdatingProjects, setIsUserUpdatingProjects,
     isUserUpdatingActivities, setIsUserUpdatingActivities,
-    isUserUpdatingUserData, setIsUserUpdatingUserData
+    isUserUpdatingUserData, setIsUserUpdatingUserData,
+    previousVersionsRef
 }) => {
 
     const [servers, setServers] = useState([])
@@ -161,6 +162,56 @@ const Connection = ({
                 }
                 break
             }
+            case "confirm": {
+                const { id, error } = response.data
+                if (error) {
+                    const backup = previousVersionsRef.current[id]
+                    if (backup) {
+                        if (id === userData._id) {
+                        setUserData(backup)
+                        } else if (id.includes('.')) {
+                        setActivities(prev => prev.map(i => i._id === id ? backup : i))
+                        } else {
+                        setProjects(prev => prev.map(p => p._id === id ? backup : p))
+                        }
+                    }
+                    delete previousVersionsRef.current[id] // clean up
+                }
+                else {
+                    // notify user that update happened and increment its __v
+                    if (id === userData._id) {
+                        setUserData((prevData) => ({
+                            ...prevData,
+                            __v: prevData.__v + 1
+                        }))
+                    }
+                    else if (id.includes('.')) {
+                        setActivities(prevItems => 
+                            prevItems.map(i => {
+                                return i._id === id
+                                    ? { ...i, __v: i.__v + 1 }
+                                    : i
+                            })
+                        )
+                    }
+                    else if (id.includes('.')) {
+                        setProjects(prevItems => 
+                            prevItems.map(p => {
+                                return p._id === id
+                                    ? { ...p, __v: p.__v + 1 }
+                                    : p
+                            })
+                        )
+                    }
+
+                    if (id in previousVersionsRef.current) {
+                        delete previousVersionsRef.current[id]
+                    }
+
+                    console.log(id, "updated successfully")
+                }
+                break
+            }
             default: {
                 console.log("Unknown message: ", response.message)
             }
@@ -169,7 +220,7 @@ const Connection = ({
         } catch (error) {
             console.error("Error processing message:", error.message)
         }
-    }, [projects, setProjects, activities, setActivities, setLoggedIn, setRights, setUsers, setUserData])
+    }, [projects, setProjects, activities, setActivities, setLoggedIn, setRights, setUsers, userData._id, setUserData])
 
     //send update ONLY when page changes
     const lastSentPage = useRef({

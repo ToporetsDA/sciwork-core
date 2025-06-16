@@ -30,14 +30,22 @@ const handleAddEdit = async (clients, sessionToken, updatedItem, itemId, type) =
     const item = await methods.updateItemFields(user._id, updatedItem, itemId, type)
     
     //handle update result
-    if (typeof item === "string") {
-      methods.send(socket, "data", sessionToken, "error", item)
+    if (typeof item === "string") {// error message
+      const errorMsg = item
+      methods.send(socket, "confirm", sessionToken, "error", { id: itemId, error: errorMsg })
     }
-    if (!item) {
+    else if (!item) { // item not found
+      const errorMsg = `Failed to update ${type} with ID ${itemId}.`
+      methods.send(socket, "confirm", sessionToken, "error", { id: itemId, error: errorMsg })
+
       console.error(`Failed to update ${type} with ID ${itemId}.`)
       return
     }
-    console.log(`Item ${itemId} updated successfully.`)
+    else { // success, send confirm message
+      methods.send(socket, "confirm", sessionToken, type, { id: itemId, error: null })
+      console.log(`Item ${itemId} updated successfully.`)
+    }
+    
 
     // 3. Check if activity was added
 
@@ -131,15 +139,28 @@ const handleAddEdit = async (clients, sessionToken, updatedItem, itemId, type) =
 
 const handleEditUser = async (clients, sessionToken, updatedUserData, userId) => {
   try {
+
+    const socket = clients.get(sessionToken).socket
+    const login = clients.get(sessionToken).login
+
     const user = await methods.updateItemFields(userId, updatedUserData, userId, type)
-    if (typeof user === "string") {
-      methods.send(socket, "data", sessionToken, "error", item)
+
+    // handle update result
+    if (typeof user === "string") { // error message
+      const errorMsg = user
+      methods.send(socket, "confirm", sessionToken, "error", { id: userId, error: errorMsg })
     }
-    if (!user) {
+    else if (!user) { // user not found
+      const errorMsg = `Failed to update user with ID ${userId}.`
+      methods.send(socket, "confirm", sessionToken, "error", { id: userId, error: errorMsg })
+
       console.error(`Failed to update user with ID ${userId}.`)
       return
     }
-    console.log(`User ${userId} updated successfully.`)
+    else { // success, send confirm message
+      methods.send(socket, "confirm", sessionToken, "user", { id: userId, error: null })
+      console.log(`User ${userId} updated successfully.`)
+    }
 
     const sender = clients.get(sessionToken)
     const senderLogin = sender?.login

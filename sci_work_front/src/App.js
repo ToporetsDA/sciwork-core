@@ -137,13 +137,19 @@ const App = () => {
   const [users, setUsers] = useState()
 
   const updateUsers = (itemId) => {
-
-    console.log("this method will get users's data of users related to Item")
+    // this method will get users's data of users related to Item
+    // for now all users are loaded at login
   }
+
+  const previousVersionsRef = useRef({})
 
   const updateData = (data) => {
 
     const { action, item } = data
+
+    if (!previousVersionsRef.current[item._id]) {
+      previousVersionsRef.current[item._id] = structuredClone(item) // or deep copy
+    }
 
     //by default update data
     // let source = projects || []
@@ -270,6 +276,11 @@ const App = () => {
   }
 
   const updateUser = (newData, currentSettingsEdit) => {
+
+    if (!previousVersionsRef.current[userData._id]) {
+      previousVersionsRef.current[userData._id] = structuredClone(userData) // or deep copy
+    }
+
     setIsUserUpdatingUserData(true)
     if (currentSettingsEdit) {
       setUserData((prevUserData) => ({
@@ -459,6 +470,7 @@ const App = () => {
       setIsUserUpdatingActivities={setIsUserUpdatingActivies}
       isUserUpdatingUserData={isUserUpdatingUserData}
       setIsUserUpdatingUserData={setIsUserUpdatingUserData}
+      previousVersionsRef={previousVersionsRef}
     />
   </Router>
   )
