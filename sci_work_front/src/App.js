@@ -244,21 +244,32 @@ const App = () => {
         setAct()
         const { type, activity } = item
 
+        //update whole activity
+        const regularUpdate = (activity) => {
+          flag(activity._id)
+          setter(prevItems => 
+            prevItems.map(i =>
+              i._id === activity._id ? activity : i
+            )
+          )
+        }
+
         switch(type) {
           case "Text":
           case "Table":
           case "Attendance":
           case "List": {
-            flag(activity._id)
-            setter(prevItems => 
-              prevItems.map(i =>
-                i._id === activity._id ? activity : i
-              )
-            )
+            regularUpdate(activity)
             break
           }
           case "Chat": {
-            console.log("send message", item)
+            if (!activity) {
+              const { message } = item
+              console.log("send message", message)
+            }
+            else {
+              regularUpdate(activity)
+            }
             break
           }
           default: {

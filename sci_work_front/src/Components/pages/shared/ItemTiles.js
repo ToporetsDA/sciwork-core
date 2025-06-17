@@ -43,7 +43,11 @@ const ItemTiles = ({
             />
         )
     }
-    
+
+    const noItems = itemsToDisplay.length === 0
+    const noParent = !containerId
+    const isInContainerItem = containerType === "Group"
+
     return (
         <>
             {(state.currentPage === "Projects" /*|| !rights.edit.includes(getAccess(container))*/) ?
@@ -59,7 +63,7 @@ const ItemTiles = ({
                             {itemsToDisplay.map((item, index) => (
                                 getItem(item, index, true)
                             ))}
-                            {itemsToDisplay.length === 0 &&
+                            {noItems && (noParent || isInContainerItem) &&
                                 getItem(true, 0, true)
                             }
                         </SortableContext>

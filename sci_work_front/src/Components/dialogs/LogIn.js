@@ -52,7 +52,7 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
                     <form onSubmit={handleSubmit}>
                         {/* Server Selection */}
                         <label htmlFor="server">Server</label>
-                        <select
+                        {/* <select
                             id="server"
                             name="server"
                             value={formValues.server}
@@ -67,10 +67,22 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
                                     {server.name}
                                 </option>
                             ))}
-                        </select>
+                        </select> */}
+                        <Shared.CustomSelect
+                            id={"server"}
+                            name={"server"}
+                            value={formValues.server}
+                            handler={handleInputChange}
+                            options={servers}
+                            optionSelectField={"id"}
+                            optionContentField={"name"}
+                            placeholder={"Select server"}
+                            emptyPlaceholder={"No servers available"}
+                            disabled={false}
+                        />
 
-                        {Shared.getInput("Login", "text", formValues.login, false, handleInputChange, false, 60)}
-                        {Shared.getInput("Password", "text", formValues.password, false, handleInputChange, false, 60)}
+                        {Shared.getInput("Login", "text", formValues.login, false, handleInputChange, false, null, 60)}
+                        {Shared.getInput("Password", "text", formValues.password, false, handleInputChange, false, null, 60)}
 
                         <div>
                             <button

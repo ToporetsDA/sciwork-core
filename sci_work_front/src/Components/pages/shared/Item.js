@@ -33,13 +33,14 @@ const Item = ({
         Page: "Dev"
     }
 
+    console.log("item", item, "container is", containerType)
+
     const isItem = (item !== true)
     //if there are no Items in project - ➕ Add below button is always visible
     const classCondition = (!isItem && index === 0)
 
     const getComponentType = () => {
         const itemsType = types[item.type] || "Dev"
-        console.log(item, "is?", item.type)
         let type
         if (isItem) {
             switch (containerType) {
@@ -69,7 +70,7 @@ const Item = ({
                     break
                 }
                 case "Chat": {
-                    type = Items[itemsType]
+                    type = SubItems.Message
                     break
                 }
                 // case "Report": //save comment, save files on private server instances to client's storage

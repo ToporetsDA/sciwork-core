@@ -68,7 +68,7 @@ const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, rec
             const list = getList(item, itemsField, isListField, checkVal, comparator)
 
             if (!list) {
-              if (comparator(item)) {
+              if (comparator ? comparator(item) : false) {
                 return (
                   <div key={item._id}>
                     {getLi(item)}

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import * as Shared from '../pages/shared'
 import * as Items from './'
 
-const List = ({
+const Chat = ({
     userData,
     projects,
     activities,
@@ -18,7 +18,7 @@ const List = ({
     recentActivities, setRecentActivities
 }) => {
 
-    // const activity = Shared.GetItemById(activities, item._id)
+    const activity = Shared.getItemById(activities, item._id)
     //will need to save tmp message as "sending..."
 
     const [chatInput, setChatInput] = useState("")
@@ -42,16 +42,16 @@ const List = ({
         const date = formatDate(new Date())
 
         const newMessage = {
-            // _id: `${activity._id}.${activity.content?.messageCount}`,
+            _id: `${activity._id}.${activity.content?.messageCount}`,
             sender: userData._id,
             content: trimmed,
             dateTime: date
         }
 
-        // updatedActivity.content.messageCount++
-        // updatedActivity.content.listItems.push(newMessage)
+        activity.content.messageCount++
+        activity.content.listItems.push(newMessage)
 
-        setData({ action: "content", item: { type: "Chat", activity: newMessage } })
+        setData({ action: "content", item: { type: "Chat", activity } })
         setChatInput("") // clear input after sending
     }
 
@@ -65,9 +65,9 @@ const List = ({
                 setData={setData}
                 state={state}
                 setState={setState}
-                itemsToDisplay={[]}
-                containerId={state.currentProject}
-                containerType={item}
+                itemsToDisplay={activity?.content?.listItems || []}
+                containerId={item._id}
+                containerType={item.type}
                 rights={rights}
                 users={users}
                 setUsers={setUsers}
@@ -93,4 +93,4 @@ const List = ({
     )
 }
 
-export default List
+export default Chat

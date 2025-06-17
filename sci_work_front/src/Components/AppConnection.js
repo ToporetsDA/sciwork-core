@@ -163,52 +163,53 @@ const Connection = ({
                 break
             }
             case "confirm": {
-                const { id, error } = response.data
+                const { data, error } = response.data
+                console.log("confirm item", response.data, data.id, error)
                 if (error) {
-                    const backup = previousVersionsRef.current[id]
+                    const backup = previousVersionsRef.current[data.id]
                     if (backup) {
-                        if (id === userData._id) {
+                        if (data.id === userData._id) {
                         setUserData(backup)
-                        } else if (id.includes('.')) {
-                        setActivities(prev => prev.map(i => i._id === id ? backup : i))
+                        } else if (data.id.includes(".")) {
+                        setActivities(prev => prev.map(i => i._id === data.id ? backup : i))
                         } else {
-                        setProjects(prev => prev.map(p => p._id === id ? backup : p))
+                        setProjects(prev => prev.map(p => p._id === data.id ? backup : p))
                         }
                     }
-                    delete previousVersionsRef.current[id] // clean up
+                    delete previousVersionsRef.current[data.id] // clean up
                 }
                 else {
                     // notify user that update happened and increment its __v
-                    if (id === userData._id) {
+                    if (data.id === userData._id) {
                         setUserData((prevData) => ({
                             ...prevData,
                             __v: prevData.__v + 1
                         }))
                     }
-                    else if (id.includes('.')) {
+                    else if (data.id.includes(".")) {
                         setActivities(prevItems => 
                             prevItems.map(i => {
-                                return i._id === id
+                                return i._id === data.id
                                     ? { ...i, __v: i.__v + 1 }
                                     : i
                             })
                         )
                     }
-                    else if (id.includes('.')) {
+                    else if (data.id.includes(".")) {
                         setProjects(prevItems => 
                             prevItems.map(p => {
-                                return p._id === id
+                                return p._id === data.id
                                     ? { ...p, __v: p.__v + 1 }
                                     : p
                             })
                         )
                     }
 
-                    if (id in previousVersionsRef.current) {
-                        delete previousVersionsRef.current[id]
+                    if (data.id in previousVersionsRef.current) {
+                        delete previousVersionsRef.current[data.id]
                     }
 
-                    console.log(id, "updated successfully")
+                    console.log(data.id, "updated successfully")
                 }
                 break
             }

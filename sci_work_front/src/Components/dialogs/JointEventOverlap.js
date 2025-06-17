@@ -46,7 +46,7 @@ const JointEventOverlapDialog = ({
                     itemKeys={["name", "startDate", "endDate"]}
                     //itemTypes
                     editable={false}
-                    isItem={false}
+                    isItem={true}
                     //linkActions
                     rights={rights}
                     recentActivities={recentActivities}

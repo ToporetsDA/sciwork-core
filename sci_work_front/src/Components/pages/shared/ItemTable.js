@@ -198,7 +198,7 @@ const ItemTable = ({
                 {isItem &&
                     <th>Status</th>
                 }
-                {isItem &&
+                {isItem && (!state.currentDialog?.name) &&
                     <th>Actions</th>
                 }
                 </tr>
@@ -239,7 +239,7 @@ const ItemTable = ({
                             {isItem &&
                                 <td>{status}</td>
                             }
-                            {isItem &&
+                            {isItem && (!state.currentDialog?.name) &&
                                 <td onClick={(e) => e.stopPropagation()}>
                                     <Shared.ItemActions
                                         userData={userData}

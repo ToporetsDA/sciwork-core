@@ -161,7 +161,7 @@ const ControlPanel = ({
         <div className='control-panel'>
             {(state.currentPage === "Projects") &&
                 <>
-                    {Shared.getInput("Search", "text", searchQuery, false, (e) => setSearchQuery(e.target.value), false, 25)}
+                    {Shared.getInput("Search", "text", searchQuery, false, (e) => setSearchQuery(e.target.value), false, null, 25)}
                     <Shared.ToggleButton
                         data={userData.currentSettings}
                         setter={setUserData}
@@ -172,15 +172,18 @@ const ControlPanel = ({
             }
             {state.currentPage === "Schedule" &&
                 <div className='scale'>
-                    <select
-                        id="scale"
+                    <Shared.CustomSelect
+                        id={"server"}
+                        name={"server"}
                         value={currentScale}
-                        onChange={(e) => setCurrentScale(e.target.value)}
-                    >
-                        <option value="week">Week</option>
-                        <option value="month">Month</option>
-                        <option value="year">Year</option>
-                    </select>
+                        handler={(e) => setCurrentScale(e.target.value)}
+                        options={[{value: "week"}, {value: "month"}, {value: "year"}]}
+                        optionSelectField={"value"}
+                        optionContentField={"value"}
+                        placeholder={"Select server"}
+                        emptyPlaceholder={"No servers available"}
+                        disabled={false}
+                    />
                     <button className='move-schedule-page button-mini' onClick={() => editIntervalAnchor(-1)}>
                         Prev.
                     </button>

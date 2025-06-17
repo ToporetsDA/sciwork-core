@@ -61,6 +61,7 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
                                         }
                                     },
                                     profileData.fixed.includes(key),
+                                    null,
                                     80
                                 )}
                                 <p className='required'>
@@ -77,6 +78,7 @@ const Profile = ({ userData, setUserData, profileData, rights }) => {
                                 false,
                                 null,
                                 true,
+                                null,
                                 80
                             )
                         )}

@@ -147,6 +147,13 @@ const Projects = ({
         ) {
             // console.log("Handling Item Drop Into a Container")
 
+            const project = Shared.getItemById(projects, state.currentProject)
+            const { item: metaItem } = Shared.findItemWithParent(project.activities, "_id", over.id, project)
+
+            if (!metaItem || metaItem?.type !== "Group") {
+                return // Skip "not containers"
+            }
+
             // Find the active and over container
             const activeContainer = findValueOfContainer(active.id, 'Item')
             const overContainer = findValueOfContainer(over.id, 'Group')
@@ -200,7 +207,6 @@ const Projects = ({
         }
     }
 
-  // This is the function that handles the sorting of the containers and items when the user is done dragging.
     const handleDragEnd = (event) => {
         const { active, over } = event
         if (!over) {

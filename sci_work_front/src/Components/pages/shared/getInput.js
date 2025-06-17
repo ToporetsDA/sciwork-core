@@ -1,6 +1,14 @@
 import '../../../css/base/input.css'
 
-const getInput = (fieldName, type, value, checked = false, handler, disabled = false, width = 50) => {
+/* from
+AddEditContent
+AddEditItem
+LogIn
+Profile
+ControlPanel
+*/
+
+const getInput = (fieldName, type, value, checked = false, handler, disabled = false, section = undefined, width = 50) => {
 
     const name = fieldName.toLowerCase()
 
@@ -17,6 +25,7 @@ const getInput = (fieldName, type, value, checked = false, handler, disabled = f
                 placeholder={fieldName}
                 name={name}
                 id={name}
+                data-section={section}
                 disabled={disabled}
                 value={value}
                 checked={checked}

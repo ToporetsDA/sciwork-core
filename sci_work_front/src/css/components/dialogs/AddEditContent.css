@@ -38,8 +38,11 @@
   background-color: #f8f8f8;
 }
 
-label {
-  display: block;
+.add-edit-content-dialog-form .field {
+  display: flex;
+}
+.add-edit-content-dialog-form .field p {
+  min-width: 30%;
 }
 
 /*# sourceMappingURL=AddEditContent.css.map */

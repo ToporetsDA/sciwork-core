@@ -35,7 +35,7 @@ router.post('/register', (req, res) => {
   }
 
   res.json({ message: 'Server registered successfully' })
-});
+})
 
 /*
  * Обробник для отримання heartbeat
@@ -55,15 +55,15 @@ router.post('/heartbeat', (req, res) => {
   }
 
   // Оновлюємо час останнього heartbeat
-  lastHeartbeat[id] = Date.now();
+  lastHeartbeat[id] = Date.now()
 
-  res.json({ message: 'Heartbeat received' });
-});
+  res.json({ message: 'Heartbeat received' })
+})
 
 // Моніторинг серверів, щоб видалити неактивні
 setInterval(() => {
-  const now = Date.now();
-  const timeout = 60000; // Час у мс для визнання сервера "мертвим" (60 секунд)
+  const now = Date.now()
+  const timeout = 60000 // Час у мс для визнання сервера "мертвим" (60 секунд)
 
   for (const id in lastHeartbeat) {
     if (now - lastHeartbeat[id] > timeout) {
@@ -72,7 +72,7 @@ setInterval(() => {
       delete lastHeartbeat[id]
     }
   }
-}, 30000); // Перевірка кожні 30 секунд
+}, 30000) // Перевірка кожні 30 секунд
 
 /**
  * Отримання списку серверів
@@ -83,8 +83,8 @@ router.get('/list', (req, res) => {
     id,
     address: activeServers[id].address,
     name: activeServers[id].name
-  }));
+  }))
   res.json(serverList)
-});
+})
 
 module.exports = router

@@ -159,18 +159,24 @@ const AddEditContent = ({
     return (
         <div className="dialog-container">
             <div className="dialog-content">
-                <form className="dialog-form">
+                <form className="add-edit-content-dialog-form">
                     {(editType.includes("Structure")) ? (
                         <>
                             {Object.entries(structureFields).map(([key, type]) => (
                                 <div key={key}>
                                     {key !== "markable" &&
-                                    <label>
-                                        {key}
-                                        <select value={type} onChange={(e) => handleStructureChange(key, e.target.value)}>
-                                            <option value="text">text</option>
-                                            <option value="checkbox">checkbox</option>
-                                        </select>
+                                    <div
+                                        className='field'
+                                    >
+                                        <p>{key}</p>
+                                        {Shared.getSelect(
+                                            type,
+                                            (e) => handleStructureChange(key, e.target.value),
+                                            [{value: "text"},{value: "checkbox"}],
+                                            "value",
+                                            "value",
+                                            "value"
+                                        )}
                                         <button
                                             className="button-mini"
                                             type="button"
@@ -184,7 +190,7 @@ const AddEditContent = ({
                                         >
                                             X
                                         </button>
-                                    </label>
+                                    </div>
                                     }
                                 </div>
                             ))}
@@ -196,15 +202,17 @@ const AddEditContent = ({
                                     undefined,
                                     e => setNewField(prev => ({ ...prev, name: e.target.value })),
                                     false,
+                                    null,
                                     50
                                 )}
-                                <select
-                                    value={newField.type}
-                                    onChange={e => setNewField(prev => ({ ...prev, type: e.target.value }))}
-                                >
-                                    <option value="text">text</option>
-                                    <option value="checkbox">checkbox</option>
-                                </select>
+                                {Shared.getSelect(
+                                    newField.type,
+                                    (e) => setNewField(prev => ({ ...prev, type: e.target.value })),
+                                    [{value: "text"},{value: "checkbox"}],
+                                    "value",
+                                    "value",
+                                    "value"
+                                )}
                                 <button
                                     className="button-mini"
                                     type="button"
@@ -230,13 +238,16 @@ const AddEditContent = ({
                                 case "text": {
                                     return (
                                         <label key={key}>
-                                            {key}
-                                            <input
-                                                type="text"
-                                                name={key}
-                                                value={formValues[key] || ""}
-                                                onChange={handleInputChange}
-                                            />
+                                            {Shared.getInput(
+                                                key,
+                                                "text",
+                                                formValues[key] || "",
+                                                false,
+                                                handleInputChange,
+                                                false,
+                                                null,
+                                                50
+                                            )}
                                             {errors[key] && <span className="error">{errors[key]}</span>}
                                         </label>
                                     )
@@ -260,34 +271,40 @@ const AddEditContent = ({
                                             <label><strong>{key}</strong></label>
                                             <div>
                                                 <label>
-                                                    Date
-                                                    <input
-                                                        type="date"
-                                                        name="date"
-                                                        data-section="markable"
-                                                        value={formValues.markable?.date || ""}
-                                                        onChange={handleInputChange}
-                                                    />
+                                                    {Shared.getInput(
+                                                        "date",
+                                                        "date",
+                                                        formValues.markable?.date || "",
+                                                        false,
+                                                        handleInputChange,
+                                                        false,
+                                                        "markable",
+                                                        50
+                                                    )}
                                                 </label>
                                                 <label>
-                                                    Start Time
-                                                    <input
-                                                        type="time"
-                                                        name="startTime"
-                                                        data-section="markable"
-                                                        value={formValues.markable?.startTime || ""}
-                                                        onChange={handleInputChange}
-                                                    />
+                                                    {Shared.getInput(
+                                                        "startTime",
+                                                        "time",
+                                                        formValues.markable?.startTime || "",
+                                                        false,
+                                                        handleInputChange,
+                                                        false,
+                                                        "markable",
+                                                        50
+                                                    )}
                                                 </label>
                                                 <label>
-                                                    End Time
-                                                    <input
-                                                        type="time"
-                                                        name="endTime"
-                                                        data-section="markable"
-                                                        value={formValues.markable?.endTime || ""}
-                                                        onChange={handleInputChange}
-                                                    />
+                                                    {Shared.getInput(
+                                                        "endTime",
+                                                        "time",
+                                                        formValues.markable?.endTime || "",
+                                                        false,
+                                                        handleInputChange,
+                                                        false,
+                                                        "markable",
+                                                        50
+                                                    )}
                                                 </label>
                                             </div>
                                         </div>

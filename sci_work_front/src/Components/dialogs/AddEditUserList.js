@@ -167,27 +167,20 @@ const AddEditUserList = ({
 
     //change access level combobox
     const getSelect = useCallback((listItem, user) => {
-        return (
-            <select
-                className="access-level"
-                value={listItem.access}
-                onChange={(e) => handleRightChange(user._id, parseInt(e.target.value))}
-            >
-                {rights.names.map((right, index) => {
-
-                    if (index > currentUserAccess) {
-                        return (
-                            <option key={index} value={index}>
-                                {right}
-                            </option>
-                        )
-                    }
-                    else {
-                        return null
-                    }
-                })}
-            </select>
-        )
+        const options = rights.names
+            .map((right, index) => {
+                return { id: index, value: right }
+            })
+            .filter(right => right.id > currentUserAccess)
+        
+        return Shared.getSelect(
+                listItem.access,
+                (e) => handleRightChange(user._id, parseInt(e.target.value)),
+                options,
+                "id",
+                "id",
+                "value"
+            )
     }, [handleRightChange, currentUserAccess, rights.names])
 
     const { usersWithAccess, usersWithoutAccess } = useMemo(() => {
@@ -223,8 +216,8 @@ const AddEditUserList = ({
         return { usersWithAccess: withAccess, usersWithoutAccess: withoutAccess }
     }, [usersData, item, currentUserAccess, rights.names, userData, handleAddUser, handleRemoveUser, getSelect])
 
-    const itemKeys = ["name", "middleName", "surName", "patronimic", "genStatus", "access", "accessLevel"]
-    const itemTypes = {
+    const itemKeysAllowed = ["name", "middleName", "surName", "patronimic", "genStatus", "access", "accessLevel"]
+    const itemTypesAllowed = {
         name: "plain",
         middleName: "plain",
         surName: "plain",
@@ -234,7 +227,17 @@ const AddEditUserList = ({
         accessLevel: "combobox"
     }
 
-    const getTable = (itemsToDisplay) => {
+    const itemKeys = ["name", "middleName", "surName", "patronimic", "genStatus", "access"]
+    const itemTypes = {
+        name: "plain",
+        middleName: "plain",
+        surName: "plain",
+        patronimic: "plain",
+        genStatus: "access",
+        access: "button"
+    }
+
+    const getTable = (itemsToDisplay, itemKeys, itemTypes) => {
         return (
             <Shared.ItemTable
                 userData={userData}
@@ -263,13 +266,13 @@ const AddEditUserList = ({
                 <div className="users-with-access">
                     <h3>Users with Access</h3>
                     <div className="scrollable-list">
-                        {getTable(usersWithAccess)}
+                        {getTable(usersWithAccess, itemKeysAllowed, itemTypesAllowed)}
                     </div>
                 </div>
                 <div className="users-without-access">
                     <h3>Users without Access</h3>
                     <div className="scrollable-list">
-                        {getTable(usersWithoutAccess)}
+                        {getTable(usersWithoutAccess, itemKeys, itemTypes)}
                     </div>
                 </div>
                 <button

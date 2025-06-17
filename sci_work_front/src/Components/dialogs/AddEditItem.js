@@ -318,6 +318,19 @@ const AddEditItem = ({
 
     const currentStructure = itemStructure[selectedType.toLowerCase()]
 
+    const disableTypes = (type) => {
+        switch(type) {
+            case "Group": {
+                if (containerId.includes('.')) {
+                    return true
+                }
+                break
+            }
+            default: {}
+        }
+        return false
+    }
+
     return (
         <div className="add-edit-item-dialog dialog-container">
             <div className="dialog-content">
@@ -339,6 +352,7 @@ const AddEditItem = ({
                                                 <button
                                                     key={val}
                                                     type="button"
+                                                    disabled={disableTypes(val)}
                                                     className={`button-from-list ${formValues[key]?.includes(val) ? 'selected' : ''}`}
                                                     onClick={() => toggleListSelection(key, val, itemStructure.lists[key].many)}
                                                 >
@@ -360,6 +374,7 @@ const AddEditItem = ({
                                             currentStructure[key] === 'checkbox' ? formValues[key] : false,
                                             handleInputChange,
                                             false,
+                                            null,
                                             60,
 
                                         )}
