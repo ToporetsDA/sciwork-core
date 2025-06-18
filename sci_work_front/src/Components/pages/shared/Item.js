@@ -28,12 +28,10 @@ const Item = ({
         List: "List",
         Table: "List",
         Attendance: "List",
-        Report: "Report",
+        Report: "List",
         Chat: "Chat",
         Page: "Dev"
     }
-
-    console.log("item", item, "container is", containerType)
 
     const isItem = (item !== true)
     //if there are no Items in project - ➕ Add below button is always visible
@@ -65,6 +63,7 @@ const Item = ({
                 }
                 case "Attendance":
                 case "Table"://separate from ItemTiles
+                case "Report":
                 case "List": {
                     type = SubItems.ListItem
                     break
@@ -73,7 +72,6 @@ const Item = ({
                     type = SubItems.Message
                     break
                 }
-                // case "Report": //save comment, save files on private server instances to client's storage
                 // case "Test": {
                 //     type = SubItems.Question
                 //     break
@@ -107,6 +105,8 @@ const Item = ({
         return (parts.length > 2) ? true : item?.userList.some(user => user.id === userData._id)
     }
 
+    const noActions = ["Chat"]
+
     return (
         <div
             className={'activity-item'}
@@ -114,21 +114,20 @@ const Item = ({
             {...attributes}
             style={style}
         >
-            <div
-                className='item-actions'
-            >
-                {/* ➕ Add below button */}
-                {Shared.getDialogButton(
-                    setState,
-                    `add-button ${classCondition ? 'button-mini' : 'button-tool'}`,
-                    (!['List', 'Attendance'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',
-                    [true, false, index, containerId, "Add Item"],
-                    "➕",
-                    false
-                )}
-                {isItem && accessCheck() &&
-                    <>
-                        {/* 🔘 DRAG HANDLE (6-dots) */}
+            {!noActions.includes(containerType) &&
+                <div
+                    className='item-actions'
+                >
+                    {/* ➕ Add below button */}
+                    {Shared.getDialogButton(
+                        setState,
+                        `add-button ${classCondition ? 'button-mini' : 'button-tool'}`,
+                        (!['List', 'Attendance', 'Report'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',
+                        [true, false, index, containerId, "Add Item"],
+                        "➕",
+                        false
+                    )}
+                    {isItem && accessCheck() && /* 🔘 DRAG HANDLE (6-dots) */
                         <div
                             className="drag-handle button-tool"
                             {...listeners}
@@ -136,19 +135,22 @@ const Item = ({
                         >
                             ⋮⋮
                         </div>
-                    </>
-                }
-            </div>
+                    }
+                </div>
+            }
+            
             {isItem && accessCheck() &&
                 <>
-                    <Shared.ItemActions
-                        userData={userData}
-                        projects={projects}
-                        setData={setData}
-                        setState={setState}
-                        item={item}
-                        rights={rights}
-                    />
+                    {!noActions.includes(containerType) &&
+                        <Shared.ItemActions
+                            userData={userData}
+                            projects={projects}
+                            setData={setData}
+                            setState={setState}
+                            item={item}
+                            rights={rights}
+                        />
+                    }
                     <ItemComponent
                         key={item._id}
                         userData={userData}

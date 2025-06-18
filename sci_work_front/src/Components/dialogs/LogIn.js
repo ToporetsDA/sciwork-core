@@ -49,6 +49,7 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
             {!isLoggedIn &&
             <div className="auth-dialog dialog-container">
                 <div className="dialog-content">
+                    <h3>Log In</h3>
                     <form onSubmit={handleSubmit}>
                         {/* Server Selection */}
                         <label htmlFor="server">Server</label>
@@ -81,8 +82,8 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
                             disabled={false}
                         />
 
-                        {Shared.getInput("Login", "text", formValues.login, false, handleInputChange, false, null, 60)}
-                        {Shared.getInput("Password", "text", formValues.password, false, handleInputChange, false, null, 60)}
+                        {Shared.getInput("login", "text", formValues.login, false, handleInputChange, false, null, 60)}
+                        {Shared.getInput("password", "text", formValues.password, false, handleInputChange, false, null, 60)}
 
                         <div>
                             <button

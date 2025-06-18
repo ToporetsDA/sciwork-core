@@ -258,6 +258,7 @@ const App = () => {
           case "Text":
           case "Table":
           case "Attendance":
+          case "Report":
           case "List": {
             regularUpdate(activity)
             break

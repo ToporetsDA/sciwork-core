@@ -237,16 +237,10 @@ const List = ({
                 )
             }
             case"Chat": {
-                return (
-                    <>
-                        {getItemTiles()}
-                        {/* like in schedule show messages from-to date. 2 inputs type date on top...
-                        maybe put in separate component? Yeah, good idea, and from THERE
-                        call List) */}
-                        {/* add element to save value from */}
-                        {/* button to save values */}
-                    </>
-                )
+                return getItemTiles()
+            }
+            case "Report": {
+                return getItemTiles()
             }
             default: {
                 return

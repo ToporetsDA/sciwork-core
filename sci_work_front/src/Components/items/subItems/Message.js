@@ -1,5 +1,5 @@
 import React from 'react'
-import '../../../css/components/items/subItems/ListItem.css'
+import '../../../css/components/items/subItems/Message.css'
 
 import * as Shared from '../../pages/shared'
 import * as Items from '../../items'
@@ -19,23 +19,19 @@ const Message = ({
     recentActivities, setRecentActivities
 }) => {
 
-    const activity = Shared.getItemById(activities, containerId)
-
-    const parts = containerId.split('.')
-    const project = Shared.getItemById(projects, parts[0])
-    const {item: metaActivity} = Shared.findItemWithParent(project.activities, "_id", containerId, project)
-
-    const fieldsToRender = activity.content?.liStructure
-
-    const getField = (key, type) => {
-        
-        return
+    const getSender = (id) => {
+        const user = Shared.getItemById(users, id)
+        return user.name + " " + user.middleName + " " + user.surName + " " + user.patronimic
     }
 
     return (
-        <>
-            {item?._id}
-        </>
+        <div className={`message ${userData._id === item.sender ? 'message-own' : ''}`}>
+            { userData._id !== item.sender &&
+                <div className="sender">{getSender(item.sender)}</div>
+            }
+            <div className="content">{item.content}</div>
+            <div className="date-time">{item.dateTime}</div>
+        </div>
     )
 }
 

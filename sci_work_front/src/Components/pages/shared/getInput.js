@@ -10,7 +10,7 @@ ControlPanel
 
 const getInput = (fieldName, type, value, checked = false, handler, disabled = false, section = undefined, width = 50) => {
 
-    const name = fieldName.toLowerCase()
+    // const name = fieldName.toLowerCase()
 
     return (
         <div
@@ -23,8 +23,8 @@ const getInput = (fieldName, type, value, checked = false, handler, disabled = f
                 type={type}
                 className="input-field"
                 placeholder={fieldName}
-                name={name}
-                id={name}
+                name={fieldName}
+                id={fieldName}
                 data-section={section}
                 disabled={disabled}
                 value={value}
@@ -32,7 +32,7 @@ const getInput = (fieldName, type, value, checked = false, handler, disabled = f
                 onChange={handler}
             />
             <label
-                htmlFor={name}
+                htmlFor={fieldName}
                 className="input-label"
             >
                 {fieldName}

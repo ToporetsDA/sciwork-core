@@ -102,40 +102,44 @@ const ListItem = ({
                     />
                 ) : (containerType !== "Report") ? (//other users see checkbox
                         <>
-                            {(!check[0]) ? (//if not checked - show checkbox
+                            {(!check?.[0]) ? (//if not checked - show checkbox
                                 <input
                                     type="checkbox"
-                                    checked={check[0] || false}
+                                    checked={check?.[0] || false}
                                     disabled={!inTimeWindow}
                                     onChange={(e) => {saveChanges(keyPath, [e.target.checked, getTime()], activity, index)}}
                                 />
                             ) : (//if checked - show time of it being checked
                                 <>
-                                    {check[1]}
+                                    {check?.[1]}
                                 </>
                             )}
                         </>
                     ) : (//other users see field(s) to save comment (and report, if it's private server with storage)
                         <div className="chat-input-row" style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
-                            <input
-                                type="text"
-                                value={reportInput}
-                                onChange={(e) => setReportInput(e.target.value)}
-                                placeholder="Enter message"
-                                style={{ flexGrow: 1 }}
-                            />
-                            {(!check[0]) ? (//if no saved value or editing
+                            {Shared.getInput(
+                                "",
+                                "text",
+                                reportInput || check[2],
+                                false,
+                                (e) => setReportInput(e.target.value),
+                                !inTimeWindow || check?.[0],
+                                null,
+                                100
+                            )}
+                            {(!check?.[0]) ? (//if no saved value or editing
                                 <button
                                     onClick={(e) => {saveChanges(keyPath, [true, getTime(), reportInput], activity, index)}}
                                 >
                                     Save
                                 </button>
                             ) : (//if already saved
-                                <button
-                                    onClick={(e) => {check[0] = false}}
-                                >
-                                    Edit
-                                </button>
+                                // <button
+                                //     onClick={(e) => {check[0] = false}}
+                                // >
+                                //     Edit
+                                // </button>
+                                <></>
                             )
                             }
                         </div>
