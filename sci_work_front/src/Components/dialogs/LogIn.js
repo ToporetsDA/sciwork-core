@@ -44,31 +44,22 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
         }
     }
 
+    const [type, setType] = useState({type: "Log in"})
+
     return (
         <>
             {!isLoggedIn &&
             <div className="auth-dialog dialog-container">
                 <div className="dialog-content">
-                    <h3>Log In</h3>
+                    <Shared.ToggleButton
+                        data={type}
+                        setter={setType}
+                        field={"type"}
+                        displayOptions={['Register', 'Log in']}
+                    />
                     <form onSubmit={handleSubmit}>
                         {/* Server Selection */}
                         <label htmlFor="server">Server</label>
-                        {/* <select
-                            id="server"
-                            name="server"
-                            value={formValues.server}
-                            onChange={handleInputChange}
-                            disabled={servers.length === 0} // Disable if no servers
-                        >
-                            <option value="" disabled>
-                                {servers.length === 0 ? "No servers available" : "Select a server"}
-                            </option>
-                            {servers.map((server) => (
-                                <option key={server.id} value={server.id}>
-                                    {server.name}
-                                </option>
-                            ))}
-                        </select> */}
                         <Shared.CustomSelect
                             id={"server"}
                             name={"server"}

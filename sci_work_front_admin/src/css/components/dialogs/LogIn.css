@@ -1,0 +1,8 @@
+@import '../../base/buttons.css';
+@import '../../base/dialog.css';
+.auth-dialog form {
+  display: flex;
+  flex-direction: column;
+}
+
+/*# sourceMappingURL=LogIn.css.map */

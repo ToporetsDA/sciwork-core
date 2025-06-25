@@ -1,0 +1,37 @@
+@import '../../../StyleVars.sass'
+@import '../../base/wrappers.sass'
+
+.notifications-container
+    max-height: $main-height
+    overflow-y: auto
+
+    scrollbar-width: none
+
+    .list
+        display: flex
+        flex-direction: column-reverse
+
+.notification-state
+    display: flex
+
+.read
+    //background-color: $tertiary-color
+
+.unread
+    .notification-circle
+        width: $space-big
+        height: $space-big
+
+        margin-right: $space-small
+
+        display: flex
+        justify-content: center
+        align-items: center
+
+        border-radius: $circle
+
+        color: white
+        background-color: $highlight-color
+        
+        font-size: $font-small
+        

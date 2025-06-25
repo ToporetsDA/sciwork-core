@@ -3,68 +3,102 @@ import { useLocation, useNavigate } from "react-router-dom"
 
 import AppContent from './AppContent'
 
-const AppDynamicContent = ({userData, setUserData, editorData, setEditorData, profileData, state, setState, orgData, setOrgData, rights, users, setUsers, itemStructure, defaultStructure, isCompany, updates, setUpdates, recentActivities, setRecentActivities }) => {
-    
+// import * as Shared from './pages/shared'
+
+const AppDynamicContent = ({
+  userData, setUserData,
+  profileData,
+  state, setState,
+  isLoggedIn,
+  rights,
+  users, setUsers,
+  itemStructure,
+  defaultStructure,
+  isCompany,
+}) => {
+
   const location = useLocation()
   const navigate = useNavigate()
   
   useEffect(() => {
     const pathParts = location.pathname.split('/').filter(Boolean)
 
-    const updateState = (page, DT) => {
+    if (!isLoggedIn && pathParts[0] !== "HomePage") {
+      navigate('/HomePage', { replace: true })
+    }
+
+    const updateState = (page, project, activity) => {
+      if (state.currentPage === page && state.currentProject === project && state.currentActivity === activity) {
+        return
+      }
       setState((prevState) => ({
         ...prevState,
         currentPage: page,
-        currentEditor: DT
+        currentProject: project,
+        currentActivity: activity,
+        currentDialog: {
+          name: undefined,
+          params: []
+        }
       }))
     }
 
+    let page = state.currentPage
+    let pr = state.currentProject
+    let act = state.currentActivity
+
     switch (pathParts.length) {
       case 0: {
-        navigate(`/HomePage`)
-        break
+        navigate('/HomePage', { replace: true })
+        return
       }
       case 1: {
-        if (state.currentPage === pathParts[0]) return
-        if (pathParts[0] === "Users") {
-          navigate(`/${pathParts[0]}/Users`)
+        if (state.currentPage === pathParts[0]) {
+          return
         }
-        updateState(pathParts[0], undefined)
+        page = pathParts[0]
+        pr = undefined
+        act = undefined
         break
       }
-      case 2:
-      case 3: {
-        if (state.currentEditor !== pathParts[1]) {
-          updateState(pathParts[0], pathParts[1])
-        }
-        break
-      }
+      // case 2: {
+      //   const project = Shared.getItemById(, pathParts[1]) || undefined
+      //   page = pathParts[0]
+      //   pr = project._id
+      //   act = undefined
+      //   break
+      // }
+      // case 3: {
+      //   const project = Shared.getItemById(, pathParts[1]) || undefined
+      //   const activity = (project) ? Shared.getItemById(project.activities, pathParts[2]) || undefined : undefined
+
+      //   if (state.currentProject !== project) {
+      //     page = pathParts[0]
+      //     pr = project._id
+      //     act = activity._id
+      //   }
+      //   break
+      // }
       default: {}
     }
 
-  }, [location.pathname, state, setState, orgData, navigate])
+    updateState(page, pr, act)
+
+  }, [location.pathname, state, setState, isLoggedIn, navigate])
   
   return (
     <AppContent
       userData={userData}
       setUserData={setUserData}
-      editorData={editorData}
-      setEditorData={setEditorData}
       profileData={profileData}
       state={state}
       setState={setState}
-      orgData={orgData}
-      setOrgData={setOrgData}
       rights={rights}
       users={users}
       setUsers={setUsers}
       itemStructure={itemStructure}
       defaultStructure={defaultStructure}
       isCompany={isCompany}
-      updates={updates}
-      setUpdates={setUpdates}
-      recentActivities={recentActivities}
-      setRecentActivities={setRecentActivities}
     />
   )
 }

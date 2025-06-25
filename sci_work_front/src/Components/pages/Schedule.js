@@ -165,6 +165,9 @@ const Schedule = ({
                 editIntervalAnchor={editIntervalAnchor}
             />
             <div className='schedule-container page-wrapper'>
+                {currentScale === "week" &&
+                    <p className='warning'>Not timed events are not displayed at weekly scale</p>
+                }
                 <p className='current-map'>
                 {currentScale!=='year' && months[intervalAnchor.getMonth()]} {intervalAnchor.getFullYear()}
                 </p>

@@ -1,0 +1,204 @@
+.button-main {
+  width: auto;
+  height: 32px;
+  max-width: 100%;
+  margin: 5px;
+  padding: 2px 24px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  color: #111111;
+  background-color: white;
+  border-radius: 24px;
+  border-style: none;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  letter-spacing: 0.25px;
+  line-height: normal;
+  text-align: center;
+  text-transform: none;
+  appearance: none;
+  box-shadow: rgba(17, 17, 17, 0.2) 0 3px 5px -1px, rgba(17, 17, 17, 0.14) 0 6px 10px 0, rgba(17, 17, 17, 0.12) 0 1px 18px 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  fill: currentcolor;
+  overflow: visible;
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 15ms linear 30ms, transform 270ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  will-change: transform, opacity;
+  z-index: 0;
+}
+.button-main:hover {
+  background: #F6F9FE;
+  color: #0066aa;
+}
+.button-main:active {
+  box-shadow: 0 4px 4px 0 rgba(60, 64, 67, 0.3), 0 8px 12px 6px rgba(60, 64, 67, 0.15);
+  outline: none;
+}
+.button-main:focus {
+  outline: none;
+  border: 2px solid #4285f4;
+}
+.button-main:not(:disabled) {
+  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0, rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
+}
+.button-main:not(:disabled):hover {
+  box-shadow: rgba(60, 64, 67, 0.3) 0 2px 3px 0, rgba(60, 64, 67, 0.15) 0 6px 10px 4px;
+}
+.button-main:not(:disabled):focus {
+  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0, rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
+}
+.button-main:not(:disabled):active {
+  box-shadow: rgba(60, 64, 67, 0.3) 0 4px 4px 0, rgba(60, 64, 67, 0.15) 0 8px 12px 6px;
+}
+.button-main:disabled {
+  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0, rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
+}
+
+.button-secondary {
+  margin: 0;
+  padding: 8px 0.8em;
+  display: inline-block;
+  position: relative;
+  color: #39739d;
+  background-color: #e1ecf4;
+  border-radius: 3px;
+  border: 1px solid #7aa7c7;
+  text-align: center;
+  text-decoration: none;
+  font-family: -apple-system, system-ui, "Segoe UI", "Liberation Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.15385;
+  box-shadow: rgba(255, 255, 255, 0.7) 0 1px 0 0 inset;
+  box-sizing: border-box;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+.button-secondary:hover, .button-secondary:focus {
+  background-color: #b3d3ea;
+  color: #225577;
+}
+.button-secondary:focus {
+  box-shadow: 0 0 0 4px rgba(0, 149, 255, 0.15);
+}
+.button-secondary:active {
+  background-color: #a0c7e4;
+  box-shadow: none;
+  color: #225577;
+}
+
+.button-from-list {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+.button-from-list:hover {
+  background-color: #e0e0e0;
+}
+.button-from-list.selected {
+  background-color: #0066aa;
+  color: #eeeeee;
+  border-color: #0056b3;
+}
+.button-from-list:hover {
+  background-color: #3399dd;
+}
+
+.button-mini {
+  height: 1.5em;
+  padding: calc(0.5em - 1px) 0.5em;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  vertical-align: top;
+  color: #111111;
+  background-color: white;
+  text-align: center;
+  appearance: none;
+  border: 1px solid #dbdbdb;
+  border-radius: 0.375em;
+  box-shadow: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: BlinkMacSystem, -apple-system, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+}
+.button-mini:active {
+  border-color: #5c5c5c;
+  outline: 0;
+}
+.button-mini:focus {
+  border-color: #0066aa;
+  outline: 0;
+}
+.button-mini:hover {
+  border-color: #b5b5b5;
+}
+.button-mini:focus:not(:active) {
+  box-shadow: rgba(72, 95, 199, 0.25) 0 0 0 0.125em;
+}
+
+.button-tool {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.toggle-wrapper {
+  width: auto;
+  display: inline-block;
+  gap: 0.1rem;
+  background: #fff;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+}
+.toggle-wrapper button {
+  padding: 0.5rem 1rem;
+  background: #fff;
+  color: #555;
+  border: none;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.toggle-wrapper button:hover {
+  background: white;
+}
+.toggle-wrapper button.active {
+  background: #333;
+  color: #fff;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  touch-action: none;
+}
+.actions:hover button {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/*# sourceMappingURL=ItemActions.css.map */

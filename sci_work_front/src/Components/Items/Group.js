@@ -39,24 +39,14 @@ const Group = ({
         <div
             className='wrapper'
         >
-            {<Items.Text
-                userData={userData}
-                projects={projects}
-                activities={activities}
-                setData={setData}
-                state={state}
-                setState={setState}
-                item={item}
-                data={"name"}
-                rights={rights}
-            />}
+            {item?.name}
             <button
                 className="group-toggle-button"
                 onClick={toggleActivities}
             >
                 {showActivities ? 'Hide' : 'Show'}
             </button>
-            {showActivities &&
+            {showActivities && !item?.deleted &&
                 <Shared.ItemTiles
                     userData={userData}
                     projects={projects}

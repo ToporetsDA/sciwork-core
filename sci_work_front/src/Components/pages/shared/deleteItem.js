@@ -1,4 +1,4 @@
-const deleteItem = (data, setData, _id) => {
+const deleteItem = (data, setData, _id, deleted) => {
 
     const projectId = _id.split('.')[0]
     
@@ -8,20 +8,20 @@ const deleteItem = (data, setData, _id) => {
     if (_id.includes(".")) {
         //delete activity
         activities = project.activities.map((activity) => {
-            return activity._id === (_id) ? { ...activity, deleted: true } : activity
+            return activity._id === (_id) ? { ...activity, deleted } : activity
         })
     }
     else {
         //delete project
         activities = project.activities.map((activity) => {
-            return { ...activity, deleted: true }
+            return { ...activity,  }
         })
     }
 
     const updatedProject = {
         ...project,
         activities,
-        ...(!_id.includes(".") && {deleted: true})
+        ...(!_id.includes(".") && {deleted})
     }
 
     console.log("deleted:", _id)

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 import * as Shared from '../pages/shared'
-import * as Items from './'
 
 const Chat = ({
     userData,
@@ -58,6 +57,7 @@ const Chat = ({
 
     return (
         <div className="wrapper">
+            {item?.name}
             <Shared.ItemTiles
                 userData={userData}
                 projects={projects}

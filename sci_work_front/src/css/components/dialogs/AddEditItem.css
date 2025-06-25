@@ -1,6 +1,17 @@
 @import '../../base/buttons.css';
 @import '../../base/dialog.css';
 @import '../../base/input.css';
+.warning {
+  width: 100%;
+  color: #ee2211;
+}
+
+.deleted {
+  background: rgba(92, 92, 92, 0.5);
+  color: #111111;
+  opacity: 0.6;
+}
+
 .add-edit-item-dialog .dialog-content {
   max-height: 75%;
   overflow-y: auto;

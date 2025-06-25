@@ -149,7 +149,7 @@ const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLogg
                         key={"LogIn"}
                         onClick={() => handleDialog("LogIn")}
                     >
-                        <p>Log In</p>
+                        <p>Log In/Register</p>
                     </li>
                 )}
             </ul>

@@ -442,15 +442,17 @@ const App = () => {
           organisationType={isCompany}
         />
         <div>
-          <AppNav
-            projects={projects}
-            activities={activities}
-            state={state}
-            isLoggedIn={isLoggedIn}
-            organisationType={isCompany}
-            recentActivities={recentActivities}
-            setRecentActivities={setRecentActivities}
-          />
+          {isLoggedIn &&
+            <AppNav
+              projects={projects}
+              activities={activities}
+              state={state}
+              isLoggedIn={isLoggedIn}
+              organisationType={isCompany}
+              recentActivities={recentActivities}
+              setRecentActivities={setRecentActivities}
+            />
+          }
           <Routes>
             <Route path="*" element={
               <AppDynamicContent

@@ -1,6 +1,4 @@
 export { default as HomePage } from './HomePage.js'
+export { default as Profile } from './Profile.js'
 export { default as Logs } from './Logs.js'
-export { default as Editors } from './Editors.js'
-export { default as Users } from './Users.js'
 export { default as Settings } from './Settings.js'
-export { default as Updates } from './Updates.js'

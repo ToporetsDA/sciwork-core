@@ -158,7 +158,7 @@ const AddEditItem = ({
         }
 
         //date checks
-        if (formValues.startDate && formValues.endDate) {
+        if (formValues.startDate && formValues.endDate && !currentItemId) {
 
             const startDate = new Date(formValues.startDate)
             const endDate = new Date(formValues.endDate)
@@ -170,7 +170,7 @@ const AddEditItem = ({
             }
 
             if (endDate < new Date()) {
-                errors.endDate = 'Trying to create expired project'
+                errors.endDate = 'Trying to create expired item'
             }
 
             if (selectedType === 'Activity') {
@@ -321,7 +321,7 @@ const AddEditItem = ({
     const disableTypes = (type) => {
         switch(type) {
             case "Group": {
-                if (containerId.includes('.')) {
+                if (containerId && containerId.includes('.')) {
                     return true
                 }
                 break

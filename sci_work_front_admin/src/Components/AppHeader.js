@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { useNavigate } from "react-router-dom"
-import '../css/AppHeader.css'
+import '../css/components/AppHeader.css'
 import logo from "../logo.svg"
 
-const AppHeader = ({ state, setState, editorData, setEditorData, isLoggedIn, setLoggedIn, updates, setUpdates }) => {
+const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLoggedIn, notifications, setNotifications, organisationType}) => {
 
     const navigate = useNavigate()
 
@@ -14,37 +14,36 @@ const AppHeader = ({ state, setState, editorData, setEditorData, isLoggedIn, set
     const [isDropdownOpen, setDropdownOpen] = useState(false)
     const dropdownRef = useRef(null)
     
-    const pages = ["Home Page", "Logs", "Data Type Editors", "Users"]
-    const morePages = ["Updates", "Settings"]
+    const pages = ['Home Page', 'Logs', 'Users']
+    const morePages = ['Profile', 'Settings']
 
-    const updatesMark = useMemo(() => {
+    const notificationsMark = useMemo(() => {
         if (isLoggedIn === true) {
-        return updates.filter(update => update.state === "unseen").length
+            return notifications.filter(notification => notification.state === "unseen").length
         }
         return -1
-    }, [updates, isLoggedIn])
+    }, [notifications, isLoggedIn])
 
     const setAllSeen = () => {
-        setUpdates(
-            updates.map(update => {
-                if (update.state === "unseen") {
-                    return { ...update, state: "unread" } // Change "unseen" to "unread"
+        setNotifications(
+            notifications.map(n => {
+                if (n.state === "unseen") {
+                    return { ...n, state: "unread" } // Change "unseen" to "unread"
                 }
-                if (update.state === "unread") {
-                    return { ...update, state: "seen" } // Change "unread" to "seen"
+                if (n.state === "unread") {
+                    return { ...n, state: "seen" } // Change "unread" to "seen"
                 }
-                return update // Leave other states as is
+                return n // Leave other states as is
             })
         )
     }
 
     //go to page
     const handleClick = (page) => {
-        const formattedPage = (page === format("Data Type Editors")) ? "Editors" : page
-        navigate(`/${formattedPage}`)
+        navigate(`/${page}`)
         setDropdownOpen(false)
 
-        if (page === "Updates") {
+        if (page === "Notifications") {
             setAllSeen()
         }
     }
@@ -98,8 +97,8 @@ const AppHeader = ({ state, setState, editorData, setEditorData, isLoggedIn, set
                 }}
             >
                 <p>{page}</p>
-                {format(page) === 'Notifications' && updatesMark > 0 && (
-                    <span className="notification-circle">{(updatesMark > 99) ? "99+" : updatesMark}</span>
+                {format(page) === 'Notifications' && notificationsMark > 0 && (
+                    <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
                 )}
             </li>
         )
@@ -128,8 +127,8 @@ const AppHeader = ({ state, setState, editorData, setEditorData, isLoggedIn, set
                             >
                                 More
                             </p>
-                            {!isDropdownOpen && updatesMark > 0 && (
-                                    <span className="notification-circle">{(updatesMark > 99) ? "99+" : updatesMark}</span>
+                            {!isDropdownOpen && notificationsMark > 0 && (
+                                    <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
                             )}
                             {isDropdownOpen && (
                                 <ul className="more">

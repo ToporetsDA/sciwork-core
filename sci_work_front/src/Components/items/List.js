@@ -259,18 +259,7 @@ const List = ({
             <div
                 className='list-header'
             >
-                <Items.Text
-                    key={item._id}
-                    userData={userData}
-                    projects={projects}
-                    activities={activities}
-                    setData={setData}
-                    state={state}
-                    setState={setState}
-                    item={item}
-                    data={"name"}
-                    rights={rights}
-                />
+                <p>{item?.name}</p>
                 <button
                     className="list-toggle-button button-main"
                     onClick={toggleLi}

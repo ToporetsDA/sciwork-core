@@ -156,13 +156,15 @@ const AddEditContent = ({
         })
     }
 
+    const techFields = ["_id", "creatorId"]
+
     return (
         <div className="dialog-container">
             <div className="dialog-content">
                 <form className="add-edit-content-dialog-form">
                     {(editType.includes("Structure")) ? (
                         <>
-                            {Object.entries(structureFields).map(([key, type]) => (
+                            {Object.entries(structureFields).filter(([key, type]) => !techFields.includes(key)).map(([key, type]) => (
                                 <div key={key}>
                                     {key !== "markable" &&
                                     <div
@@ -233,7 +235,7 @@ const AddEditContent = ({
                             {/* <p className='warning'>WARNING: deletion of a field will erase it from existing entries!</p> */}
                         </>
                     ) : (
-                        Object.entries(structureFields).map(([key, type]) => {
+                        Object.entries(structureFields).filter(([key, type]) => !techFields.includes(key)).map(([key, type]) => {
                             switch(type) {
                                 case "text": {
                                     return (

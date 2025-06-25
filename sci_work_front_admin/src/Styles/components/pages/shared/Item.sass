@@ -1,0 +1,41 @@
+@import '../../../base/buttons.sass'
+
+.activity-item
+    display: flex
+    justify-content: flex-start
+    position: relative
+
+    touch-action: none
+
+.item-actions
+    display: flex
+    justify-content: flex-start
+    position: relative
+    
+    touch-action: none
+
+    &:hover
+        .drag-handle, .add-button
+            opacity: 1
+            pointer-events: auto
+
+.drag-handle
+    padding: $space-small
+    
+    display: inline-flex
+    align-items: center
+
+    cursor: grab
+
+    &:hover
+            opacity: 1
+            pointer-events: auto
+
+.add-button
+
+    cursor: pointer
+
+    &:hover
+            opacity: 1
+            pointer-events: auto
+    

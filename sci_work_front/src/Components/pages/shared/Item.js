@@ -100,16 +100,34 @@ const Item = ({
         opacity: (isDragging) ? 0.5 : 1
     }
 
+    const getAccess = (rights, type, accessibleItem, userData) => {
+        console.log("getAccess", item._id, rights, type, accessibleItem, userData)
+        return rights[type].includes(Shared.getAccess(accessibleItem, userData))
+    }
+
+    const getProjectAccess = (rights, type, item, userData) => {
+        console.log("getProjectAccess", item._id, rights, type, item, userData)
+        return getAccess(rights, type, Shared.getItemById(projects, item._id.split('.')[0]), userData)
+    }
+
     const accessCheck = () => {
         const parts = item._id.split('.')
-        return (parts.length > 2) ? true : item?.userList.some(user => user.id === userData._id)
+        const project = Shared.getItemById(projects, parts[0])
+        const projectAccess = getAccess(rights, "fullView", project, userData)
+        return (parts.length > 2)
+            ? projectAccess
+            : item?.deleted
+                ? projectAccess
+                : item?.userList.some(user => user.id === userData._id)
     }
 
     const noActions = ["Chat"]
 
-    return (
+    const deleted = item?.deleted ? "deleted" : ""
+
+    return accessCheck ? (
         <div
-            className={'activity-item'}
+            className={`activity-item ${deleted}`}
             ref={setNodeRef}
             {...attributes}
             style={style}
@@ -119,15 +137,17 @@ const Item = ({
                     className='item-actions'
                 >
                     {/* ➕ Add below button */}
-                    {Shared.getDialogButton(
-                        setState,
-                        `add-button ${classCondition ? 'button-mini' : 'button-tool'}`,
-                        (!['List', 'Attendance', 'Report'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',
-                        [true, false, index, containerId, "Add Item"],
-                        "➕",
-                        false
-                    )}
-                    {isItem && accessCheck() && /* 🔘 DRAG HANDLE (6-dots) */
+                    {(isItem ? getProjectAccess(rights, "edit", item, userData) : true) &&
+                        Shared.getDialogButton(
+                            setState,
+                            `add-button ${classCondition ? 'button-mini' : 'button-tool'}`,
+                            (!['List', 'Attendance', 'Report'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',
+                            [true, false, index, containerId, "Add Item"],
+                            "➕",
+                            false
+                        )
+                    }
+                    {(isItem ? getProjectAccess(rights, "edit", item, userData) : true) && /* 🔘 DRAG HANDLE (6-dots) */
                         <div
                             className="drag-handle button-tool"
                             {...listeners}
@@ -151,27 +171,34 @@ const Item = ({
                             rights={rights}
                         />
                     }
-                    <ItemComponent
-                        key={item._id}
-                        userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
-                        state={state}
-                        setState={setState}
-                        item={item}
-                        index={index}
-                        containerId={containerId}
-                        containerType={containerType}
-                        rights={rights}
-                        users={users}
-                        setUsers={setUsers}
-                        recentActivities={recentActivities}
-                        setRecentActivities={setRecentActivities}
-                    />
+                    {item?.deleted ? (
+                        <p>{item?.name || item._id}</p>
+                    ) : (
+                        <ItemComponent
+                            key={item._id}
+                            userData={userData}
+                            projects={projects}
+                            activities={activities}
+                            setData={setData}
+                            state={state}
+                            setState={setState}
+                            item={item}
+                            index={index}
+                            containerId={containerId}
+                            containerType={containerType}
+                            rights={rights}
+                            users={users}
+                            setUsers={setUsers}
+                            recentActivities={recentActivities}
+                            setRecentActivities={setRecentActivities}
+                        />
+                    )
+                    }
                 </>
             }
         </div>
+    ) : (
+        <></>
     )
 }
 

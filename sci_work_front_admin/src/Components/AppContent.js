@@ -1,9 +1,20 @@
-import React, { useState, Suspense } from 'react'
-import '../css/AppContent.css'
+import { useState, Suspense } from 'react'
+import '../css/components/AppContent.css'
 import * as Pages from './pages'
-import * as Dialogs from './pages/dialogs'
+import * as Dialogs from './dialogs'
 
-const AppContent = ({userData, setUserData, editorData, setEditorData, profileData, state, setState, rights, orgData, setOrgData, users, setUsers, itemStructure, defaultStructure, isCompany, updates, setUpdates, recentActivities, setRecentActivities }) => {
+// import * as Shared from './pages/shared'
+
+const AppContent = ({
+    userData, setUserData,
+    profileData,
+    state, setState,
+    rights,
+    users, setUsers,
+    itemStructure,
+    defaultStructure,
+    isCompany
+}) => {
 
     // dialogs
 
@@ -16,26 +27,18 @@ const AppContent = ({userData, setUserData, editorData, setEditorData, profileDa
     // pages
     
     const loadPageComponent = (pageName) => {
-        const formattedPageName = (pageName === 'Editor') ? 'Editors' : pageName
-        return Pages[formattedPageName.replace(/\s+/g, '')]
+        return Pages[pageName.replace(/\s+/g, '')]
     }
 
     const PageComponent = state.currentPage ? loadPageComponent(state.currentPage) : undefined
-
-    // more for pages
-
-    const [itemsToDisplay, setItemsToDisplay] = useState(() => {
-        return (state.currentEditor) ? editorData : orgData.dataTypes
-    }, [state.currentProject, orgData])
 
     return (
         <main className="content">
             {DialogComponent &&
                 <DialogComponent
-                    editorData={editorData}
-                    setEditorData={setEditorData}
-                    orgData={orgData}
-                    setOrgData={setOrgData}
+                    userData={userData}
+                    setUserData={setUserData}
+                    profileData={profileData}
                     state={state}
                     setState={setState}
                     rights={rights}
@@ -51,22 +54,12 @@ const AppContent = ({userData, setUserData, editorData, setEditorData, profileDa
                     <PageComponent
                         userData={userData}
                         setUserData={setUserData}
-                        editorData={editorData}
-                        setEditorData={setEditorData}
                         profileData={profileData}
                         state={state}
                         setState={setState}
-                        orgData={orgData}
-                        setOrgData={setOrgData}
-                        itemsToDisplay={itemsToDisplay}
-                        setItemsToDisplay={setItemsToDisplay}
                         rights={rights}
                         users={users}
                         setUsers={setUsers}
-                        updates={updates}
-                        setUpdates={setUpdates}
-                        recentActivities={recentActivities}
-                        setRecentActivities={setRecentActivities}
                     />
                 </Suspense>
             ) : (

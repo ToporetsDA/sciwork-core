@@ -111,7 +111,7 @@ const ListItem = ({
                                 />
                             ) : (//if checked - show time of it being checked
                                 <>
-                                    {check?.[1]}
+                                    {": " + check?.[1]}
                                 </>
                             )}
                         </>

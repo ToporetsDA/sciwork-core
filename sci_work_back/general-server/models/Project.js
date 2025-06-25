@@ -7,6 +7,7 @@ const projectSchema = new mongoose.Schema({
   name: { type: String, required: true },
   startDate: { type: String, required: true },
   endDate: { type: String, required: true },
+  deleted: { type: Boolean, required: false },
   activities: [
     {
       _id: { type: String, auto: true },
@@ -22,6 +23,7 @@ const projectSchema = new mongoose.Schema({
       days: { type: [String], default: [] },
       thirdParty: { type: Boolean, default: false },
       serviceName: { type: String, default: null },
+      deleted: { type: Boolean, required: false },
       userList: [
         {
           id: { type: String, required: true },

@@ -1,16 +1,17 @@
-import React, { useState, useMemo } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
 
 import AppConnection from './Components/AppConnection'
 import AppHeader from './Components/AppHeader'
 import AppDynamicContent from './Components/AppDynamicContent'
 
+// import * as Shared from './Components/pages/shared'
+
 const App = () => {
 
   const [state, setState] = useState({
     currentPage: 'HomePage',   //string
-    currentEditor: undefined,
     currentDialog: {
       name: undefined,  //string
       params: []        //[any]
@@ -20,13 +21,20 @@ const App = () => {
   //user
   
   //genStatus: 0 - item creator/organisation owner, 1 - manager (add/edit items), 2 - supervisor, 3 - user
-  const [userData, setUserData] = useState({ genStatus: -1})
+  const [userData, setUserData] = useState(
+    {
+      genStatus: -1,
+      currentSettings: {
+        notificationsPeriod: 5,
+        notificationsDelay: 15,
+        displayProjects: "grid"
+      }
+    }
+  )
 
-  const [editorData, setEditorData] = useState({ genStatus: -1})
+  const [rights, setRights] = useState()
 
-  const [orgData, setOrgData] = useState({rights: undefined, dataTypes: []})
-
-  const defaultProfileData = {// [isOptional, type]
+  const defaultProfileData = {// [isRequired, type]
     basic: {
       name:         [true,  'string'],
       middleName:   [false, 'string'],
@@ -56,12 +64,24 @@ const App = () => {
       name: 'text',
       startDate: 'date',
       endDate: 'date',
+      isTimed: 'checkbox',
       startTime: 'time',
       endTime: 'time',
+      type: 'list',
       repeat: 'checkbox',
-      days: 'days',
+      days: 'list',
       thirdParty: 'checkbox',
       serviceName: 'text'
+    },
+    lists: {
+      days: { many: true, options: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']},
+      type: { many: false, options: [/*'Dev',*/ 'Group', 'Text', 'Chat', 'List', 'Table', 'Attendance', 'Report', /*'Test'*/]}
+    },
+    checks: {
+      days:         {val: true, dep: "repeat"},
+      serviceName:  {val: true, dep: "thirdParty"},
+      startTime:    {val: true, dep: "isTimed"},
+      endTime:      {val: true, dep: "isTimed"},
     }
   }
 
@@ -78,9 +98,10 @@ const App = () => {
         name: '',
         startDate: '',
         endDate: '',
+        isTimed: true,
         startTime: '',
         endTime: '',
-        page: false,
+        type: 'Dev',
         repeat: false,
         days: [],
         thirdParty: false,
@@ -89,39 +110,52 @@ const App = () => {
     }
   }, [])
 
-  //header
-  const isCompany = true;
+  const [logs, setLogs] = useState([])
 
-  //nav
-  const [recentActivities, setRecentActivities] = useState([])
+  //header
+  const isCompany = true
 
   //login
-  const [isLoggedIn, setLoggedIn] = useState(false);
+  const [isLoggedIn, setLoggedIn] = useState(false)
 
   //connection
 
-  const [isUserUpdatingData, setIsUserUpdatingData] = useState(false)
+  const [isUserUpdatingItems, setIsUserUpdatingItems] = useState(false)
+  const [isUserUpdatingUserData, setIsUserUpdatingUserData] = useState(false)
 
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState()
 
-  const editUserList = (action, id, data) => {
-    setIsUserUpdatingData(id)
-    if (action === "add") {
-      setUsers(prev => [ ...prev, data ])
+  const updateUsers = (itemId) => {
+    // this method will get users's data of users related to Item
+    // for now all users are loaded at login
+  }
+
+  const previousVersionsRef = useRef({})
+
+  const updateUser = (newData, currentSettingsEdit) => {
+
+    if (!previousVersionsRef.current[userData._id]) {
+      previousVersionsRef.current[userData._id] = structuredClone(userData) // or deep copy
     }
-    if (action === "edit") {
-      setUsers(prev => 
-        prev.map(prevUser => 
-          prevUser._id === id ? { ...prevUser, ...data } : prevUser
-        )
-      )
+
+    setIsUserUpdatingUserData(true)
+    if (currentSettingsEdit) {
+      setUserData((prevUserData) => ({
+          ...prevUserData,
+          currentSettings: {
+              ...prevUserData.currentSettings,
+              ...newData
+          }
+      }))
+    }
+    else {
+      setUserData((prevUserData) => ({
+          ...prevUserData,
+          ...newData,
+      }))
     }
   }
 
-  //updates
-
-  const [updates, setUpdates] = useState([])
-  
   //Html
   return (
     <Router>
@@ -129,56 +163,47 @@ const App = () => {
         <AppHeader
           state={state}
           setState={setState}
-          editorData={editorData}
-          setEditorData={setEditorData}
+          userData={userData}
+          setUserData={setUserData}
           isLoggedIn={isLoggedIn}
           setLoggedIn={setLoggedIn}
-          updates={updates}
-          setUpdates={setUpdates}
           organisationType={isCompany}
         />
-        <Routes>
-          <Route path="*" element={
-            <AppDynamicContent
-              userData={userData}
-              setUserData={setUserData}
-              editorData={editorData}
-              setEditorData={setEditorData}
-              profileData={defaultProfileData}
-              state={state}
-              setState={setState}
-              orgData={orgData}
-              setOrgData={setOrgData}
-              rights={orgData.rights}
-              users={users}
-              setUsers={editUserList}
-              itemStructure={defaultItemStructure}
-              defaultStructure={defaultStructure}
-              isCompany={isCompany}
-              updates={updates}
-              setUpdates={setUpdates}
-              setNotifications={setUpdates}
-              recentActivities={recentActivities}
-              setRecentActivities={setRecentActivities}
-            />
-          }
-          />
-        </Routes>
+        <div>
+          <Routes>
+            <Route path="*" element={
+              <AppDynamicContent
+                userData={userData}
+                setUserData={updateUser}
+                profileData={defaultProfileData}
+                state={state}
+                setState={setState}
+                isLoggedIn={isLoggedIn}
+                rights={rights}
+                users={users}
+                setUsers={updateUsers}
+                itemStructure={defaultItemStructure}
+                defaultStructure={defaultStructure}
+                isCompany={isCompany}
+              />
+            } />
+          </Routes>
+        </div>
       </div>
     <AppConnection
       state={state}
       setState={setState}
-      editorData={editorData}
-      setEditorData={setEditorData}
       userData={userData}
       setUserData={setUserData}
       isLoggedIn={isLoggedIn}
       setLoggedIn={setLoggedIn}
-      setOrgData={setOrgData}
-      users={users}
+      setRights={setRights}
       setUsers={setUsers}
-      isUserUpdatingData={isUserUpdatingData}
-      setIsUserUpdatingData={setIsUserUpdatingData}
+      isUserUpdatingItems={isUserUpdatingItems}
+      setIsUserUpdatingItems={setIsUserUpdatingItems}
+      isUserUpdatingUserData={isUserUpdatingUserData}
+      setIsUserUpdatingUserData={setIsUserUpdatingUserData}
+      previousVersionsRef={previousVersionsRef}
     />
   </Router>
   )

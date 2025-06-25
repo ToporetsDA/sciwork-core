@@ -197,7 +197,7 @@ const ControlPanel = ({
             }
             {(state.currentPage === "Projects" || state.currentPage === "Project"  || state.currentPage === "Activity") &&
                 <>
-                    {userData.currentSettings.displayProjects !== "table" &&
+                    {userData.currentSettings.displayProjects !== "table" && state.currentPage === "Projects" &&
                     <div className='sort-and-filter'>
                         <div>
                             <button

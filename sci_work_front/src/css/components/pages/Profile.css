@@ -1,3 +1,25 @@
+.warning {
+  width: 100%;
+  color: #ee2211;
+}
+
+.deleted {
+  background: rgba(92, 92, 92, 0.5);
+  color: #111111;
+  opacity: 0.6;
+}
+
+.warning {
+  width: 100%;
+  color: #ee2211;
+}
+
+.deleted {
+  background: rgba(92, 92, 92, 0.5);
+  color: #111111;
+  opacity: 0.6;
+}
+
 .button-main {
   width: auto;
   height: 32px;
@@ -187,6 +209,17 @@
 .toggle-wrapper button.active {
   background: #333;
   color: #fff;
+}
+
+.warning {
+  width: 100%;
+  color: #ee2211;
+}
+
+.deleted {
+  background: rgba(92, 92, 92, 0.5);
+  color: #111111;
+  opacity: 0.6;
 }
 
 .wrapper {

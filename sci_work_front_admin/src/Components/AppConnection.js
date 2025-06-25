@@ -1,8 +1,20 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import useWebSocket from 'react-use-websocket'
-import LogIn from './pages/dialogs/LogIn'
 
-const Connection = ({ state, setState, editorData, setEditorData, userData, setUserData, isLoggedIn, setLoggedIn, setOrgData, users, setUsers, isUserUpdatingData, setIsUserUpdatingData }) => {
+import LogIn from './dialogs/LogIn'
+
+// import * as Shared from './pages/shared'
+
+const Connection = ({
+    state, setState,
+    userData, setUserData,
+    isLoggedIn, setLoggedIn,
+    setRights,
+    setUsers,
+    isUserUpdatingItems, setIsUserUpdatingItems,
+    isUserUpdatingUserData, setIsUserUpdatingUserData,
+    previousVersionsRef
+}) => {
 
     const [servers, setServers] = useState([])
     const [loading, setLoading] = useState(true)
@@ -28,7 +40,7 @@ const Connection = ({ state, setState, editorData, setEditorData, userData, setU
         const [domain, port] = serverAddress.split(':')
         
         // Increment the port by 1
-        const newPort = parseInt(port, 10) + 2
+        const newPort = parseInt(port, 10) + 1
         
         // Reassemble the address with the new port
         return `${domain}:${newPort}`
@@ -58,14 +70,18 @@ const Connection = ({ state, setState, editorData, setEditorData, userData, setU
             data: data,          // Payload data
             timestamp: new Date().toISOString(), // Optional timestamp
         }
+
         // Send the message as a JSON string
         sendMessage(JSON.stringify(message))
         console.log('Sent message:', message)
 
-        setIsUserUpdatingData(false) // Reset flag
-    }, [sendMessage, sessionToken, setIsUserUpdatingData])
+         // Reset flags
+        setIsUserUpdatingItems(false)
+        setIsUserUpdatingUserData(false)
+    }, [sendMessage, sessionToken, setIsUserUpdatingItems, setIsUserUpdatingUserData])
 
     const handleResponse = useCallback((event) => {
+        console.log("from handleResponse: ")
         try {
             const response = JSON.parse(event.data)
             console.log(response) // This will log the entire response
@@ -73,65 +89,69 @@ const Connection = ({ state, setState, editorData, setEditorData, userData, setU
             // Now, you can access specific parts of the response
             switch(response.message) {
             case "data": {
-                const { data } = response
-                const { type, data: fetchedData } = data
+                const { type, data } = response.data
         
                 console.log("Received data type:", type)
-                console.log("Fetched data:", fetchedData)
+                console.log("Fetched data:", data)
         
                 // You can handle the data based on the type (user, projects, etc.)
                 switch (type) {
-                case "setup": {
-                    setUserData(fetchedData.user)
-                    setOrgData(fetchedData.organisation)
-                    break
-                }
-                case "editor": {
-                    setEditorData(fetchedData)
-                    break
-                }
-                case "organisation": {
-                    setOrgData(fetchedData)
-                    break
-                }
-                case "Users": {
-                    setUsers(fetchedData)
-                    break
-                }
-                default: {
-                    console.log("Unknown data type:", type)
-                }
+                    case "all": {
+                        setUserData(data.user)
+                        console.log(data.items)
+                        setRights(data.organisation.rights)
+                        setUsers(data.users)
+                        break
+                    }
+                    case "users": {
+                        setUsers(data)
+                        break
+                    }
+                    case "user": {
+                        setUserData(data)
+                        break
+                    }
+                    case "organisation": {
+                        setRights(data.organisation.rights)
+                        break
+                    }
+                    default: {
+                        console.log("Unknown data type:", type)
+                    }
                 }
                 break
             }
-            case "addEdit": {
-                const { type, data: fetchedData } = response.data
-        
-                console.log("Received data type:", type)
-                console.log("Updated:", fetchedData)
-        
-                // You can handle the data based on the type (user, projects, etc.)
-                switch (type) {
-                case"editor": {
-                    const item = fetchedData
-                    if (editorData.find(project => project._id === item._id).length === 0) {
-                    setEditorData(prevData => ({ ...prevData, item }))
+            case "confirm": {
+                const { data, error } = response.data
+                console.log("confirm item", response.data, data.id, error)
+                if (error) {
+                    const backup = previousVersionsRef.current[data.id]
+                    if (backup) {
+                        if (data.id === userData._id) {
+                        setUserData(backup)
+                        } else {
+                            // editors
+                        }
+                    }
+                    delete previousVersionsRef.current[data.id] // clean up
+                }
+                else {
+                    // notify user that update happened and increment its __v
+                    if (data.id === userData._id) {
+                        setUserData((prevData) => ({
+                            ...prevData,
+                            __v: prevData.__v + 1
+                        }))
                     }
                     else {
-                        setEditorData(prevData => 
-                            prevData.map(project => 
-                            project._id === item._id ? item : project
-                        ))
+                        //editors
                     }
-                    break
-                }
-                case"user": {
-                    setEditorData(fetchedData)
-                    break
-                }
-                default: {
 
-                }
+                    if (data.id in previousVersionsRef.current) {
+                        delete previousVersionsRef.current[data.id]
+                    }
+
+                    console.log(data.id, "updated successfully")
                 }
                 break
             }
@@ -143,36 +163,42 @@ const Connection = ({ state, setState, editorData, setEditorData, userData, setU
         } catch (error) {
             console.error("Error processing message:", error.message)
         }
-    }, [editorData, setEditorData, setUserData, setLoggedIn, setOrgData, setUsers])
+    }, [setLoggedIn, setRights, setUsers, userData._id, setUserData, previousVersionsRef])
 
-    //send update ONLY when page value changes
-    const lastSentPage = useRef(null)
+    //send update ONLY when page changes
+    const lastSentPage = useRef({
+        currentPage: 'HomePage'
+    })
     useEffect(() => {
-        if (lastSentPage.current === state.currentPage || !isLoggedIn) return
-            sendMsg("goTo", format(state.currentPage))
-        lastSentPage.current = state.currentPage
-    }, [sendMsg, state.currentPage, isLoggedIn])
-
-    // Track user-initiated changes
-    const updateData = useCallback((type, updatedData, id) => {
-        const updatedItem = { item: updatedData.find(item => item._id === id), id: id}
-        if (readyState === 1) { // Check if WebSocket is open
-            const data = { type: type, data: updatedItem}
-            sendMsg("addEditData", data)
-            console.log("Sent update:", data)
-        } else {
-            console.error("WebSocket is not open. Cannot send update.")
+        if ((lastSentPage.current.currentPage === state.currentPage) || !isLoggedIn) {
+            return
         }
+        const location = state.currentProject || state.currentPage
+        sendMsg("goTo", { page: format(location), isId: false })
+        lastSentPage.current = state
+    }, [sendMsg, state, isLoggedIn])
+
+    // Track user-initiated changes to data
+    const updateByUser = useCallback((item, toDo, itemType) => {
+
+        if (readyState === 1) { // Check if WebSocket is open
+            sendMsg(toDo, item)
+            console.log("Sent update:")
+        } else {
+            console.error(`WebSocket is not open. Cannot send ${itemType} update.`)
+        }
+
     }, [readyState, sendMsg])
 
-    // Trigger user updates data in editor
+    // Trigger user-initiated updates
     useEffect(() => {
-        if (isUserUpdatingData && state.currentEditor) {
-            const data = (state.currentEditor === "Users") ? users : editorData
-            console.log("list data:", data)
-            updateData(state.currentEditor, data, isUserUpdatingData)
+        if (isUserUpdatingItems) {
+            // updateByUser(isUserUpdatingItems, "editor")
         }
-    }, [editorData, users, updateData, isUserUpdatingData, state.currentEditor])
+        if (isUserUpdatingUserData) {
+            updateByUser(userData, "addEditUser", "user")
+        }
+    }, [userData, updateByUser, isUserUpdatingItems, isUserUpdatingUserData])
 
     //on login
     const loginToServer = async (formValues) => {

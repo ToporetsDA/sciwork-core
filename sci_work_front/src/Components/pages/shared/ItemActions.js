@@ -13,39 +13,58 @@ const ItemActions = ({userData, projects, setData, setState, item, rights}) => {
     const condition = (parts.length === 1)
     const buttonClass = (condition) ? "button-mini" : "button-mini button-tool"
     const wrapperClass = (condition) ? "" : "actions"
+
+    const getAccess = (rights, type, accessibleItem, userData) => {
+        return rights[type].includes(Shared.getAccess(accessibleItem, userData))
+    }
     
     return (
         <>
-            {!item.deleted && rights.edit.includes(Shared.getAccess(accessibleItem, userData)) && (
+            {getAccess(rights, "edit", accessibleItem, userData) && (
             <div
                 className={wrapperClass}
             >
-                {Shared.getDialogButton(
-                    setState,
-                    buttonClass,
-                    "AddEditUserList",
-                    [item._id],
-                    "👥",
-                    true
+                {(item?.deleted && getAccess(rights, "fullView", accessibleItem, userData)) ? (
+                    <button
+                        className={buttonClass}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            Shared.deleteItem(projects, setData, item._id, false)
+                        }}
+                    >
+                        ♻️
+                    </button>
+                ) : (
+                    <>
+                        {Shared.getDialogButton(
+                            setState,
+                            buttonClass,
+                            "AddEditUserList",
+                            [item._id],
+                            "👥",
+                            true
+                        )}
+                        {(parts?.length < 3) &&
+                        Shared.getDialogButton(
+                            setState,
+                            buttonClass,
+                            "AddEditItem",
+                            [item, item._id],
+                            "⚙️",
+                            true
+                        )}
+                        <button
+                            className={buttonClass}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                Shared.deleteItem(projects, setData, item._id, true)
+                            }}
+                        >
+                            🗑️
+                        </button>
+                    </>
                 )}
-                {(parts?.length < 3) &&
-                Shared.getDialogButton(
-                    setState,
-                    buttonClass,
-                    "AddEditItem",
-                    [item, item._id],
-                    "⚙️",
-                    true
-                )}
-                <button
-                    className={buttonClass}
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        Shared.deleteItem(projects, setData, item._id)
-                    }}
-                >
-                    🗑️
-                </button>
+                
             </div>
             )}
         </>
