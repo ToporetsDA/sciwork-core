@@ -43,8 +43,22 @@ const ItemTiles = ({
             />
         )
     }
+    
+    const getAccess = () => {
+        const parts = containerId?.split('.')
+        if (!parts) {
+            return rights.edit.includes(userData.genStatus)
+        }
+        const project = Shared.getItemById(projects, parts[0])
+        const { item: activity } = Shared.findItemWithParent(project.activities, "_id", containerId, project)
+        const access = (parts.length === 1)
+            ? Shared.getAccess(project, userData)
+            : Shared.getAccess(activity, userData)
+        return rights.edit.includes(access)
+    }
 
     const noItems = itemsToDisplay.length === 0
+    const canEdit = getAccess()
     const noParent = !containerId
     const isInContainerItem = containerType === "Group"
     const isInListBasedItem = ["List", "Chat", "Attendance", "Report"].includes(containerType)
@@ -64,7 +78,7 @@ const ItemTiles = ({
                             {itemsToDisplay.map((item, index) => (
                                 getItem(item, index, true)
                             ))}
-                            {noItems && (!noParent || isInContainerItem || isInListBasedItem) &&
+                            {noItems && canEdit && (!noParent || isInContainerItem || isInListBasedItem) &&
                                 getItem(true, 0, true)
                             }
                         </SortableContext>
