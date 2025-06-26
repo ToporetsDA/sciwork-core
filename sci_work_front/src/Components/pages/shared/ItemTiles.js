@@ -64,7 +64,7 @@ const ItemTiles = ({
                             {itemsToDisplay.map((item, index) => (
                                 getItem(item, index, true)
                             ))}
-                            {noItems && (noParent || isInContainerItem || isInListBasedItem) &&
+                            {noItems && (!noParent || isInContainerItem || isInListBasedItem) &&
                                 getItem(true, 0, true)
                             }
                         </SortableContext>

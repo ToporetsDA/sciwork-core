@@ -56,8 +56,6 @@ const AddEditUserList = ({
         }
     }
 
-    console.log("from AddEditUserList", parts, project, metaActivity, activity, item)
-
     const currentUserParam = (parts.length < 2) ? item : metaActivity
     const currentUserAccess = Shared.getAccess(currentUserParam, userData)
 
@@ -98,23 +96,20 @@ const AddEditUserList = ({
             console.log("addedUser", usersData.find(user => user._id === userList[userList.length - 1].id))
 
             const entries = listItem.markable.userEntries
+            const edit = entries.some(e => e._id === addedUser._id)
 
-            if (addedUser) {
-                listItem.markable.userEntries = [
-                    ...entries,
-                    {
-                        _id: addedUser._id,
-                        name: addedUser.name,
-                        middleName: addedUser.middleName,
-                        surName: addedUser.surName,
-                        patronimic: addedUser.patronimic,
-                        checker: [false, "--:--"]
-                    }
-                ]
+            const updatedEntry = {
+                _id: addedUser._id,
+                name: addedUser.name,
+                middleName: addedUser.middleName,
+                surName: addedUser.surName,
+                patronimic: addedUser.patronimic,
+                checker: [false, "--:--"]
             }
-            else {
-                listItem.markable.userEntries = entries.filter(e => userList.some(u => u._id === e._id))
-            }
+
+            listItem.markable.userEntries = edit
+                ? entries.map(e => e._id === addedUser._id ? updatedEntry : e)
+                : [...entries, updatedEntry]
 
             setData({
                 action: "content",
@@ -192,7 +187,7 @@ const AddEditUserList = ({
             const listItem = userList.find(item => item.id === user._id)
             if (listItem) {
                 let button = getButton("add-remove-access", handleRemoveUser, user._id, "X")
-                let select = getSelect(listItem, user, )
+                let select = getSelect(listItem, user)
 
                 //cant edit yourself
                 if (user._id === userData._id) {

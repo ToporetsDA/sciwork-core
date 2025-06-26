@@ -54,6 +54,7 @@ const Chat = ({
         setChatInput("") // clear input after sending
     }
 
+    console.log("messages", activity?.content?.listItems)
 
     return (
         <div className="wrapper">

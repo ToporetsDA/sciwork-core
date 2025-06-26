@@ -75,24 +75,22 @@ const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, rec
                   </div>
                 )
               }
-              else {
-                return <div key={item._id}></div>
-              }
+              return <div key={item._id}></div>
             }
-            else {
-              return (
-                <div key={item._id}>
-                  {getLi(item)}
-                  <ul>
-                    {list}
-                  </ul>
-                </div>
-              )
-            }
+            return (
+              <div key={item._id}>
+                {getLi(item)}
+                <ul>
+                  {list}
+                </ul>
+              </div>
+            )
           }
-          else {
-            return getLi(item)
-          }
+          return (
+            <div key={item._id}>
+              {getLi(item)}
+            </div>
+          )
         })}
       </ul>
     )

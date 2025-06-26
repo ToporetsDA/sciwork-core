@@ -218,7 +218,11 @@ const ItemTable = ({
                     return (
                         <tr
                             key={index}
-                            className={`${isExpiring ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}
+                            className={`
+                                ${item?.deleted ? "deleted" : ""}
+                                ${isExpiring ? 'expiring' : ''}
+                                ${isExpired ? 'expired' : ''}
+                            `}
                             onClick={() => {
                                 if (isItem) {//for links
                                     if (linkActions) {

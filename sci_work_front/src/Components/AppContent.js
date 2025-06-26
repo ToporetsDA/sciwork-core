@@ -1,4 +1,4 @@
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import '../css/components/AppContent.css'
 import * as Pages from './pages'
 import * as Dialogs from './dialogs'
@@ -52,8 +52,15 @@ const AppContent = ({
 
     const [itemsToDisplay, setItemsToDisplay] = useState({
         projects: projects || [],
-        activities: project?.activities ? project.activities : []
-    }, [state.currentProject, projects])
+        activities: project?.activities || []
+    })
+
+    useEffect(() => {
+        setItemsToDisplay({
+            projects: projects || [],
+            activities: project?.activities || []
+        })
+    }, [projects, project?.activities])
 
     return (
         <main className="content">

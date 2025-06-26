@@ -195,7 +195,7 @@ const Connection = ({
                             })
                         )
                     }
-                    else if (data.id.includes(".")) {
+                    else if (!data.id.includes(".")) {
                         setProjects(prevItems => 
                             prevItems.map(p => {
                                 return p._id === data.id

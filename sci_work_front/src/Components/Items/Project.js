@@ -22,6 +22,7 @@ const Project = ({
             key={index}
             className={`
             card
+            ${item?.deleted ? "deleted" : ""}
             ${(new Date(item.endDate) - new Date()) / (24 * 60 * 60 * 1000) < 30 ? 'expiring' : ''}
             ${(new Date(item.endDate) < new Date()) ? 'expired' : ''}
             `}

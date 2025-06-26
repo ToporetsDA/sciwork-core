@@ -270,8 +270,10 @@ const List = ({
             {showLi &&
                 <>
                     {/* EditStructure button */}
-                    {getDialog(metaActivity.type, "Edit Structure")}
-                    {metaActivity.type === "Table" &&
+                    {rights.edit.includes(Shared.getAccess(metaActivity, userData)) &&
+                        getDialog(metaActivity.type, "Edit Structure")
+                    }
+                    {rights.edit.includes(Shared.getAccess(metaActivity, userData)) && metaActivity.type === "Table" &&
                         getDialog(metaActivity.type, "Add Item")
                     }
                     {/* list items */}

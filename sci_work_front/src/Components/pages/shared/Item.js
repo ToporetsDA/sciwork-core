@@ -101,27 +101,33 @@ const Item = ({
     }
 
     const getAccess = (rights, type, accessibleItem, userData) => {
-        console.log("getAccess", item._id, rights, type, accessibleItem, userData)
         return rights[type].includes(Shared.getAccess(accessibleItem, userData))
     }
 
     const getProjectAccess = (rights, type, item, userData) => {
-        console.log("getProjectAccess", item._id, rights, type, item, userData)
         return getAccess(rights, type, Shared.getItemById(projects, item._id.split('.')[0]), userData)
     }
+
+    const noActions = ["Chat"]
 
     const accessCheck = () => {
         const parts = item._id.split('.')
         const project = Shared.getItemById(projects, parts[0])
         const projectAccess = getAccess(rights, "fullView", project, userData)
-        return (parts.length > 2)
-            ? projectAccess
-            : item?.deleted
-                ? projectAccess
-                : item?.userList.some(user => user.id === userData._id)
+        const { item: activity } = Shared.findItemWithParent(project.activities, "_id", parts[0] + '.' + parts[1], project)
+        const activityView = (parts.length > 2) ? getAccess(rights, "fullView", activity, userData) : null
+        const activityInteract = (parts.length > 2) ? getAccess(rights, "interact", activity, userData) : null
+        
+        const result = (item === true)
+            ? item?.deleted
+                ? (parts.length > 2)
+                    ? activityView
+                    : projectAccess
+                : item?.userList?.some(user => user.id === userData._id) || activityInteract
+            : true
+        
+        return result
     }
-
-    const noActions = ["Chat"]
 
     const deleted = item?.deleted ? "deleted" : ""
 

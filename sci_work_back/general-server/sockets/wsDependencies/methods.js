@@ -125,7 +125,7 @@ const hasOverlappingFields = (updateA, updateB, ignoredFields = ['_id', '__v']) 
 }
 
 //inner method
-const getChangedFields = (updated, original, type = null) => {
+const getChangedFields = (updated, original, type = null, basePath = "") => {
   const excluded = ['_id', '__v', 'lastModifiedBy']
   const changed = {}
 
@@ -133,41 +133,24 @@ const getChangedFields = (updated, original, type = null) => {
     return typeof val === 'object' && val !== null
   }
 
+  const isArrayOfObjects = (arr) => {
+    return Array.isArray(arr) && arr.every(el => typeof el === 'object' && el !== null)
+  }
+
   const deepEqual = (a, b) => {
-    if (a === b) return true
+    //variables
+    if (a === b) {
+      return true
+    }
+    //arrays
     if (Array.isArray(a) && Array.isArray(b)) {
       return JSON.stringify(a) === JSON.stringify(b)
-    }
-    if (isObject(a) && isObject(b)) {
-      const aKeys = Object.keys(a)
-      const bKeys = Object.keys(b)
-      if (aKeys.length !== bKeys.length) return false
-      return aKeys.every(k => deepEqual(a[k], b[k]))
     }
     return false
   }
 
-  const getUpdatedSubfields = (newObj, oldObj, path = "") => {
-    const changes = {}
-
-    for (const key in newObj) {
-      if (!(key in oldObj)) {
-        continue
-      }
-
-      const newVal = newObj[key]
-      const oldVal = oldObj[key]
-
-      if (typeof newVal === "object" && newVal !== null && typeof oldVal === "object" && oldVal !== null) {
-        const nestedChanges = getUpdatedSubfields(newVal, oldVal, `${path}.${key}`)
-        Object.assign(changes, nestedChanges)
-      }
-      else if (newVal !== oldVal) {
-        changes[`${path}.${key}`] = newVal
-      }
-    }
-
-    return changes
+  const makePath = (key) => {
+    return basePath ? `${basePath}.${key}` : key
   }
 
   for (const key in updated) {
@@ -177,64 +160,34 @@ const getChangedFields = (updated, original, type = null) => {
 
     const newVal = updated[key]
     const oldVal = original[key]
+    const path = makePath(key)
 
-    // 1. Regular field diff
-    if (!isObject(newVal) || !isObject(oldVal)) {
-      if (newVal !== oldVal) changed[key] = newVal
-      continue
+    // 1. Scalar
+    if ((!isObject(newVal) || !isObject(oldVal)) && newVal !== oldVal) {
+      changed[path] = newVal
     }
-
-    // 2. Special case: deep compare .content if type is activity
-    if (key === 'content' && type) {
-      const contentChanges = {}
-      const template = getActivityContent(type)
-
-      for (const subKey in newVal) {
-        if (!(subKey in template)) continue
-
-        const subVal = newVal[subKey]
-        const oldSubVal = oldVal?.[subKey]
-
-        // SPECIAL: listItems diff by object fields
-        if (subKey === 'listItems' && Array.isArray(subVal) && Array.isArray(oldSubVal)) {
-          const maxLen = Math.max(subVal.length, oldSubVal.length)
-
-          for (let i = 0; i < maxLen; i++) {
-            const newItem = subVal[i]
-            const oldItem = oldSubVal[i]
-
-            if (i < oldSubVal.length && !deepEqual(newItem, oldItem)) {
-              changed[`content.listItems.${i}`] = newItem
-            }
-          }
-
-          if (subVal.length > oldSubVal.length) { // full safe array
-            contentChanges[subKey] = subVal
-          }
-        }
-        else if (subKey === 'currentSettings' && isObject(subVal) && isObject(oldSubVal)) {
-          const updatedSettings = getUpdatedSubfields(subVal, oldSubVal, 'content.currentSettings')
-          Object.assign(changed, updatedSettings)
-        }
-        else if (!deepEqual(subVal, oldSubVal)) {
-          contentChanges[subKey] = subVal
-        }
-      }
-
-      if (Object.keys(contentChanges).length > 0) {
-        changed[key] = { ...oldVal, ...contentChanges }
+    // 2. Object
+    else if (isObject(newVal) && isObject(oldVal)) {
+      const nestedDiff = getChangedFields(newVal, oldVal, null, path)
+      if (Object.keys(nestedDiff).length > 0) {
+        Object.assign(changed, nestedDiff)
       }
     }
-
-    // 3. Special case: precise object handling
-    else if (key === 'currentSettings' && isObject(newVal) && isObject(oldVal)) {
-      const updatedSettings = getUpdatedSubfields(newVal, oldVal, 'currentSettings')
-      Object.assign(changed, updatedSettings)
+    // 3. Array of objects
+    else if (isArrayOfObjects(newVal) && isArrayOfObjects(oldVal)) {
+      if (newVal.length !== oldVal.length) {// Safe fallback: replace full array on addition/deletion
+        changed[path] = newVal
+      }
+      else {
+        for (let i = 0; i < newVal.length; i++) {
+          const nested = getChangedFields(newVal[i], oldVal[i] || {}, null, `${path}.${i}`)
+          Object.assign(changed, nested)
+        }
+      }
     }
-
-    // 4. Deep compare for other objects (non-content)
+    // 4. Mismatched types or non-object arrays
     else if (!deepEqual(newVal, oldVal)) {
-      changed[key] = newVal
+      changed[path] = newVal
     }
   }
 
