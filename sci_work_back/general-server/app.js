@@ -2,16 +2,22 @@ require("dotenv").config()
 
 const createError = require("http-errors")
 const express = require("express")
-var path = require('path')
+const path = require('path')
 const cookieParser = require("cookie-parser")
 const logger = require("morgan")
 const mongoose = require("mongoose")
+const db = require("./sockets/wsDependencies/db")
 const { v4: uuidv4 } = require('uuid')
 const fs = require('fs')
 const axios = require("axios")
 
+//routes
 const usersRouter = require("./routes/users")
-const { startWebSocketServer } = require('./websockets')
+//admin routes
+const usersAdminRouter = require("./routes/adminUsers")
+
+const { startWebSocketServer } = require('./sockets/websockets')
+const { startAdminWebSocketServer } = require('./sockets/adminWebsockets')
 
 const app = express()
 
@@ -31,6 +37,7 @@ const serverAddress = `http://localhost:${port}`  // Адреса цього с�
 const serverName = fs.readFileSync(path.join(__dirname, 'serverName.txt'), 'utf-8')
 
 const wss = startWebSocketServer(port + 1)
+const awss = startAdminWebSocketServer(port + 2)
 
 // Підключення до бази даних
 mongoose.connect("mongodb://127.0.0.1:27017/SciWork", {})
@@ -49,8 +56,12 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "public")))
 
+// routes
 app.use("/users", usersRouter)
+// admin routes
+app.use("/admin/users", usersAdminRouter)
 
+// Налаштування ID
 if (fs.existsSync(idFilePath)) {
   serverId = fs.readFileSync(idFilePath, 'utf-8')
   console.log(`Loaded existing server ID: ${serverId}`)
@@ -66,10 +77,14 @@ console.log(`Assigned server ID: ${serverId}`)
 // Функція для реєстрації сервера
 const registerToCoordinator = async () => {
   try {
+    const serverData = await db.Collections.organisation.findById("677402a670b2a51ee527615e")
+    const settings = serverData.toObject()
+
     const registerResponse = await axios.post(`${coordinatorAddress}/servers/register`, {
       id: serverId,
       address: serverAddress,
-      name: serverName
+      name: serverName,
+      canReg: settings.userCanReg
     })
 
     console.log("Registered to coordinator:", registerResponse.data.message)
@@ -93,7 +108,6 @@ const sendHeartbeat = async () => {
       id: serverId,
       address: serverAddress
     })
-    console.log("Heartbeat sent to coordinator")
     heartbeatFailures = 0 // Скидаємо лічильник при успішному з'єднанні
   } catch (error) {
     console.error("Error sending heartbeat:", error.message)

@@ -1,5 +1,5 @@
 import React from 'react'
-import '../../css/pages/HomePage.css'
+import '../../css/components/pages/HomePage.css'
 
 const HomePage = ({ state, setState }) => {
 

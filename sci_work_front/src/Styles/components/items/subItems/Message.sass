@@ -1,0 +1,43 @@
+@import '../../../../StyleVars.sass'
+
+.message-list
+    padding: 1rem
+    gap: 0.5rem
+
+    display: flex
+    flex-direction: column
+
+.message
+    padding: 0.75rem 1rem
+    
+    border-radius: 0.5rem
+
+    background: $main-color
+    
+    box-shadow: $shadow
+
+    .sender
+        margin-bottom: 0.25rem
+
+        color: $tertiary-text-color
+
+        font-weight: bold
+
+    .content
+        margin-bottom: 0.5rem
+
+        font-size: 1rem
+
+    .date-time
+        font-size: 0.75rem
+        text-align: right
+
+.message-own
+    margin-left: auto
+
+    color: $secondary-text-color
+    background: $secondary-color
+
+    .sender
+        color: $secondary-text-color
+    

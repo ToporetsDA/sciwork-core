@@ -1,0 +1,56 @@
+.warning {
+  width: 100%;
+  color: #ee2211;
+}
+
+.deleted {
+  background: rgba(92, 92, 92, 0.5);
+  color: #111111;
+  opacity: 0.6;
+}
+
+.schedule {
+  width: 90%;
+  display: grid;
+  gap: 0;
+  border: 1px solid black;
+}
+.schedule .schedule-cell {
+  border: inherit;
+  min-height: 98px;
+}
+.schedule .schedule-item {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(17, 17, 17, 0.1411764706);
+}
+.schedule div {
+  overfrow: hidden;
+}
+.schedule h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #333;
+}
+.schedule p {
+  margin: 15px 0;
+  font-size: 10px;
+  color: #666;
+}
+.schedule .event {
+  position: absolute;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid #5c5c5c;
+  white-space: pre-line;
+}
+.schedule .event-bg {
+  background-color: rgba(0, 102, 170, 0.2);
+}
+.schedule .overlap-bg {
+  background-color: rgba(238, 34, 17, 0.2);
+}
+
+/*# sourceMappingURL=ScheduleBoard.css.map */

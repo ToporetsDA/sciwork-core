@@ -8,10 +8,11 @@ const organisationSchema = new mongoose.Schema({
     interact: { type: [Number], required: true },
     edit: { type: [Number], required: true }
   },
+  dataTypes: { type: [String], required: true },
   _id: { type: mongoose.Schema.Types.ObjectId, auto: true } // Ensures proper ObjectId creation
 })
 
 // Export the Organisation model
-const Organisation = mongoose.model("Organisation", organisationSchema)
+const Organisation = mongoose.model("Organisation", organisationSchema, "organisations")
 
 module.exports = Organisation

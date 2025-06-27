@@ -1,0 +1,8 @@
+@import '../../base/buttons.css';
+@import '../../base/dialog.css';
+.dialog-content {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+/*# sourceMappingURL=JointEventOverlap.css.map */

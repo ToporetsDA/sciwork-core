@@ -1,0 +1,1 @@
+{"version":3,"sourceRoot":"","sources":["../../StyleVars.sass","../../Styles/base/dialog.sass"],"names":[],"mappings":"AA6CA;EACI;EAEA,OAlBc;;;AAoBlB;EACI;EACA,OA5Bc;EA6Bd;;;ACnDJ;EACI;EACA;EAEA;EACA;EACA;EAEA;EACA;EACA;EACA;EAEA;;AAEA;EACI;EACA;EAEA,SDXI;ECaJ,kBDHK;ECKL,eDVC;ECWD,YDeC","file":"dialog.css"}

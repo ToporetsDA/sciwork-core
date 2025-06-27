@@ -1,22 +1,32 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
-import '../css/AppHeader.css'
+import { useNavigate } from "react-router-dom"
+import '../css/components/AppHeader.css'
 import logo from "../logo.svg"
 
-const AppHeader = ({ state, setState, userData, setLoggedIn, notifications, setNotifications, organisationType}) => {
+const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLoggedIn, notifications, setNotifications, organisationType}) => {
+
+    const navigate = useNavigate()
+
+    const format = (str) => {
+        return str.replace(/\s+/g, '')
+    }
 
     const [isDropdownOpen, setDropdownOpen] = useState(false)
     const dropdownRef = useRef(null)
     
     const pages = ['Home Page', 'Schedule', (organisationType) ? 'Projects' : 'Subjects']
     const morePages = (userData.genStatus === 0) ? (
-        ['Profile', 'User List', 'Notifications', 'Chats', 'Settings']
+        ['Profile', 'User List', 'Notifications', 'Settings']
     ) : (
         ['Profile', 'Notifications', 'Chats', 'Settings']
     )
 
     const notificationsMark = useMemo(() => {
-        return notifications.filter(notification => notification.state === "unseen").length
-    }, [notifications])
+        if (isLoggedIn === true) {
+            return notifications.filter(notification => notification.state === "unseen").length
+        }
+        return -1
+    }, [notifications, isLoggedIn])
 
     const setAllSeen = () => {
         setNotifications(
@@ -34,21 +44,22 @@ const AppHeader = ({ state, setState, userData, setLoggedIn, notifications, setN
 
     //go to page
     const handleClick = (page) => {
-        setState(prevState => ({
-            ...prevState,
-            currentPage: page,
-            currentProject: undefined,
-            currentActivity: undefined,
-            currentDialog: {
-                name: undefined,
-                params: []
-            }
-        }))
+        navigate(`/${page}`)
         setDropdownOpen(false)
 
         if (page === "Notifications") {
             setAllSeen()
         }
+    }
+
+    const handleDialog = (dialog, params) => {
+        setState((prevState) => ({
+            ...prevState,
+            currentDialog: {
+                name: dialog,
+                params: params
+            }
+        }))
     }
 
     //open dropdown menu with more pages
@@ -58,7 +69,8 @@ const AppHeader = ({ state, setState, userData, setLoggedIn, notifications, setN
 
     //log out
     const handleLogOut = () => {
-        handleClick(null)
+        handleClick(format("Home Page"))
+        handleDialog()
         setLoggedIn(false)
     }
 
@@ -76,64 +88,70 @@ const AppHeader = ({ state, setState, userData, setLoggedIn, notifications, setN
         }
     }, [dropdownRef])
 
+    const getLi = (page) => {
+        return (
+            <li
+                key={format(page)}
+                onClick={() => handleClick(format(page))}
+                className={state.currentPage === format(page) ? 'active' : ''}
+                style={{
+                fontWeight: state.currentPage === format(page) ? 'bold' : 'normal',
+                pointerEvents: state.currentPage === format(page) ? 'none' : 'auto',
+                opacity: state.currentPage === format(page) ? 0.5 : 1,
+                }}
+            >
+                <p>{page}</p>
+                {format(page) === 'Notifications' && notificationsMark > 0 && (
+                    <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
+                )}
+            </li>
+        )
+    }
+    
     return (
         <header>
             <img className="logo" src={logo} alt="SciWork" />
-            <ul className="menu">
-                {pages.map((page) => (
-                <li
-                    key={page}
-                    onClick={() => handleClick(page)}
-                    className={state.currentPage === page ? 'active' : ''}
-                    style={{
-                    fontWeight: state.currentPage === page ? 'bold' : 'normal',
-                    pointerEvents: state.currentPage === page ? 'none' : 'auto',
-                    opacity: state.currentPage === page ? 0.5 : 1,
-                    }}
-                >
-                    <p>{page}</p>
-                </li>
-                ))}
-                <li
-                    onClick={handleMore}
-                    ref={dropdownRef}
-                >
-                    <p
-                        onClick={handleMore}
-                        style={{
-                            fontWeight: isDropdownOpen ? 'bold' : 'normal',
-                            pointerEvents: 'auto',
-                            opacity: isDropdownOpen ? 0.5 : 1,
-                        }}
-                    >
-                        More
-                    </p>
-                    {!isDropdownOpen && notificationsMark > 0 && (
-                            <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
-                    )}
-                    {isDropdownOpen && (
-                        <ul className="more">
-                            {morePages.map((page) => (
-                            <li
-                                key={page}
-                                onClick={() => handleClick(page)}
-                                className={state.currentPage === page ? 'active' : ''}
+                <ul className="menu">
+                {(isLoggedIn === true) ? (
+                    <>
+                        {pages.map((page) => (
+                            getLi(page)
+                        ))}
+                        <li
+                            onClick={handleMore}
+                            ref={dropdownRef}
+                        >
+                            <p
+                                onClick={handleMore}
                                 style={{
-                                fontWeight: state.currentPage === page ? 'bold' : 'normal',
-                                pointerEvents: state.currentPage === page ? 'none' : 'auto',
-                                opacity: state.currentPage === page ? 0.5 : 1
+                                    fontWeight: isDropdownOpen ? 'bold' : 'normal',
+                                    pointerEvents: 'auto',
+                                    opacity: isDropdownOpen ? 0.5 : 1,
                                 }}
                             >
-                                <p>{page}</p>
-                                {page === 'Notifications' && notificationsMark > 0 && (
-                                        <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
-                                )}
-                            </li>
-                            ))}
-                            <li onClick={handleLogOut}><p>Log Out</p></li>
-                        </ul>
-                    )}
-                </li>
+                                More
+                            </p>
+                            {!isDropdownOpen && notificationsMark > 0 && (
+                                    <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
+                            )}
+                            {isDropdownOpen && (
+                                <ul className="more">
+                                    {morePages.map((page) => (
+                                        getLi(page)
+                                    ))}
+                                    <li onClick={handleLogOut}><p>Log Out</p></li>
+                                </ul>
+                            )}
+                        </li>
+                    </>
+                ) : (
+                    <li
+                        key={"LogIn"}
+                        onClick={() => handleDialog("LogIn")}
+                    >
+                        <p>Log In/Register</p>
+                    </li>
+                )}
             </ul>
         </header>
     )}

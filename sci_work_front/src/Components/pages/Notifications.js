@@ -1,24 +1,86 @@
-import React from 'react'
-import '../../css/pages/Notifications.css'
+import { useEffect } from 'react'
+import '../../css/components/pages/Notifications.css'
 
-import * as Shared from './sharedComponents/index'
+import * as Shared from './shared'
 
-const Notifications = ({data, setData, state, setState, notifications, setNotifications, setRecentActivities}) => {
+const Notifications = ({
+    userData, setUserData,
+    state, setState,
+    projects, 
+    activities,
+    setData,
+    rights,
+    users, setUsers,
+    notifications, setNotifications,
+    recentActivities, setRecentActivities
+}) => {
+    
+    useEffect(() => {
+        return () => {
+            setNotifications(prev => (
+                prev.map(n => n.state === "unseen"
+                    ? { ...n, state: "seen" }
+                    : n)
+            ))
+        }
+    }, [setNotifications])
 
-    const ItemList = Shared.LinkList
+    const changeNotificationState = (id) => {
+        setNotifications((prevNotifications) => ([
+            ...prevNotifications.map(n => {
+                console.log("note", n, id)
+                if (n._id === id) {
+                    return {
+                        ...n,
+                        state: "read"
+                    }
+                }
+                else {
+                    return n
+                }
+            })
+        ]))
+    }
+
+    const getStateDiv = (state) => {
+        return (
+            <div className={`notification-state ${state}`}>
+                {(state === "unread") &&
+                    <div className="notification-circle"></div>
+                }
+                {state}
+            </div>
+        )
+    }
+
+    const notificationsToDisplay = notifications.map(n => {
+        return {
+            ...n,
+            state: getStateDiv(n.state)
+        }
+    })
 
     return (
-        <div className="notificationsContainer">
-            <ItemList
-                data={data}
+        <div className="notifications-container .page-wrapper-no-cp">
+            <Shared.ItemTable
+                userData={userData}
+                projects={projects}
+                activities={activities}
+                setData={setData}
                 state={state}
                 setState={setState}
-                list={notifications}
-                setList={setNotifications}
+                itemsToDisplay={notificationsToDisplay}
+                itemKeys={["state", "name", "generationTime", "generationDate"]}
+                //itemTypes
+                editable={false}
+                isItem={false}
+                linkActions={changeNotificationState}
+                rights={rights}
+                recentActivities={recentActivities}
                 setRecentActivities={setRecentActivities}
             />
         </div>
-    );
+    )
 }
 
 export default Notifications

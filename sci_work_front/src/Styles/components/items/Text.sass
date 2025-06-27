@@ -1,0 +1,38 @@
+@import '../../../StyleVars.sass'
+
+.text-wrapper
+    padding: $space-small
+
+    position: relative
+
+.editor-area
+    min-height: 2em
+
+    padding: $space-small
+
+    border: 1px solid transparent
+    
+    &:focus
+        outline: 1px dashed #888
+        border-color: #aaa
+
+        background: $main-color
+
+.toolbar-popup
+    padding: $space-small $space-medium
+
+    display: flex
+    gap: $space-medium
+
+    position: fixed
+    top: 0
+    left: 50%
+    z-index: 999999
+
+    border: 1px solid #ccc
+    border-radius: $space-small
+    box-shadow: $shadow
+
+    background: white
+
+    transform: translateX(-50%)

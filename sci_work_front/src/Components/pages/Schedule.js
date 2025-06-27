@@ -1,9 +1,20 @@
-import React, { useState, useCallback, useMemo } from 'react'
-import '../../css/pages/Schedule.css'
-import ControlPanel from './sharedComponents/ControlPanel'
-import ScheduleBoard from './pageComponents/ScheduleBoard'
+import { useState, useCallback, useMemo } from 'react'
+import '../../css/components/pages/Schedule.css'
 
-const Schedule = ({ userData, setUserData, state, setState, data, setData, itemsToDisplay, setItemsToDisplay, rights, recentActivities, setRecentActivities }) => {
+import ScheduleBoard from './specific/ScheduleBoard'
+
+import * as Shared from './shared'
+
+const Schedule = ({
+    userData, setUserData,
+    state, setState,
+    projects,
+    activities,
+    setData,
+    itemsToDisplay, setItemsToDisplay,
+    rights,
+    recentActivities, setRecentActivities
+}) => {
     
     const daysOfWeek = useMemo(() => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], [])
     const months = useMemo(() => ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'], [])
@@ -75,14 +86,14 @@ const Schedule = ({ userData, setUserData, state, setState, data, setData, items
                 const formattedDate = `${String(dayDate.getDate()).padStart(2, '0')}.${String(dayDate.getMonth() + 1).padStart(2, '0')}`
                 
                 return (
-                    <div key={'v-' + index} className="topLabel">
+                    <div key={'v-' + index} className="top-label">
                         {day} {(currentScale === 'week') && formattedDate}
                     </div>
                 )
             })
         }
         if (currentScale === 'year') {
-            return months.map((month, index) => <div key={'v-' + index} className="topLabel">{month}</div>)
+            return months.map((month, index) => <div key={'v-' + index} className="top-label">{month}</div>)
         }
         return []
     }, [currentScale, intervalAnchor, daysOfWeek, months])
@@ -130,7 +141,7 @@ const Schedule = ({ userData, setUserData, state, setState, data, setData, items
             }
 
             return (
-                <div key={`h-${index}`} className="leftLabel">
+                <div key={`h-${index}`} className="left-label">
                     {itemInfo}
                 </div>
             )
@@ -140,24 +151,28 @@ const Schedule = ({ userData, setUserData, state, setState, data, setData, items
 
     return (
         <>
-            <ControlPanel
+            <Shared.ControlPanel
                 userData={userData}
                 setUserData={setUserData}
                 state={state}
                 setState={setState}
-                data={data}
+                projects={projects}
+                activities={activities}
                 rights={rights}
                 setItemsToDisplay={setItemsToDisplay}
                 currentScale={currentScale}
                 setCurrentScale={setCurrentScale}
                 editIntervalAnchor={editIntervalAnchor}
             />
-            <div className='scheduleContainer'>
-                <p className='currentMap'>
+            <div className='schedule-container page-wrapper'>
+                {currentScale === "week" &&
+                    <p className='warning'>Not timed events are not displayed at weekly scale</p>
+                }
+                <p className='current-map'>
                 {currentScale!=='year' && months[intervalAnchor.getMonth()]} {intervalAnchor.getFullYear()}
                 </p>
                 <div
-                    className="scheduleVMap"
+                    className="schedule-v-map"
                     style={{
                         display: 'grid',
                         gridTemplateColumns: scheduleBoard.gridTemplateColumns
@@ -165,27 +180,31 @@ const Schedule = ({ userData, setUserData, state, setState, data, setData, items
                     {scheduleVMap}
                 </div>
                 <div
-                    className="scheduleHMap"
-                    style={{
-                        display: 'grid',
-                        gridTemplateRows: scheduleBoard.gridTemplateRows
-                    }}
+                    className='schedule-scrollable'
                 >
-                    {scheduleHMap}
+                    <div
+                        className="schedule-h-map"
+                        style={{
+                            display: 'grid',
+                            gridTemplateRows: scheduleBoard.gridTemplateRows
+                        }}
+                    >
+                        {scheduleHMap}
+                    </div>
+                    <ScheduleBoard
+                        projects={projects}
+                        state={state}
+                        setState={setState}
+                        currentScale={currentScale}
+                        setCurrentScale={setCurrentScale}
+                        gridValues={gridValues}
+                        setGridValues={setGridValues}
+                        intervalAnchor={intervalAnchor}
+                        scheduleBoard={scheduleBoard}
+                        recentActivities={recentActivities}
+                        setRecentActivities={setRecentActivities}
+                    />
                 </div>
-                <ScheduleBoard
-                    data={data}
-                    state={state}
-                    setState={setState}
-                    currentScale={currentScale}
-                    setCurrentScale={setCurrentScale}
-                    gridValues={gridValues}
-                    setGridValues={setGridValues}
-                    intervalAnchor={intervalAnchor}
-                    scheduleBoard={scheduleBoard}
-                    recentActivities={recentActivities}
-                    setRecentActivities={setRecentActivities}
-                />
             </div>
         </>
     )}

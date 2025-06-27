@@ -1,122 +1,155 @@
 import React from 'react'
-import '../css/AppNav.css'
+import { useNavigate } from "react-router-dom"
+import '../css/components/AppNav.css'
 
-import * as Shared from '../Components/pages/sharedComponents'
+import * as Shared from './pages/shared'
 
-const AppNav = ({ data, state, setState, organisationType, recentActivities, setRecentActivities }) => {
+const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, recentActivities, setRecentActivities }) => {
   
+  const navigate = useNavigate()
+
   //project.name and activity.name pairs
   const clearRecent = () => {
     setRecentActivities([])
   }
 
-  //project and activity are objects
-  //recent.project and recent.activity are strings
+  const getLi = (activity) => {
+    return (
+      <li
+        key={activity._id}
+        onClick={
+          () => {navigate(Shared.goTo(activity, projects, recentActivities, setRecentActivities))}
+        }
+        className={
+          state.currentActivity === activity._id ? 'active' : ''
+        }
+        style={state.currentActivity === activity._id ? {
+          fontWeight: 'bold',
+          pointerEvents: 'none',
+          opacity: 0.5,
+        } : {
+          fontWeight: 'normal',
+          pointerEvents: 'auto',
+          opacity: 1,
+        }}
+      >
+        {activity.name}
+      </li>
+    )
+  }
 
-  const goTo = Shared.GoTo
+  const isInRecent = (item) => {
+    return recentActivities.filter(recent => (recent._id.includes(item._id))).length > 0
+  }
 
-  const handleClick = (activity) => {
-    const activityExists = recentActivities.some(recent => recent._id === activity._id);
+  const getList = (list, itemsField, isListField, checkVal, comparator) => {
 
-    if (activityExists === false) {
-      setRecentActivities((prevActivities) => [
-        ...prevActivities,
-        activity
-      ])
+    const filteredList = (comparator)
+      ? list[itemsField].filter(item => {
+          const val = (item[isListField] === checkVal) ? (
+            !!getList(item, itemsField, isListField, checkVal, comparator) || comparator(item)
+          ) : (
+            comparator(item)
+          )
+          return val
+        })
+      : list[itemsField]
+
+    if (filteredList.length === 0) {
+      return false
     }
-    setState((prevState) => ({
-      ...prevState,
-      ...goTo(activity, data, setRecentActivities)
-    }))
+    
+    return (
+      <ul
+        key={list._id}
+      >
+        {filteredList.map((item) => {
+          if (item[isListField] === checkVal) {
+            const list = getList(item, itemsField, isListField, checkVal, comparator)
+
+            if (!list) {
+              if (comparator ? comparator(item) : false) {
+                return (
+                  <div key={item._id}>
+                    {getLi(item)}
+                  </div>
+                )
+              }
+              return <div key={item._id}></div>
+            }
+            return (
+              <div key={item._id}>
+                {getLi(item)}
+                <ul>
+                  {list}
+                </ul>
+              </div>
+            )
+          }
+          return (
+            <div key={item._id}>
+              {getLi(item)}
+            </div>
+          )
+        })}
+      </ul>
+    )
   }
   
   return (
     <nav>
-      <ul className="projects">
-        <h4
-          className={state.currentPage === 'Projects' ? 'active' : ''}
-          style={{
-          fontWeight: state.currentPage === 'Projects' ? 'bold' : 'normal',
-          pointerEvents: state.currentPage === 'Projects' ? 'none' : 'auto',
-          opacity: state.currentPage === 'Projects' ? 0.5 : 1,
-          }}
-        >
-          {organisationType === true ? 'Projects' : 'Subjects'}
-        </h4>
+      {isLoggedIn === true &&
+      <>
+        <ul className="nav-items">
+          <h4
+            className={state.currentPage === 'Projects' ? 'active' : ''}
+            style={{
+            fontWeight: state.currentPage === 'Projects' ? 'bold' : 'normal',
+            pointerEvents: state.currentPage === 'Projects' ? 'none' : 'auto',
+            opacity: state.currentPage === 'Projects' ? 0.5 : 1,
+            }}
+          >
+            {organisationType === true ? 'Projects' : 'Subjects'}
+          </h4>
 
-        {data.map((project) => (
-          <li key={project.name}>
-            <details>
-              <summary>{project.name}</summary>
-              <ul>
-                {project.activities.map((activity) => (
-                <li
-                  key={activity.name}
-                  onClick={() => {handleClick(activity)}}
-                  className={state.currentPage === activity.name ? 'active' : ''}
-                  style={{
-                  fontWeight: state.currentPage === activity.name ? 'bold' : 'normal',
-                  pointerEvents: state.currentPage === activity.name ? 'none' : 'auto',
-                  opacity: state.currentPage === activity.name ? 0.5 : 1,
-                  }}
-                >{activity.name}</li>
-                ))}
-              </ul>
-            </details>
-          </li>
-          ))}
-      </ul>
-        
-      <ul className="recent">
-        <h4>Recent</h4>
-        {data.map((project) => {
+          {projects.map((project) => (
+            <li key={project._id}>
+              <details>
+                <summary>{project.name}</summary>
+                {getList(project, "activities", "type", "Group")}
+              </details>
+            </li>
+            ))}
+        </ul>
+          
+        <ul className="nav-items">
+          <h4>Recent</h4>
+          {projects.map((project) => {
+            if (isInRecent(project)) {
+              return (
+                <li key={project._id}>
+                  <details>
+                    <summary>{project.name}</summary>
+                    {getList(project, "activities", "type", "Group", isInRecent)}
+                  </details>
+                </li>
+              )
+            }
+            else {
+              return null
+            }
+          })}
 
-          const projectRecentActivities = recentActivities.filter(recent => Math.floor(recent._id / 1000000000) === project._id)
-
-          if (projectRecentActivities.length > 0) {
-
-            return (
-              <li key={project.name}>
-                <details>
-                  <summary>{project.name}</summary>
-                  <ul>
-                    {project.activities.map((activity) => {
-                      const recentActivity = recentActivities.filter(recent => recent._id === activity._id)
-                      if (recentActivity.length > 0) {
-                        return (
-                          <li
-                            key={activity._id}
-                            onClick={() => {handleClick(activity)}}
-                            className={state.currentActivity === undefined ? 'active' : ''}
-                            style={{
-                              fontWeight: state.currentPage === undefined ? 'bold' : 'normal',
-                              pointerEvents: state.currentPage === undefined ? 'none' : 'auto',
-                              opacity: state.currentPage === undefined ? 0.5 : 1,
-                            }}
-                          >
-                            {activity.name}
-                          </li>
-                        )
-                      }
-                      return null
-                  })}
-                  </ul>
-                </details>
-              </li>
-            )
-          }
-          else {
-            return null
-          }
-        })}
-
-        <button
-          style={{ display: recentActivities.length === 0 ? 'none' : 'block' }}
-          onClick={clearRecent}
-        >
-          Close all
-        </button>
-      </ul>
+          <button
+            className='button-secondary'
+            style={{ display: recentActivities.length === 0 ? 'none' : 'block' }}
+            onClick={clearRecent}
+          >
+            Clear recent
+          </button>
+        </ul>
+      </>
+      }
     </nav>
   )
 }

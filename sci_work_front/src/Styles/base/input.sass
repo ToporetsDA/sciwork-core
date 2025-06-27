@@ -1,0 +1,74 @@
+@import '../../StyleVars.sass'
+
+.input-group
+    min-width: 20%
+    max-width: 80%
+
+    padding: $space-big 0 0
+
+    position: relative
+
+.input-field
+    width: 100%
+
+    padding: $space-small 0
+
+    border: 0
+    border-bottom: 2px solid $tertiary-color
+    outline: 0
+
+    background: transparent
+
+    font-family: inherit
+    font-size: $font-medium
+    
+    transition: border-color 0.2s
+
+    &::placeholder
+        color: transparent
+
+    &:placeholder-shown ~ .input-label
+        top: $space-big
+
+        font-size: $font-medium
+
+        cursor: text
+        
+
+.input-label
+    display: block
+    position: absolute
+    top: 0
+    
+    color: $tertiary-color
+    
+    font-size: $font-small
+
+    transition: 0.2s
+    
+
+.input-field:focus
+    padding-bottom: $space-small
+
+    border-width: 3px
+    border-image: linear-gradient(to right, $secondary-color, $tertiary-text-color)
+    border-image-slice: 1
+
+    font-weight: 700
+
+    ~ .input-label
+        display: block
+        position: absolute
+        top: 0
+        
+        color: $secondary-color
+
+        font-size: $font-small
+        font-weight: 700
+
+        transition: 0.2s
+
+/* reset input */
+.input-field
+    &:required, &:invalid
+        box-shadow: none

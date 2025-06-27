@@ -1,0 +1,397 @@
+import { useState, useMemo }  from 'react'
+import '../../css/components/dialogs/AddEditItem.css'
+
+import { ObjectId } from 'bson'
+
+import * as Shared from '../pages/shared'
+
+const AddEditItem = ({
+    userData, setUserData,
+    projects,
+    activities,
+    setData,
+    state, setState,
+    rights,
+    itemStructure,
+    defaultStructure,
+    isCompany
+}) => {
+
+    const currentItem = state.currentDialog.params[0]
+    const currentItemId = state.currentDialog.params[1]
+    const activityIndex = state.currentDialog.params[2]
+    const containerId = state.currentDialog.params[3]
+
+    const selectedType = state.currentProject ? "Activity" : "Project"
+
+    const formatLabel = (key) => key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())
+
+    const unformatLabel = (label) => {
+        return label
+            .replace(/ ([a-zA-Z])/g, (_, c) => c.toUpperCase())
+            .replace(/ /g, '')
+            .replace(/^./, (c) => c.toLowerCase())
+    }
+
+    // Initialize form values based on default type
+
+    const initializeFormValues = (defaultValues, structure) => {
+        if (currentItem === true) {
+            // If currentItem is 'true', return default values for a new item
+            return Object.keys(defaultValues).reduce((acc, key) => {
+                acc[key] = defaultValues[key] || (structure[key] === 'checkbox' ? false : '') // Fallback to empty string if no default
+                return acc
+            }, {})
+        } else if (currentItem !== undefined) {
+            // If currentItem is an object, fill with its values
+            return Object.keys(defaultValues).reduce((acc, key) => {
+                acc[key] = currentItem[key] !== undefined ? currentItem[key] : defaultValues[key] || (structure[key] === 'checkbox' ? false : '') // Fallback to default if missing
+                return acc
+            }, {})
+        }
+        return {} // Return empty object if currentItem is undefined
+    }
+
+    const [formValues, setFormValues] = useState(() => {
+        return initializeFormValues(defaultStructure[selectedType.toLowerCase()], itemStructure[selectedType.toLowerCase()])
+    })
+
+    // Reset form values for the new type
+
+    const handleInputChange = (e) => {
+        const { name, type, checked, value } = e.target
+        setFormValues((prev) => ({
+            ...prev,
+            [unformatLabel(name)]: type === 'checkbox' ? checked : value
+        }))
+    }
+
+    // Update set of selected days
+    const toggleListSelection = (field, value, many) => {
+        setFormValues((prev) => {
+
+            const currentList = [...prev[field]] || []
+            const baseList = many ? currentList : currentList.filter((v) => v === value)
+            const updatedList = baseList.includes(value)
+                ? baseList.filter((v) => v !== value)
+                : [...baseList, value]
+            
+            return {
+            ...prev,
+            [field]: updatedList
+            }
+        })
+    }
+
+    //show item-fields
+    const showItemFields = useMemo(() => {
+        const isSchedule = state.currentPage === 'Schedule'
+        const project = Shared.getItemById(projects, state.currentProject)
+        const itemWithUserList = (state.currentProject)
+            ? Shared.findItemWithParent(project.activities, "_id", currentItemId, project)?.item
+            : Shared.getItemById(projects, currentItemId)
+            
+        let canEdit = userData.genStatus
+        //edit
+        if (itemWithUserList?._id) {
+            canEdit = itemWithUserList.userList.find(user => user.id === userData._id)?.access
+        }
+        //add
+        else if (containerId && currentItemId) {
+            const item = (!containerId.includes('.'))
+                ? Shared.getItemById(projects, containerId)
+                : Shared.findItemWithParent(project.activities, "_id", currentItemId, project).item
+            
+            canEdit = item.userList.find(user => user.id === userData._id)?.access
+        }
+        
+        return (
+            !isSchedule
+            && (
+                (selectedType === 'Project')
+                || (selectedType === 'Activity' && state.currentProject)
+            )
+            && (rights.edit.includes(canEdit))
+        )
+    }, [userData, projects, state, selectedType, currentItemId, containerId, rights.edit])
+
+    //conditions for fields that should appear based on other fields values
+    const fieldConditionCheck = (key) => {
+        const check = itemStructure.checks?.[key]
+        if (!check) return true // no condition => always show
+        return formValues[check.dep] === check.val
+    }
+
+    // Close the dialog
+
+    const closeDialog = () => {
+        setState((prevState) => ({
+            ...prevState,
+            currentDialog: {
+                name: undefined,
+                params: []
+            }
+        }))
+    }
+
+    //save changes
+
+    const [errors, setErrors] = useState({})
+
+    const validation = () => {
+
+        const errors = {}
+
+        //empty check
+        Object.keys(formValues).forEach((key) => {
+            if (formValues[key] === '' && itemStructure[key] !== 'checkbox' && itemStructure[key] !== 'list' && fieldConditionCheck(key)) {
+                errors[key] = 'This field is required.'
+            }
+            if (formValues[key].length === 0 && itemStructure[key] === 'list') {
+                errors[key] = 'Select an option(s).'
+            }
+        })
+
+        //name check
+        if (formValues.name.length < 3) {
+            errors.name = 'Too short'
+        }
+
+        //date checks
+        if (formValues.startDate && formValues.endDate && !currentItemId) {
+
+            const startDate = new Date(formValues.startDate)
+            const endDate = new Date(formValues.endDate)
+
+            if (startDate > endDate) {
+                if ((startDate === endDate && selectedType === 'Project') || selectedType === 'Activity') {
+                    errors.startDate = 'Start date must be before end date.'
+                }
+            }
+
+            if (endDate < new Date()) {
+                errors.endDate = 'Trying to create expired item'
+            }
+
+            if (selectedType === 'Activity') {
+                const project = Shared.getItemById(projects, Shared.getItemById(projects, state.currentProject))
+                
+                if (startDate < project.startDate || startDate >= project.endDate) {
+                    errors.startDate = "Start date must be within project's lifetime."
+                }
+
+                if (endDate < project.startDate || endDate > project.endDate) {
+                    errors.startDate = "End date must be within project's lifetime."
+                }
+            }
+        }
+
+        //time check
+        if (formValues.startDate && formValues.endDate && formValues.isTimed && formValues.startTime && formValues.endTime) {
+            const startDate = new Date(formValues.startDate)
+            const endDate = new Date(formValues.endDate)
+
+            const [startHour, startMinute] = formValues.startTime.split(':').map(Number)
+            const [endHour, endMinute] = formValues.endTime.split(':').map(Number)
+        
+            const startInMinutes = startHour * 60 + startMinute
+            const endInMinutes = endHour * 60 + endMinute
+
+            if(startDate === endDate && startInMinutes > endInMinutes) {
+                errors.startTime = "Activity can not start after it has ended"
+            }
+        
+            if (startDate === endDate && startInMinutes + 15 >= endInMinutes) {
+                errors.endTime = "Activity must exist at least 15 minutes."
+            }
+        }
+
+        //repeat check
+        if (formValues.repeat === true && formValues.days.length === 0) {
+            errors.repeat = "Select at least 1 day to repeat the activity."
+        }
+
+        return errors
+    }
+
+    const formatFormValues = (values) => {
+        const formatted = {}
+
+        for (const key in values) {
+            const value = values[key]
+            const field = itemStructure.lists[key]
+
+            if (!field) {
+                formatted[key] = value
+                continue
+            }
+
+            if (field.many === false && Array.isArray(value)) {
+                formatted[key] = value[0] ?? null
+            }
+            else {
+                formatted[key] = value
+            }
+        }
+
+        return formatted
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+
+        //validation
+        const errors = validation()
+        if (Object.keys(errors).length > 0) {
+            setErrors(errors)
+            alert('Please fix the errors before saving.')
+            return
+        }
+
+        const project = Shared.getItemById(projects, state.currentProject)
+        const formattedFormValues = formatFormValues(formValues)
+
+        const { item: parent } = Shared.findItemWithParent(project?.activities || [], "_id", containerId, project)
+
+        let newItem = {
+            ...formattedFormValues,
+            _id: currentItemId
+                ? currentItemId
+                : selectedType === "Project"
+                    ? new ObjectId().toHexString()
+                    : project._id + '.' + project.dndCount,
+            activities: [],
+            userList: (selectedType === "Project" || !parent?.userList)
+                ? [{
+                    id: userData._id,
+                    access: 0
+                }]
+                : parent.userList,
+            ...(selectedType === "Project"
+                ? { dndCount: 0 }
+                : { dnd: project.dndCount })
+        }
+
+        // submit
+
+        let item
+        const action = currentItemId ? "edit" : "add"
+        
+        if (selectedType === "Project") {
+            //edit
+            if (currentItemId) {
+                item = { ...currentItem, ...formattedFormValues }
+            }
+            //add
+            else {
+                item = newItem
+            }
+        }
+        else if (selectedType === "Activity") {
+            //edit
+            if (currentItemId) {
+                const { parent: container } = Shared.findItemWithParent(project.activities, "_id", currentItemId, project)
+                
+                const target = container.activities.find(act => act._id === currentItemId)
+                if (target) {
+                    Object.assign(target, formattedFormValues)
+                }
+                
+                item = {
+                    ...target,
+                    ...formattedFormValues
+                }
+            }
+            //add
+            else {
+                item = {
+                    _id: newItem._id,
+                    containerId,
+                    index: activityIndex,
+                    activity: newItem
+                }
+            }
+        }
+        setData({ action, item })
+        closeDialog()
+    }
+
+    const currentStructure = itemStructure[selectedType.toLowerCase()]
+
+    const disableTypes = (type) => {
+        switch(type) {
+            case "Group": {
+                if (containerId && containerId.includes('.')) {
+                    return true
+                }
+                break
+            }
+            default: {}
+        }
+        return false
+    }
+
+    return (
+        <div className="add-edit-item-dialog dialog-container">
+            <div className="dialog-content">
+                <h2>{currentItem === true 
+                    ? (state.currentProject ? 'Add new Activity' : 'Add New Project')
+                    : `Edit: ${currentItem.name}`}
+
+                </h2>
+                <form onSubmit={handleSubmit}>
+                    {(showItemFields) && (
+                        Object.keys(currentStructure).map((key) => (
+                            <div key={key} className="form-group">
+                                {(currentStructure[key] === "list") ? (
+                                    fieldConditionCheck(key) &&
+                                    <div className='list-field-box'>
+                                        <label htmlFor={key}>{formatLabel(key)}</label>
+                                        <div className={`field-box list-buttons`}>
+                                            {itemStructure.lists[key].options.map((val) => (
+                                                <button
+                                                    key={val}
+                                                    type="button"
+                                                    disabled={disableTypes(val)}
+                                                    className={`button-from-list ${formValues[key]?.includes(val) ? 'selected' : ''}`}
+                                                    onClick={() => toggleListSelection(key, val, itemStructure.lists[key].many)}
+                                                >
+                                                    {val}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                <>
+                                    {fieldConditionCheck(key) &&
+                                    <div
+                                        className={`field-box ${currentStructure[key] === 'checkbox' && 'checkbox-field-box'}`}
+                                    >
+                                        {Shared.getInput(
+                                            formatLabel(key),
+                                            currentStructure[key],
+                                            currentStructure[key] !== 'checkbox' ? formValues[key] : undefined,
+                                            currentStructure[key] === 'checkbox' ? formValues[key] : false,
+                                            handleInputChange,
+                                            false,
+                                            null,
+                                            60,
+
+                                        )}
+                                    </div>
+                                    }
+                                </>
+                                )}
+                                {errors[key] && <span className="error-message">{errors[key]}</span>}
+                            </div>
+                        ))
+                    )}
+                    <button type="submit" className="button-main">Save</button>
+                    <button type="button" className="button-main" onClick={closeDialog}>Cancel</button>
+                </form>
+            </div>
+        </div>
+    )
+}
+
+export default AddEditItem

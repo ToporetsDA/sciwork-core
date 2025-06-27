@@ -1,9 +1,25 @@
-import React, { useState, Suspense } from 'react'
-import '../css/AppContent.css'
+import { useState, useEffect, Suspense } from 'react'
+import '../css/components/AppContent.css'
 import * as Pages from './pages'
-import * as Dialogs from './pages/dialogs'
+import * as Dialogs from './dialogs'
 
-const AppContent = ({userData, setUserData, profileData, state, setState, data, setData, rights, users, itemStructure, defaultStructure, isCompany, notifications, setNotifications, recentActivities, setRecentActivities }) => {
+import * as Shared from './pages/shared'
+
+const AppContent = ({
+    userData, setUserData,
+    profileData,
+    state, setState,
+    projects,
+    activities,
+    setData,
+    rights,
+    users, setUsers,
+    itemStructure,
+    defaultStructure,
+    isCompany,
+    notifications, setNotifications,
+    recentActivities, setRecentActivities
+}) => {
 
     // dialogs
 
@@ -11,12 +27,20 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
         return Dialogs[dialogName.replace(/\s+/g, '')]
     }
 
-    const DialogComponent = (state.currentDialog.name !== undefined) ? loadDialogComponent(state.currentDialog.name) : undefined
+    const DialogComponent = (state.currentDialog.name !== undefined && state.currentDialog.name !== "LogIn") ? loadDialogComponent(state.currentDialog.name) : undefined
 
     // pages
     
     const loadPageComponent = (pageName) => {
-        const formattedPageName = (pageName === 'Subjects' || pageName === 'Project' || pageName === 'Activity') ? 'Projects' : pageName
+        let formattedPageName
+        switch(pageName) {
+            case"Subjects":
+            case"Project": {
+                formattedPageName = "Projects"
+                break
+            }
+            default: {formattedPageName = pageName}
+        }
         return Pages[formattedPageName.replace(/\s+/g, '')]
     }
 
@@ -24,10 +48,19 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
 
     // more for pages
 
+    const project = Shared.getItemById(projects, state.currentProject)
+
     const [itemsToDisplay, setItemsToDisplay] = useState({
-        projects: data,
-        activities: state.currentProject?.activities ? state.currentProject.activities : []
-    }, [state.currentProject, data])
+        projects: projects || [],
+        activities: project?.activities || []
+    })
+
+    useEffect(() => {
+        setItemsToDisplay({
+            projects: projects || [],
+            activities: project?.activities || []
+        })
+    }, [projects, project?.activities])
 
     return (
         <main className="content">
@@ -35,12 +68,21 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
                 <DialogComponent
                     userData={userData}
                     setUserData={setUserData}
-                    data={data}
-                    setData={setData}
+                    profileData={profileData}
                     state={state}
                     setState={setState}
+                    projects={projects}
+                    activities={activities}
+                    setData={setData}
+                    itemsToDisplay={itemsToDisplay}
+                    setItemsToDisplay={setItemsToDisplay}
                     rights={rights}
                     users={users}
+                    setUsers={setUsers}
+                    notifications={notifications}
+                    setNotifications={setNotifications}
+                    recentActivities={recentActivities}
+                    setRecentActivities={setRecentActivities}
                     itemStructure={itemStructure}
                     defaultStructure={defaultStructure}
                     isCompany={isCompany}
@@ -54,11 +96,14 @@ const AppContent = ({userData, setUserData, profileData, state, setState, data, 
                         profileData={profileData}
                         state={state}
                         setState={setState}
-                        data={data}
+                        projects={projects}
+                        activities={activities}
                         setData={setData}
                         itemsToDisplay={itemsToDisplay}
                         setItemsToDisplay={setItemsToDisplay}
                         rights={rights}
+                        users={users}
+                        setUsers={setUsers}
                         notifications={notifications}
                         setNotifications={setNotifications}
                         recentActivities={recentActivities}

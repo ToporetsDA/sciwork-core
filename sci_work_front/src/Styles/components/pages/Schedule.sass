@@ -1,0 +1,35 @@
+@import '../../../StyleVars.sass'
+@import '../../base/wrappers.sass'
+
+.schedule-container
+    padding-left: calc($control-panel-height / 2)
+    padding-right: calc($control-panel-height / 2)
+
+    display: flex
+    flex-wrap: wrap
+    overflow-y: auto
+    
+    scrollbar-width: none
+
+    .current-map
+        width: 7.5%
+
+    .schedule-v-map
+        width: 90%
+
+        margin: 0 0 $space-medium 0
+
+        flex-shrink: 0
+
+    .schedule-h-map
+        width: 7.5%
+        height: $control-panel-height
+
+        .left-label
+            min-height: 99.6px
+
+.schedule-scrollable
+    width: 100%
+    overflow: auto
+
+    display: flex
