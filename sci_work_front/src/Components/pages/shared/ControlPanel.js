@@ -102,7 +102,7 @@ const ControlPanel = ({
         })
     }, [currentSortOption])
 
-    //filter items
+    //filter items 
 
     const filterItems = useCallback((items) => {
         let filtered = items
