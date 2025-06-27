@@ -1,17 +1,20 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import useWebSocket from 'react-use-websocket'
 
 import LogIn from './dialogs/LogIn'
 
-// import * as Shared from './pages/shared'
+import * as Shared from './pages/shared'
 
 const Connection = ({
     state, setState,
     userData, setUserData,
+    projects, setProjects,
+    activities, setActivities,
     isLoggedIn, setLoggedIn,
     setRights,
     setUsers,
-    isUserUpdatingItems, setIsUserUpdatingItems,
+    isUserUpdatingProjects, setIsUserUpdatingProjects,
+    isUserUpdatingActivities, setIsUserUpdatingActivities,
     isUserUpdatingUserData, setIsUserUpdatingUserData,
     previousVersionsRef
 }) => {
@@ -76,14 +79,16 @@ const Connection = ({
         console.log('Sent message:', message)
 
          // Reset flags
-        setIsUserUpdatingItems(false)
+        setIsUserUpdatingProjects(false)
+        setIsUserUpdatingActivities(false)
         setIsUserUpdatingUserData(false)
-    }, [sendMessage, sessionToken, setIsUserUpdatingItems, setIsUserUpdatingUserData])
+    }, [sendMessage, sessionToken, setIsUserUpdatingProjects, setIsUserUpdatingActivities, setIsUserUpdatingUserData])
 
     const handleResponse = useCallback((event) => {
         console.log("from handleResponse: ")
         try {
             const response = JSON.parse(event.data)
+            const currentData = projects
             console.log(response) // This will log the entire response
         
             // Now, you can access specific parts of the response
@@ -99,6 +104,7 @@ const Connection = ({
                     case "all": {
                         setUserData(data.user)
                         console.log(data.items)
+                        setProjects(data.items)
                         setRights(data.organisation.rights)
                         setUsers(data.users)
                         break
@@ -109,6 +115,41 @@ const Connection = ({
                     }
                     case "user": {
                         setUserData(data)
+                        break
+                    }
+                    case "data": {
+                        setProjects(data)
+                        break
+                    }
+                    case "project": {
+                        const updatedData = currentData.map(item =>
+                            item._id === data._id ? data : item
+                        )
+                        setProjects(updatedData)
+                        break
+                    }
+                    case "activities": {//add along with activity templates
+                        console.log("activities", data)
+                        setActivities(data)
+                        break
+                    }
+                    case "activity": {
+                        //edit
+                        if (Shared.getItemById(activities, data._id)?._id) {
+                            setActivities(prevActivities =>
+                                prevActivities.map(act =>
+                                    act._id === data._id ? data : act
+                                )
+                            )
+                        }
+                        //add
+                        else {
+                            setActivities(prevActivities => [...prevActivities, data])
+                        }
+                        break
+                    }
+                    case "delete": {//just _id
+                        Shared.deleteItem(currentData, setProjects, data._id)
                         break
                     }
                     case "organisation": {
@@ -129,8 +170,10 @@ const Connection = ({
                     if (backup) {
                         if (data.id === userData._id) {
                         setUserData(backup)
+                        } else if (data.id.includes(".")) {
+                        setActivities(prev => prev.map(i => i._id === data.id ? backup : i))
                         } else {
-                            // editors
+                        setProjects(prev => prev.map(p => p._id === data.id ? backup : p))
                         }
                     }
                     delete previousVersionsRef.current[data.id] // clean up
@@ -143,8 +186,23 @@ const Connection = ({
                             __v: prevData.__v + 1
                         }))
                     }
-                    else {
-                        //editors
+                    else if (data.id.includes(".")) {
+                        setActivities(prevItems => 
+                            prevItems.map(i => {
+                                return i._id === data.id
+                                    ? { ...i, __v: i.__v + 1 }
+                                    : i
+                            })
+                        )
+                    }
+                    else if (!data.id.includes(".")) {
+                        setProjects(prevItems => 
+                            prevItems.map(p => {
+                                return p._id === data.id
+                                    ? { ...p, __v: p.__v + 1 }
+                                    : p
+                            })
+                        )
                     }
 
                     if (data.id in previousVersionsRef.current) {
@@ -163,18 +221,23 @@ const Connection = ({
         } catch (error) {
             console.error("Error processing message:", error.message)
         }
-    }, [setLoggedIn, setRights, setUsers, userData._id, setUserData, previousVersionsRef])
+    }, [projects, setProjects, activities, setActivities, setLoggedIn, setRights, setUsers, userData._id, setUserData, previousVersionsRef])
 
     //send update ONLY when page changes
     const lastSentPage = useRef({
-        currentPage: 'HomePage'
+        currentPage: 'HomePage',
+        currentProject: undefined,
+        currentActivity: undefined
     })
     useEffect(() => {
-        if ((lastSentPage.current.currentPage === state.currentPage) || !isLoggedIn) {
+        if (
+            (lastSentPage.current.currentPage === state.currentPage && lastSentPage.current.currentProject === state.currentProject)
+            || !isLoggedIn
+        ) {
             return
         }
         const location = state.currentProject || state.currentPage
-        sendMsg("goTo", { page: format(location), isId: false })
+        sendMsg("goTo", { page: format(location), isId: (!!state.currentProject)})
         lastSentPage.current = state
     }, [sendMsg, state, isLoggedIn])
 
@@ -192,13 +255,16 @@ const Connection = ({
 
     // Trigger user-initiated updates
     useEffect(() => {
-        if (isUserUpdatingItems) {
-            // updateByUser(isUserUpdatingItems, "editor")
+        if (isUserUpdatingProjects) {
+            updateByUser(Shared.getItemById(projects, isUserUpdatingProjects), "addEditData", "metadata")
+        }
+        if (isUserUpdatingActivities) {
+            updateByUser(Shared.getItemById(activities, isUserUpdatingActivities), "addEditContent", "content")
         }
         if (isUserUpdatingUserData) {
             updateByUser(userData, "addEditUser", "user")
         }
-    }, [userData, updateByUser, isUserUpdatingItems, isUserUpdatingUserData])
+    }, [projects, activities, userData, updateByUser, isUserUpdatingProjects, isUserUpdatingActivities, isUserUpdatingUserData])
 
     //on login
     const loginToServer = async (formValues) => {
@@ -210,7 +276,7 @@ const Connection = ({
         }
     
         try {
-            const response = await fetch(`${selectedServer.address}/admin/users/login`, {
+            const response = await fetch(`${selectedServer.address}/users/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ login: formValues.login, password: formValues.password })

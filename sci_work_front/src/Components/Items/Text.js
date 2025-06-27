@@ -49,21 +49,12 @@ const Text = ({
 
     useEffect(() => {
         if (isEditing && editorRef.current && toolbarRef.current) {
+            const rect = editorRef.current.getBoundingClientRect()
 
-            // Обчислюємо top відносно обгортки
-            const topOffset = editorRef.current.offsetTop
+            toolbarRef.current.style.top = `${rect.top - toolbarRef.current.offsetHeight - 8}px`
+            toolbarRef.current.style.left = `${rect.left}px`
+            toolbarRef.current.style.width = `${rect.width}px`
 
-            // Встановлюємо позицію тулбару
-            toolbarRef.current.style.top = `${topOffset - toolbarRef.current.offsetHeight - 8}px`
-
-            // Встановлюємо left і width тулбару так, щоб співпадали з редактором
-            const leftOffset = editorRef.current.offsetLeft
-            const width = editorRef.current.offsetWidth
-
-            toolbarRef.current.style.left = `${leftOffset}px`
-            toolbarRef.current.style.width = `${width}px`
-
-            // Забираємо translateX(-50%) — він тепер не потрібен
             toolbarRef.current.style.transform = 'none'
         }
     }, [isEditing])

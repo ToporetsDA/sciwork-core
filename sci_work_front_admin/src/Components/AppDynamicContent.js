@@ -12,8 +12,6 @@ const AppDynamicContent = ({
   isLoggedIn,
   rights,
   users, setUsers,
-  itemStructure,
-  defaultStructure,
   isCompany,
 }) => {
 
@@ -96,8 +94,6 @@ const AppDynamicContent = ({
       rights={rights}
       users={users}
       setUsers={setUsers}
-      itemStructure={itemStructure}
-      defaultStructure={defaultStructure}
       isCompany={isCompany}
     />
   )

@@ -1,4 +1,4 @@
-import { useState, Suspense } from 'react'
+import { Suspense } from 'react'
 import '../css/components/AppContent.css'
 import * as Pages from './pages'
 import * as Dialogs from './dialogs'
@@ -11,8 +11,6 @@ const AppContent = ({
     state, setState,
     rights,
     users, setUsers,
-    itemStructure,
-    defaultStructure,
     isCompany
 }) => {
 
@@ -44,8 +42,6 @@ const AppContent = ({
                     rights={rights}
                     users={users}
                     setUsers={setUsers}
-                    itemStructure={itemStructure}
-                    defaultStructure={defaultStructure}
                     isCompany={isCompany}
                 />
             }

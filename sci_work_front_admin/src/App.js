@@ -52,63 +52,7 @@ const App = () => {
     }
   }
 
-  //items
-
-  const defaultItemStructure = {
-    project: {
-      name: 'text',
-      startDate: 'date',
-      endDate: 'date',
-    },
-    activity: {
-      name: 'text',
-      startDate: 'date',
-      endDate: 'date',
-      isTimed: 'checkbox',
-      startTime: 'time',
-      endTime: 'time',
-      type: 'list',
-      repeat: 'checkbox',
-      days: 'list',
-      thirdParty: 'checkbox',
-      serviceName: 'text'
-    },
-    lists: {
-      days: { many: true, options: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']},
-      type: { many: false, options: [/*'Dev',*/ 'Group', 'Text', 'Chat', 'List', 'Table', 'Attendance', 'Report', /*'Test'*/]}
-    },
-    checks: {
-      days:         {val: true, dep: "repeat"},
-      serviceName:  {val: true, dep: "thirdParty"},
-      startTime:    {val: true, dep: "isTimed"},
-      endTime:      {val: true, dep: "isTimed"},
-    }
-  }
-
-  const defaultStructure = useMemo(() => {
-    return {
-      project: {
-        name: '',
-        startDate: '',
-        endDate: '',
-        activities: [],
-        userList: []
-      },
-      activity: {
-        name: '',
-        startDate: '',
-        endDate: '',
-        isTimed: true,
-        startTime: '',
-        endTime: '',
-        type: 'Dev',
-        repeat: false,
-        days: [],
-        thirdParty: false,
-        serviceName: ''
-      }
-    }
-  }, [])
+  //logs
 
   const [logs, setLogs] = useState([])
 
@@ -182,8 +126,6 @@ const App = () => {
                 rights={rights}
                 users={users}
                 setUsers={updateUsers}
-                itemStructure={defaultItemStructure}
-                defaultStructure={defaultStructure}
                 isCompany={isCompany}
               />
             } />

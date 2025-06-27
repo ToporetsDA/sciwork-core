@@ -1,22 +1,13 @@
 import { useState, useMemo } from 'react'
-import { useNavigate } from "react-router-dom"
 import '../../../css/components/pages/shared/ItemTable.css'
 
-import * as Shared from './'
-import * as Items from '../../items'
-
 /* from
-Projects
-List
-AddEditUserList
-JointEventOverlap
-Notifications
+Logs
+Users
 */
 
 const ItemTable = ({
     userData,
-    projects,
-    activities,
     setData,
     state, setState,
     itemsToDisplay,
@@ -29,90 +20,17 @@ const ItemTable = ({
     recentActivities, setRecentActivities
 }) => {
 
-    //navigation for projects
-    const navigate = useNavigate()
-
-    //find activity if activities
-    const parts = (itemsToDisplay.length > 0) ? itemsToDisplay[0]._id.split('.') : []
-    parts.pop()
-    const activity = Shared.getItemById(activities, parts.join('.'))
-
     //column types for activities
     const liKeys = itemKeys.filter(val => val !== 'tech')
-
-    const saveChanges = (key, value, activity, index) => {
-    
-        const updatedActivity = Shared.setFieldValue(
-            activity,
-            `listItems.${index}.${key}`,
-            value
-        )
-
-        setData({action: "content", item: {type: "Table", activity: updatedActivity}})
-    }
-
-    // get now "hh:mm"
-    const getTime = () => {
-        return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }
 
     const getTileContent = (key, item, index) => {
         
         switch(itemTypes[key]) {
             case "text": {
-                return (
-                    <Items.Text
-                        userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
-                        state={state}
-                        setState={setState}
-                        item={item}
-                        data={`listItems.${index}.${key}`}
-                        rights={rights}
-                    />
-                )
-            }
-            case "checkbox": {
-                return (
-                    <input
-                        type="checkbox"
-                        checked={item[key] || false}
-                        onChange={(e) => {saveChanges(key, e.target.checked, activity, index)}}
-                    />
-                )
+                return item[key]
             }
             case "plain": {
                 return item[key]
-            }
-            case "checker": {
-                return (
-                    <>
-                    {(item[key][0] === false) ? (//if not checked - show checkbox
-                        <input
-                            type="checkbox"
-                            checked={item[key][0] || false}
-                            onChange={(e) => {saveChanges(key, [e.target.checked, getTime()], activity, index)}}
-                        />
-                    ) : (//if checked - show time of it being checked
-                        <div>
-                            {item[key][1]}
-                        </div>
-                    )}
-                    {item[key].length === 3 && //add to Text Editable param and pass this
-                        <div className='text-wrapper'>
-                            <div className='text-container'>
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: item[key][2]
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    }
-                    </>
-                )
             }
             case "button": {
                 return item[key]
@@ -195,36 +113,21 @@ const ItemTable = ({
                         )}
                     </th>
                 ))}
-                {isItem &&
-                    <th>Status</th>
-                }
-                {isItem && (!state.currentDialog?.name) &&
-                    <th>Actions</th>
-                }
                 </tr>
             </thead>
             <tbody>
                 {sortedItems.map((item, index) => {
-                    const daysLeft = (new Date(item.endDate) - new Date()) / (24 * 60 * 60 * 1000)
-                    const isExpiring = daysLeft < 30
-                    const isExpired = new Date(item.endDate) < new Date()
-                    const status = isExpired ? 'Expired' : isExpiring ? 'Expiring' : 'Active'
-
-                    const items = (!state.currentProject) ? projects : activities
-
                     const idParts = item._id.split('.')
                     const i = parseInt(idParts[idParts.length - 1], 10)
 
                     return (
                         <tr
                             key={index}
-                            className={`${isExpiring ? 'expiring' : ''} ${isExpired ? 'expired' : ''}`}
                             onClick={() => {
                                 if (isItem) {//for links
                                     if (linkActions) {
                                         linkActions(item._id)
                                     }
-                                    navigate(Shared.goTo(item, items, recentActivities, setRecentActivities))
                                 }
                             }}
                         >
@@ -236,22 +139,6 @@ const ItemTable = ({
                                     }
                                 </td>
                             ))}
-                            {isItem &&
-                                <td>{status}</td>
-                            }
-                            {isItem && (!state.currentDialog?.name) &&
-                                <td onClick={(e) => e.stopPropagation()}>
-                                    <Shared.ItemActions
-                                        userData={userData}
-                                        projects={projects}
-                                        activities={activities}
-                                        setData={setData}
-                                        setState={setState}
-                                        item={item}
-                                        rights={rights}
-                                    />
-                                </td>
-                            }
                         </tr>
                     )
                 })}
