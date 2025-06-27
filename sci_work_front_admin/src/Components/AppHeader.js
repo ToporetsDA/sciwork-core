@@ -1,9 +1,14 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from "react-router-dom"
 import '../css/components/AppHeader.css'
 import logo from "../logo.svg"
 
-const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLoggedIn, notifications, setNotifications, organisationType}) => {
+const AppHeader = ({
+    state, setState,
+    userData, setUserData,
+    isLoggedIn, setLoggedIn,
+    organisationType
+}) => {
 
     const navigate = useNavigate()
 
@@ -17,35 +22,10 @@ const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLogg
     const pages = ['Home Page', 'Logs', 'Users']
     const morePages = ['Profile', 'Settings']
 
-    const notificationsMark = useMemo(() => {
-        if (isLoggedIn === true) {
-            return notifications.filter(notification => notification.state === "unseen").length
-        }
-        return -1
-    }, [notifications, isLoggedIn])
-
-    const setAllSeen = () => {
-        setNotifications(
-            notifications.map(n => {
-                if (n.state === "unseen") {
-                    return { ...n, state: "unread" } // Change "unseen" to "unread"
-                }
-                if (n.state === "unread") {
-                    return { ...n, state: "seen" } // Change "unread" to "seen"
-                }
-                return n // Leave other states as is
-            })
-        )
-    }
-
     //go to page
     const handleClick = (page) => {
         navigate(`/${page}`)
         setDropdownOpen(false)
-
-        if (page === "Notifications") {
-            setAllSeen()
-        }
     }
 
     const handleDialog = (dialog, params) => {
@@ -97,9 +77,6 @@ const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLogg
                 }}
             >
                 <p>{page}</p>
-                {format(page) === 'Notifications' && notificationsMark > 0 && (
-                    <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
-                )}
             </li>
         )
     }
@@ -127,9 +104,6 @@ const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLogg
                             >
                                 More
                             </p>
-                            {!isDropdownOpen && notificationsMark > 0 && (
-                                    <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
-                            )}
                             {isDropdownOpen && (
                                 <ul className="more">
                                     {morePages.map((page) => (

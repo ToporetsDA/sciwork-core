@@ -6,7 +6,7 @@ import AppConnection from './Components/AppConnection'
 import AppHeader from './Components/AppHeader'
 import AppDynamicContent from './Components/AppDynamicContent'
 
-// import * as Shared from './Components/pages/shared'
+import * as Shared from './Components/pages/shared'
 
 const App = () => {
 
@@ -64,14 +64,26 @@ const App = () => {
 
   //connection
 
-  const [isUserUpdatingItems, setIsUserUpdatingItems] = useState(false)
   const [isUserUpdatingUserData, setIsUserUpdatingUserData] = useState(false)
 
   const [users, setUsers] = useState()
 
-  const updateUsers = (itemId) => {
-    // this method will get users's data of users related to Item
-    // for now all users are loaded at login
+  const updateUsers = (action, userId, access) => {
+
+    let user = Shared.getItemById(users, userId)
+
+    switch(action) {
+      case "access": {
+        user.genStatus = access
+        setIsUserUpdatingUserData({id: user, action})
+        break
+      }
+      case "delete": {
+        setIsUserUpdatingUserData({id: user, action})
+        break
+      }
+      default:
+    }
   }
 
   const previousVersionsRef = useRef({})
@@ -141,8 +153,6 @@ const App = () => {
       setLoggedIn={setLoggedIn}
       setRights={setRights}
       setUsers={setUsers}
-      isUserUpdatingItems={isUserUpdatingItems}
-      setIsUserUpdatingItems={setIsUserUpdatingItems}
       isUserUpdatingUserData={isUserUpdatingUserData}
       setIsUserUpdatingUserData={setIsUserUpdatingUserData}
       previousVersionsRef={previousVersionsRef}

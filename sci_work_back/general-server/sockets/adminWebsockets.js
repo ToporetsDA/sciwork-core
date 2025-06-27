@@ -3,16 +3,21 @@ const mongoose = require('mongoose')
 
 const methods = require("./wsDependencies/methods")
 const handlers = require("./wsDependencies/handlers")
+const db = require("./wsDependencies/db")
 
 // Map to store WebSocket connections by session token
 const admins = new Map() // This will store WebSocket connections keyed by session token
+
+const updateUser = async (userId, updatedUserData, overwrite = true) => {
+  await db.Collections.user.findByIdAndUpdate(userId, updatedUserData, { overwrite })
+}
 
 // start the WebSocket server
 const startAdminWebSocketServer = (port) => {
   const wss = new WebSocket.Server({ port })
 
   wss.on("connection", (ws, req) => {
-    console.log("New WebSocket connection established.")
+    console.log("New admin WebSocket connection established.")
     let sessionToken = null
 
     // When the WebSocket receives a message
@@ -32,9 +37,9 @@ const startAdminWebSocketServer = (port) => {
               // Store WebSocket connection with session token
               admins.set(sessionToken, {socket: ws, login: parsedMessage.data.login})
 
-              console.log(`WebSocket connection associated with session token: ${sessionToken}`)
+              console.log(`WebSocket (admin) connection associated with session token: ${sessionToken}`)
               
-              methods.getData("all",  parsedMessage.data, ws, sessionToken)
+              methods.getData("all-admin",  parsedMessage.data, ws, sessionToken)
             }
             else {
               ws.send(JSON.stringify({ error: "Session token missing" }))
@@ -43,9 +48,26 @@ const startAdminWebSocketServer = (port) => {
           }
           case "addEditUser": {
             const updatedUserData = parsedMessage.data
-            const userId = updatedUserData._id
-        
-            handlers.handleEditUser(admins, sessionToken, updatedUserData, userId, "user")
+            const userId = updatedUserData.item._id
+            
+            try {
+              updateUser(userId, updatedUserData.item, { overwrite: true })
+              console.log("User updated:", userId)
+
+              // Optionally notify the user or clients
+              admins.get(sessionToken)?.socket.send(JSON.stringify({
+                type: "userUpdated",
+                data: updatedUserData
+              }))
+            } catch (error) {
+              console.error("Failed to update user:", error.message)
+              admins.get(sessionToken)?.socket.send(JSON.stringify({
+                type: "error",
+                message: "Failed to update user",
+                error: error.message
+              }))
+            }
+            // handlers.handleEditUser(admins, sessionToken, updatedUserData, userId, "user")
             break
           }
           default: {

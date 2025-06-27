@@ -304,7 +304,7 @@ const Connection = ({
         }
     }
 
-    //get list of organisations whos servers are on
+    //get list of working servers
     useEffect(() => {
         const fetchServers = async () => {
             try {

@@ -4,7 +4,7 @@ const User = require("../models/User")
 const crypto = require('crypto')
 const { getAdminWebSocketByToken } = require("../sockets/adminWebsockets")
 
-const loggedInUsers = new Set()
+const loggedInAdmins = new Set()
 
 // GET all users
 router.get("/get", async (req, res) => {
@@ -80,7 +80,7 @@ router.post("/login", async (req, res) => {
     }
 
     // Check if already logged in
-    if (loggedInUsers.has(login)) {
+    if (loggedInAdmins.has(login)) {
       return res.status(401).json({ message: "User is already logged in" })
     }
 
@@ -95,7 +95,7 @@ router.post("/login", async (req, res) => {
       console.error("WebSocket client not found for user:", login)
     }
 
-    return res.status(200).json({ message: "Login successful", sessionToken })
+    return res.status(200).json({ message: "Admin Login successful", sessionToken })
   } catch (error) {
     console.error("Login error:", error.message)
     return res.status(500).json({ message: "Internal server error", error: error.message })

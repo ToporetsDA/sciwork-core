@@ -15,8 +15,12 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
         }
     })
 
+    const [canReg, setCanReg] = useState(false)
+
     const handleInputChange = (e) => {
         const { name, value } = e.target
+        const server = servers.find(s => s.id === value)
+        setCanReg(server?.canReg)
         setFormValues((prev) => ({
             ...prev,
             [name]: value
@@ -51,12 +55,6 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
             {!isLoggedIn &&
             <div className="auth-dialog dialog-container">
                 <div className="dialog-content">
-                    <Shared.ToggleButton
-                        data={type}
-                        setter={setType}
-                        field={"type"}
-                        displayOptions={['Register', 'Log in']}
-                    />
                     <form onSubmit={handleSubmit}>
                         {/* Server Selection */}
                         <label htmlFor="server">Server</label>
@@ -72,6 +70,17 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
                             emptyPlaceholder={"No servers available"}
                             disabled={false}
                         />
+                        {canReg ? (
+                                <Shared.ToggleButton
+                                    data={type}
+                                    setter={setType}
+                                    field={"type"}
+                                    displayOptions={['Register', 'Log in']}
+                                />
+                            ) : (
+                                <h3>Login</h3>
+                            )
+                        }
 
                         {Shared.getInput("login", "text", formValues.login, false, handleInputChange, false, null, 60)}
                         {Shared.getInput("password", "text", formValues.password, false, handleInputChange, false, null, 60)}

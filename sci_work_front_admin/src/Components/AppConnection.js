@@ -3,18 +3,12 @@ import useWebSocket from 'react-use-websocket'
 
 import LogIn from './dialogs/LogIn'
 
-import * as Shared from './pages/shared'
-
 const Connection = ({
     state, setState,
     userData, setUserData,
-    projects, setProjects,
-    activities, setActivities,
     isLoggedIn, setLoggedIn,
     setRights,
     setUsers,
-    isUserUpdatingProjects, setIsUserUpdatingProjects,
-    isUserUpdatingActivities, setIsUserUpdatingActivities,
     isUserUpdatingUserData, setIsUserUpdatingUserData,
     previousVersionsRef
 }) => {
@@ -51,7 +45,7 @@ const Connection = ({
 
     const { sendMessage, readyState } = useWebSocket(wsUrl, {
         onOpen: () => {
-            console.log('WebSocket connection established.')
+            console.log('Admin WebSocket connection established.')
             // Send the login message after the connection is established
             sendMsg("login", { login: formValues.login });
         },
@@ -79,16 +73,13 @@ const Connection = ({
         console.log('Sent message:', message)
 
          // Reset flags
-        setIsUserUpdatingProjects(false)
-        setIsUserUpdatingActivities(false)
         setIsUserUpdatingUserData(false)
-    }, [sendMessage, sessionToken, setIsUserUpdatingProjects, setIsUserUpdatingActivities, setIsUserUpdatingUserData])
+    }, [sendMessage, sessionToken, setIsUserUpdatingUserData])
 
     const handleResponse = useCallback((event) => {
         console.log("from handleResponse: ")
         try {
             const response = JSON.parse(event.data)
-            const currentData = projects
             console.log(response) // This will log the entire response
         
             // Now, you can access specific parts of the response
@@ -101,10 +92,8 @@ const Connection = ({
         
                 // You can handle the data based on the type (user, projects, etc.)
                 switch (type) {
-                    case "all": {
+                    case "all-admin": {
                         setUserData(data.user)
-                        console.log(data.items)
-                        setProjects(data.items)
                         setRights(data.organisation.rights)
                         setUsers(data.users)
                         break
@@ -114,42 +103,16 @@ const Connection = ({
                         break
                     }
                     case "user": {
-                        setUserData(data)
-                        break
-                    }
-                    case "data": {
-                        setProjects(data)
-                        break
-                    }
-                    case "project": {
-                        const updatedData = currentData.map(item =>
-                            item._id === data._id ? data : item
-                        )
-                        setProjects(updatedData)
-                        break
-                    }
-                    case "activities": {//add along with activity templates
-                        console.log("activities", data)
-                        setActivities(data)
-                        break
-                    }
-                    case "activity": {
-                        //edit
-                        if (Shared.getItemById(activities, data._id)?._id) {
-                            setActivities(prevActivities =>
-                                prevActivities.map(act =>
-                                    act._id === data._id ? data : act
-                                )
+                        if (userData._id === data._id) {
+                            setUserData(data)
+                        }
+                        else {
+                            setUsers(prevUsers =>
+                                prevUsers.map(u => {
+                                    return u._id === data._id ? data : u
+                                })
                             )
                         }
-                        //add
-                        else {
-                            setActivities(prevActivities => [...prevActivities, data])
-                        }
-                        break
-                    }
-                    case "delete": {//just _id
-                        Shared.deleteItem(currentData, setProjects, data._id)
                         break
                     }
                     case "organisation": {
@@ -170,39 +133,16 @@ const Connection = ({
                     if (backup) {
                         if (data.id === userData._id) {
                         setUserData(backup)
-                        } else if (data.id.includes(".")) {
-                        setActivities(prev => prev.map(i => i._id === data.id ? backup : i))
-                        } else {
-                        setProjects(prev => prev.map(p => p._id === data.id ? backup : p))
                         }
                     }
                     delete previousVersionsRef.current[data.id] // clean up
-                }
-                else {
+                } else {
                     // notify user that update happened and increment its __v
                     if (data.id === userData._id) {
                         setUserData((prevData) => ({
                             ...prevData,
                             __v: prevData.__v + 1
                         }))
-                    }
-                    else if (data.id.includes(".")) {
-                        setActivities(prevItems => 
-                            prevItems.map(i => {
-                                return i._id === data.id
-                                    ? { ...i, __v: i.__v + 1 }
-                                    : i
-                            })
-                        )
-                    }
-                    else if (!data.id.includes(".")) {
-                        setProjects(prevItems => 
-                            prevItems.map(p => {
-                                return p._id === data.id
-                                    ? { ...p, __v: p.__v + 1 }
-                                    : p
-                            })
-                        )
                     }
 
                     if (data.id in previousVersionsRef.current) {
@@ -221,7 +161,7 @@ const Connection = ({
         } catch (error) {
             console.error("Error processing message:", error.message)
         }
-    }, [projects, setProjects, activities, setActivities, setLoggedIn, setRights, setUsers, userData._id, setUserData, previousVersionsRef])
+    }, [setLoggedIn, setRights, setUsers, userData._id, setUserData, previousVersionsRef])
 
     //send update ONLY when page changes
     const lastSentPage = useRef({
@@ -246,7 +186,7 @@ const Connection = ({
 
         if (readyState === 1) { // Check if WebSocket is open
             sendMsg(toDo, item)
-            console.log("Sent update:")
+            console.log("Sent update:", toDo, item)
         } else {
             console.error(`WebSocket is not open. Cannot send ${itemType} update.`)
         }
@@ -255,16 +195,14 @@ const Connection = ({
 
     // Trigger user-initiated updates
     useEffect(() => {
-        if (isUserUpdatingProjects) {
-            updateByUser(Shared.getItemById(projects, isUserUpdatingProjects), "addEditData", "metadata")
+        if (isUserUpdatingUserData === true) {
+            updateByUser({item: userData, action: "user"}, "addEditUser", "user")
         }
-        if (isUserUpdatingActivities) {
-            updateByUser(Shared.getItemById(activities, isUserUpdatingActivities), "addEditContent", "content")
+        else if (typeof isUserUpdatingUserData === "object") {
+            const { id, action } = isUserUpdatingUserData
+            updateByUser({item: id, action}, "addEditUser", action)
         }
-        if (isUserUpdatingUserData) {
-            updateByUser(userData, "addEditUser", "user")
-        }
-    }, [projects, activities, userData, updateByUser, isUserUpdatingProjects, isUserUpdatingActivities, isUserUpdatingUserData])
+    }, [userData, updateByUser, isUserUpdatingUserData])
 
     //on login
     const loginToServer = async (formValues) => {
@@ -276,7 +214,7 @@ const Connection = ({
         }
     
         try {
-            const response = await fetch(`${selectedServer.address}/users/login`, {
+            const response = await fetch(`${selectedServer.address}/admin/users/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ login: formValues.login, password: formValues.password })
@@ -290,7 +228,8 @@ const Connection = ({
                 setFormValues(formValues)
 
                 // Set WebSocket URL dynamically
-                const wsAddress = `ws://${serverAddress(selectedServer.address)}`
+                const address = selectedServer.address.replace(/(\d+)$/, (match) => String(Number(match) + 1))
+                const wsAddress = `ws://${serverAddress(address)}`
                 setWsUrl(wsAddress)
 
                 console.log('WebSocket URL:', wsAddress)

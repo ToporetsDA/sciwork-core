@@ -23,36 +23,6 @@ const ItemTable = ({
     //column types for activities
     const liKeys = itemKeys.filter(val => val !== 'tech')
 
-    const getTileContent = (key, item, index) => {
-        
-        switch(itemTypes[key]) {
-            case "text": {
-                return item[key]
-            }
-            case "plain": {
-                return item[key]
-            }
-            case "button": {
-                return item[key]
-            }
-            case "combobox": {
-                return item[key]
-            }
-            case "access": {
-                return rights.names[Number(item[key])]
-            }
-            case "tech": {
-                return
-            }
-            default: {
-                console.log("unknown key type", itemTypes[key])
-                return item[key]
-            }
-        }
-
-        
-    }
-
     //sorting, not saveable
     const [sortConfig, setSortConfig] = useState({ key: null, direction: null })
 
@@ -117,8 +87,6 @@ const ItemTable = ({
             </thead>
             <tbody>
                 {sortedItems.map((item, index) => {
-                    const idParts = item._id.split('.')
-                    const i = parseInt(idParts[idParts.length - 1], 10)
 
                     return (
                         <tr
@@ -133,10 +101,7 @@ const ItemTable = ({
                         >
                             {liKeys.map((key) => (
                                 <td key={key}>
-                                    {!editable
-                                        ? item[key] //text
-                                        : getTileContent(key, item, i) //editable text
-                                    }
+                                    {item[key]}
                                 </td>
                             ))}
                         </tr>

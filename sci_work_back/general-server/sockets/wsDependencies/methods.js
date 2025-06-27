@@ -388,6 +388,28 @@ const getData = async (type, login, ws, sessionToken, _id) => {
       data = { user, items, organisation, users }
       break
     }
+    case "all-admin": {
+      // Fetch Fetch user by login
+      const user = await db.Collections.user.findOne(login)
+      if (!user) {
+        throw new Error(`User not found for login: ${login}`)
+      }
+
+      const organisation = await db.Collections.organisation.findOne({
+        name: "default"
+      })
+
+      const users = await db.Collections.user.find({}, {
+        login: 0,
+        password: 0,
+        currentSettings: 0,
+        notifications: 0,
+        statusName: 0
+      })
+
+      data = { user, organisation, users }
+      break
+    }
     case "users": {
       const users = await db.Collections.user.find({}, {
         login: 0,

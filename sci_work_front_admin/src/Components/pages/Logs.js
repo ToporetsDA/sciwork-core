@@ -6,9 +6,6 @@ import * as Shared from './shared'
 const Logs = ({
     userData, setUserData,
     state, setState,
-    projects, 
-    activities,
-    setData,
     itemsToDisplay, setItemsToDisplay,
     rights,
     users, setUsers,
@@ -25,16 +22,13 @@ const Logs = ({
                 rights={rights}
                 setItemsToDisplay={setItemsToDisplay}
             />
-            <div className={`page-wrapper`}>
+            <div>
                 <Suspense fallback={<div>Loading projects...</div>}>
                     <Shared.ItemTable
                         userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
                         state={state}
                         setState={setState}
-                        itemsToDisplay={projects}
+                        itemsToDisplay={[]}
                         itemKeys={["user", "type", "dateTime", "event"]}
                         //itemTypes
                         editable={false}

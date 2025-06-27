@@ -6,6 +6,7 @@ const path = require('path')
 const cookieParser = require("cookie-parser")
 const logger = require("morgan")
 const mongoose = require("mongoose")
+const db = require("./sockets/wsDependencies/db")
 const { v4: uuidv4 } = require('uuid')
 const fs = require('fs')
 const axios = require("axios")
@@ -76,10 +77,14 @@ console.log(`Assigned server ID: ${serverId}`)
 // Функція для реєстрації сервера
 const registerToCoordinator = async () => {
   try {
+    const serverData = await db.Collections.organisation.findById("677402a670b2a51ee527615e")
+    const settings = serverData.toObject()
+
     const registerResponse = await axios.post(`${coordinatorAddress}/servers/register`, {
       id: serverId,
       address: serverAddress,
-      name: serverName
+      name: serverName,
+      canReg: settings.userCanReg
     })
 
     console.log("Registered to coordinator:", registerResponse.data.message)
