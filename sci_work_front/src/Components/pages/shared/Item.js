@@ -1,3 +1,4 @@
+import { useContext }  from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import '../../../css/components/pages/shared/Item.css'
@@ -7,19 +8,18 @@ import * as Items from '../../items'
 import * as SubItems from '../../items/subItems'
 
 const Item = ({
-    userData,
-    projects,
-    activities,
-    setData,
-    state, setState,
     item,
     index,
     containerId,
-    containerType,
-    rights,
-    users, setUsers,
-    recentActivities, setRecentActivities
+    containerType
 }) => {
+
+    const {
+        userData,
+        projects,
+        setState,
+        rights
+    } = useContext(Shared.AppContext)
 
     const types = {
         Dev: "Dev",
@@ -169,12 +169,7 @@ const Item = ({
                 <>
                     {!noActions.includes(containerType) &&
                         <Shared.ItemActions
-                            userData={userData}
-                            projects={projects}
-                            setData={setData}
-                            setState={setState}
                             item={item}
-                            rights={rights}
                         />
                     }
                     {item?.deleted ? (
@@ -182,21 +177,11 @@ const Item = ({
                     ) : (
                         <ItemComponent
                             key={item._id}
-                            userData={userData}
-                            projects={projects}
-                            activities={activities}
-                            setData={setData}
-                            state={state}
-                            setState={setState}
+
                             item={item}
                             index={index}
                             containerId={containerId}
                             containerType={containerType}
-                            rights={rights}
-                            users={users}
-                            setUsers={setUsers}
-                            recentActivities={recentActivities}
-                            setRecentActivities={setRecentActivities}
                         />
                     )
                     }

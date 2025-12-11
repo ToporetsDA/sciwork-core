@@ -1,17 +1,20 @@
-import { useState, useEffect, useRef, useMemo, useCallback }  from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback, useContext }  from 'react'
 import '../../../css/components/pages/shared/ControlPanel.css'
 
 import * as Shared from './'
 
 const ControlPanel = ({
-    userData, setUserData,
-    state, setState,
-    projects,
-    activities,
-    rights,
     setItemsToDisplay,
     currentScale, setCurrentScale,
-    editIntervalAnchor }) => {
+    editIntervalAnchor
+}) => {
+
+    const {
+        userData, setUserData,
+        state, setState,
+        projects,
+        rights
+    } = useContext(Shared.AppContext)
 
     const filterOptions = {
         sort: ["A-Z", "Z-A", "start date", "end date"],

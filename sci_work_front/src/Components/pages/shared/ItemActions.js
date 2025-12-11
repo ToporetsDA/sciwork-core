@@ -1,8 +1,18 @@
+import { useContext }  from 'react'
+
 import * as Shared from './'
 
 import '../../../css/components/pages/shared/ItemActions.css'
 
-const ItemActions = ({userData, projects, setData, setState, item, rights}) => {
+const ItemActions = ({ item }) => {
+
+    const {
+        userData,
+        projects,
+        setData,
+        setState,
+        rights
+    } = useContext(Shared.AppContext)
 
     const parts = item?._id.split('.')
     const project = Shared.getItemById(projects, parts[0])

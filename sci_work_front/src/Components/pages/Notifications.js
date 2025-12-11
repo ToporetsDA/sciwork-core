@@ -1,19 +1,13 @@
-import { useEffect } from 'react'
+import { useEffect, useContext } from 'react'
 import '../../css/components/pages/Notifications.css'
 
 import * as Shared from './shared'
 
-const Notifications = ({
-    userData, setUserData,
-    state, setState,
-    projects, 
-    activities,
-    setData,
-    rights,
-    users, setUsers,
-    notifications, setNotifications,
-    recentActivities, setRecentActivities
-}) => {
+const Notifications = () => {
+
+    const {
+        notifications, setNotifications
+    } = useContext(Shared.AppContext)
     
     useEffect(() => {
         return () => {
@@ -63,21 +57,12 @@ const Notifications = ({
     return (
         <div className="notifications-container .page-wrapper-no-cp">
             <Shared.ItemTable
-                userData={userData}
-                projects={projects}
-                activities={activities}
-                setData={setData}
-                state={state}
-                setState={setState}
                 itemsToDisplay={notificationsToDisplay}
                 itemKeys={["state", "name", "generationTime", "generationDate"]}
                 //itemTypes
                 editable={false}
                 isItem={false}
                 linkActions={changeNotificationState}
-                rights={rights}
-                recentActivities={recentActivities}
-                setRecentActivities={setRecentActivities}
             />
         </div>
     )

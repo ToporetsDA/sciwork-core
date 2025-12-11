@@ -1,4 +1,4 @@
-import React  from 'react'
+import { useContext }  from 'react'
 import { SortableContext } from '@dnd-kit/sortable'
 import '../../../css/components/pages/shared/ItemTiles.css'
 
@@ -6,18 +6,17 @@ import * as Shared from './'
 import * as Items from '../../items'
 
 const ItemTiles = ({
-    userData,
-    projects,
-    activities,
-    setData,
-    state, setState,
     itemsToDisplay,
     containerId,
-    containerType,
-    rights,
-    users, setUsers,
-    recentActivities, setRecentActivities
+    containerType
 }) => {
+
+    const {
+        userData,
+        projects,
+        state,
+        rights
+    } = useContext(Shared.AppContext)
 
     const getItem = (item, index, dnd) => {
         const Component = (dnd) ? Shared.Item : Items.Project
@@ -25,21 +24,10 @@ const ItemTiles = ({
             <Component
                 key={item._id}
                 
-                userData={userData}
-                projects={projects}
-                activities={activities}
-                setData={setData}
-                state={state}
-                setState={setState}
                 item={item}
                 index={index}
                 containerId={containerId}//
                 containerType={containerType}//
-                rights={rights}
-                users={users}
-                setUsers={setUsers}
-                recentActivities={recentActivities}
-                setRecentActivities={setRecentActivities}
             />
         )
     }

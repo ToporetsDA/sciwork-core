@@ -1,9 +1,19 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { useNavigate } from "react-router-dom"
+import { useState, useRef, useEffect, useMemo, useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../css/components/AppHeader.css'
-import logo from "../logo.svg"
+import logo from '../logo.svg'
 
-const AppHeader = ({ state, setState, userData, setUserData, isLoggedIn, setLoggedIn, notifications, setNotifications, organisationType}) => {
+import * as Shared from './pages/shared'
+
+const AppHeader = () => {
+
+    const {
+        state, setState,
+        userData,
+        isLoggedIn, setLoggedIn,
+        notifications, setNotifications,
+        organisationType
+    } = useContext(Shared.AppContext)
 
     const navigate = useNavigate()
 

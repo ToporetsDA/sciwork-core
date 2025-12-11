@@ -1,26 +1,17 @@
-import React, { useEffect } from 'react'
+import { useEffect, useContext } from 'react'
 import { useLocation, useNavigate } from "react-router-dom"
 
 import AppContent from './AppContent'
 
 import * as Shared from './pages/shared'
 
-const AppDynamicContent = ({
-  userData, setUserData,
-  profileData,
-  state, setState,
-  isLoggedIn,
-  projects,
-  activities,
-  setData,
-  rights,
-  users, setUsers,
-  itemStructure,
-  defaultStructure,
-  isCompany,
-  notifications, setNotifications,
-  recentActivities, setRecentActivities
-}) => {
+const AppDynamicContent = () => {
+
+  const {
+    state, setState,
+    isLoggedIn,
+    projects,
+  } = useContext(Shared.AppContext)
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -92,26 +83,7 @@ const AppDynamicContent = ({
   }, [location.pathname, state, setState, projects, isLoggedIn, navigate])
   
   return (
-    <AppContent
-      userData={userData}
-      setUserData={setUserData}
-      profileData={profileData}
-      state={state}
-      setState={setState}
-      projects={projects}
-      activities={activities}
-      setData={setData}
-      rights={rights}
-      users={users}
-      setUsers={setUsers}
-      itemStructure={itemStructure}
-      defaultStructure={defaultStructure}
-      isCompany={isCompany}
-      notifications={notifications}
-      setNotifications={setNotifications}
-      recentActivities={recentActivities}
-      setRecentActivities={setRecentActivities}
-    />
+    <AppContent/>
   )
 }
 

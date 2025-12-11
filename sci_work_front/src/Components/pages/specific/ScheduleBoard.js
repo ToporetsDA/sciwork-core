@@ -1,18 +1,21 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, useContext } from 'react'
 import { useNavigate } from "react-router-dom"
 import '../../../css/components/pages/specific/ScheduleBoard.css'
 
 import * as Shared from '../shared'
 
 const ScheduleBoard = ({
-    projects,
-    state, setState,
     currentScale, setCurrentScale,
     gridValues, setGridValues,
     intervalAnchor,
     scheduleBoard,
-    recentActivities, setRecentActivities
 }) => {
+
+    const {
+        projects,
+        setState,
+        recentActivities, setRecentActivities
+    } = useContext(Shared.AppContext)
 
     const navigate = useNavigate()
     const goTo = Shared.goTo

@@ -5,16 +5,7 @@ import ScheduleBoard from './specific/ScheduleBoard'
 
 import * as Shared from './shared'
 
-const Schedule = ({
-    userData, setUserData,
-    state, setState,
-    projects,
-    activities,
-    setData,
-    itemsToDisplay, setItemsToDisplay,
-    rights,
-    recentActivities, setRecentActivities
-}) => {
+const Schedule = () => {
     
     const daysOfWeek = useMemo(() => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], [])
     const months = useMemo(() => ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'], [])
@@ -152,14 +143,6 @@ const Schedule = ({
     return (
         <>
             <Shared.ControlPanel
-                userData={userData}
-                setUserData={setUserData}
-                state={state}
-                setState={setState}
-                projects={projects}
-                activities={activities}
-                rights={rights}
-                setItemsToDisplay={setItemsToDisplay}
                 currentScale={currentScale}
                 setCurrentScale={setCurrentScale}
                 editIntervalAnchor={editIntervalAnchor}
@@ -192,17 +175,12 @@ const Schedule = ({
                         {scheduleHMap}
                     </div>
                     <ScheduleBoard
-                        projects={projects}
-                        state={state}
-                        setState={setState}
                         currentScale={currentScale}
                         setCurrentScale={setCurrentScale}
                         gridValues={gridValues}
                         setGridValues={setGridValues}
                         intervalAnchor={intervalAnchor}
                         scheduleBoard={scheduleBoard}
-                        recentActivities={recentActivities}
-                        setRecentActivities={setRecentActivities}
                     />
                 </div>
             </div>

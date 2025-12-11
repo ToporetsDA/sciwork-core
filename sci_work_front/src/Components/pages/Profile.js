@@ -1,9 +1,15 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import '../../css/components/pages/Profile.css'
 
 import * as Shared from './shared'
 
-const Profile = ({ userData, setUserData, profileData, rights }) => {
+const Profile = () => {
+
+    const {
+        userData, setUserData,
+        profileData,
+        rights
+    } = useContext(Shared.AppContext)
 
     const [editMode, setEditMode] = useState(false)
     const [tmpUserData, setTempData] = useState({ ...userData })

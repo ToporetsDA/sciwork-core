@@ -426,79 +426,80 @@ const App = () => {
   more organisation data  (like class, department) (optional)
   */
 
+  const vals = {
+    //tech
+    state: state,
+    isLoggedIn: isLoggedIn,
+    isCompany: isCompany,
+    rights: rights,
+    organisationType: isCompany,
+    profileData: defaultProfileData,
+    itemStructure: defaultItemStructure,
+    defaultStructure: defaultStructure,
+    //data
+    userData: userData,
+    projects: projects,
+    activities: activities,
+    users: users,
+    //metadata
+    notifications: notifications,
+    recentActivities: recentActivities,
+    
+    //tech
+    setState: setState,
+    setLoggedIn: setLoggedIn,
+    //data
+    setUserData: updateUser,
+    setData: updateData,
+    setUsers: updateUsers,
+    //metadata
+    setNotifications: setNotifications,
+    setRecentActivities: setRecentActivities,
+  }
+
   //Html
   return (
     <Router>
       <div className="App">
-        <AppHeader
-          state={state}
-          setState={setState}
-          userData={userData}
-          setUserData={setUserData}
-          isLoggedIn={isLoggedIn}
-          setLoggedIn={setLoggedIn}
-          notifications={notifications}
-          setNotifications={setNotifications}
-          organisationType={isCompany}
-        />
-        <div>
-          {isLoggedIn &&
-            <AppNav
-              projects={projects}
-              activities={activities}
-              state={state}
-              isLoggedIn={isLoggedIn}
-              organisationType={isCompany}
-              recentActivities={recentActivities}
-              setRecentActivities={setRecentActivities}
-            />
-          }
-          <Routes>
-            <Route path="*" element={
-              <AppDynamicContent
-                userData={userData}
-                setUserData={updateUser}
-                profileData={defaultProfileData}
-                state={state}
-                setState={setState}
-                isLoggedIn={isLoggedIn}
-                projects={projects}
-                activities={activities}
-                setData={updateData}
-                rights={rights}
-                users={users}
-                setUsers={updateUsers}
-                itemStructure={defaultItemStructure}
-                defaultStructure={defaultStructure}
-                isCompany={isCompany}
-                notifications={notifications}
-                setNotifications={setNotifications}
-                recentActivities={recentActivities}
-                setRecentActivities={setRecentActivities}
-              />
-            } />
-          </Routes>
-        </div>
+        <Shared.AppProvider
+          vals={vals}
+        >
+          <AppHeader/>
+          <div>
+            {isLoggedIn &&
+              <AppNav/>
+            }
+            <Routes>
+              <Route path="*" element={
+                <AppDynamicContent/>
+              } />
+            </Routes>
+          </div>
+        </Shared.AppProvider>
       </div>
     <AppConnection
       state={state}
       setState={setState}
+      //data
       userData={userData}
       setUserData={setUserData}
       projects={projects}
       setProjects={setProjects}
       activities={activities}
       setActivities={setActivities}
+      //tech+meta
       isLoggedIn={isLoggedIn}
       setLoggedIn={setLoggedIn}
       setRights={setRights}
       setUsers={setUsers}
+      //flags
       isUserUpdatingProjects={isUserUpdatingProjects}
       setIsUserUpdatingProjects={setIsUserUpdatingProjects}
       isUserUpdatingActivities={isUserUpdatingActivities}
       setIsUserUpdatingActivities={setIsUserUpdatingActivies}
       isUserUpdatingUserData={isUserUpdatingUserData}
       setIsUserUpdatingUserData={setIsUserUpdatingUserData}
+      //buffer
       previousVersionsRef={previousVersionsRef}
     />
   </Router>

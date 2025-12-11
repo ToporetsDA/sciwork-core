@@ -1,4 +1,4 @@
-import { Suspense, useState, useEffect }  from 'react'
+import { Suspense, useState, useEffect, useContext }  from 'react'
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners, useSensor, useSensors, } from '@dnd-kit/core'
 import { arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
 import '../../css/components/pages/Projects.css'
@@ -6,16 +6,16 @@ import '../../css/components/pages/Projects.css'
 import * as Shared from './shared'
 
 const Projects = ({
-    userData, setUserData,
-    state, setState,
-    projects, 
-    activities,
-    setData,
-    itemsToDisplay, setItemsToDisplay,
-    rights,
-    users, setUsers,
-    recentActivities, setRecentActivities
+    itemsToDisplay, setItemsToDisplay
 }) => {
+
+    const {
+        userData,
+        state,
+        projects, 
+        activities,
+        setData
+    } = useContext(Shared.AppContext)
 
     const displayOptions = new Map([
         ['tiles', 'grid'],
@@ -226,20 +226,9 @@ const Projects = ({
                 const items = (state.currentPage === "Projects") ? itemsToDisplay.projects : containers
                 return (
                     <Shared.ItemTiles
-                        userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
-                        state={state}
-                        setState={setState}
                         itemsToDisplay={items}
                         containerId={state.currentProject}
                         containerType={item}
-                        rights={rights}
-                        users={users}
-                        setUsers={setUsers}
-                        recentActivities={recentActivities}
-                        setRecentActivities={setRecentActivities}
                     />
                 )
             }
@@ -248,18 +237,9 @@ const Projects = ({
                     <Shared.Item
                         key={item._id}
                         
-                        userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
-                        state={state}
-                        setState={setState}
                         item={item}
                         containerId={state.currentProject}
                         containerType={"Project"}
-                        rights={rights}
-                        recentActivities={recentActivities}
-                        setRecentActivities={setRecentActivities}
                     />
                 )
             }
@@ -269,18 +249,9 @@ const Projects = ({
                     <Shared.Item
                         key={i._id}
                         
-                        userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
-                        state={state}
-                        setState={setState}
                         item={i}
                         containerId={activeId}
                         containerType={"Group"}
-                        rights={rights}
-                        recentActivities={recentActivities}
-                        setRecentActivities={setRecentActivities}
                     />
                 )
             }
@@ -293,13 +264,6 @@ const Projects = ({
     return (
         <>
             <Shared.ControlPanel
-                userData={userData}
-                setUserData={setUserData}
-                state={state}
-                setState={setState}
-                projects={projects}
-                activities={activities}
-                rights={rights}
                 setItemsToDisplay={setItemsToDisplay}
             />
             <div className={`page-wrapper ${displayOptions.get(userData.currentSettings.displayProjects)}`}>
@@ -310,21 +274,12 @@ const Projects = ({
                             getItemTiles("tiles", "Project")
                         ) : (
                             <Shared.ItemTable
-                                userData={userData}
-                                projects={projects}
-                                activities={activities}
-                                setData={setData}
-                                state={state}
-                                setState={setState}
                                 itemsToDisplay={projects}
                                 itemKeys={["name", "dndCount", "startDate", "endDate"]}
                                 //itemTypes
                                 editable={false}
                                 isItem={true}
                                 //linkActions
-                                rights={rights}
-                                recentActivities={recentActivities}
-                                setRecentActivities={setRecentActivities}
                             />
                         )}
                     </Suspense>

@@ -1,25 +1,16 @@
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, useContext } from 'react'
 import '../css/components/AppContent.css'
 import * as Pages from './pages'
 import * as Dialogs from './dialogs'
 
 import * as Shared from './pages/shared'
 
-const AppContent = ({
-    userData, setUserData,
-    profileData,
-    state, setState,
-    projects,
-    activities,
-    setData,
-    rights,
-    users, setUsers,
-    itemStructure,
-    defaultStructure,
-    isCompany,
-    notifications, setNotifications,
-    recentActivities, setRecentActivities
-}) => {
+const AppContent = () => {
+
+    const {
+        state,
+        projects
+    } = useContext(Shared.AppContext)
 
     // dialogs
 
@@ -66,48 +57,15 @@ const AppContent = ({
         <main className="content">
             {DialogComponent &&
                 <DialogComponent
-                    userData={userData}
-                    setUserData={setUserData}
-                    profileData={profileData}
-                    state={state}
-                    setState={setState}
-                    projects={projects}
-                    activities={activities}
-                    setData={setData}
                     itemsToDisplay={itemsToDisplay}
                     setItemsToDisplay={setItemsToDisplay}
-                    rights={rights}
-                    users={users}
-                    setUsers={setUsers}
-                    notifications={notifications}
-                    setNotifications={setNotifications}
-                    recentActivities={recentActivities}
-                    setRecentActivities={setRecentActivities}
-                    itemStructure={itemStructure}
-                    defaultStructure={defaultStructure}
-                    isCompany={isCompany}
                 />
             }
             {PageComponent ? (
                 <Suspense fallback={<div>Loading...</div>}>
                     <PageComponent
-                        userData={userData}
-                        setUserData={setUserData}
-                        profileData={profileData}
-                        state={state}
-                        setState={setState}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
                         itemsToDisplay={itemsToDisplay}
                         setItemsToDisplay={setItemsToDisplay}
-                        rights={rights}
-                        users={users}
-                        setUsers={setUsers}
-                        notifications={notifications}
-                        setNotifications={setNotifications}
-                        recentActivities={recentActivities}
-                        setRecentActivities={setRecentActivities}
                     />
                 </Suspense>
             ) : (

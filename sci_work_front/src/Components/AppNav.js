@@ -1,11 +1,19 @@
-import React from 'react'
+import { useContext } from 'react'
 import { useNavigate } from "react-router-dom"
 import '../css/components/AppNav.css'
 
 import * as Shared from './pages/shared'
 
-const AppNav = ({ projects, activities, state, isLoggedIn, organisationType, recentActivities, setRecentActivities }) => {
+const AppNav = () => {
   
+  const {
+    state,
+    projects,
+    isLoggedIn,
+    organisationType,
+    recentActivities, setRecentActivities
+  } = useContext(Shared.AppContext)
+
   const navigate = useNavigate()
 
   //project.name and activity.name pairs

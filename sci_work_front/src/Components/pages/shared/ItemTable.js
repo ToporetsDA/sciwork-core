@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useContext } from 'react'
 import { useNavigate } from "react-router-dom"
 import '../../../css/components/pages/shared/ItemTable.css'
 
@@ -14,20 +14,22 @@ Notifications
 */
 
 const ItemTable = ({
-    userData,
-    projects,
-    activities,
-    setData,
-    state, setState,
     itemsToDisplay,
     itemKeys,
     itemTypes,
     editable, //editable content
     isItem, //is project or activity
-    linkActions,
-    rights,
-    recentActivities, setRecentActivities
+    linkActions
 }) => {
+
+    const {
+        projects,
+        activities,
+        setData,
+        state,
+        rights,
+        recentActivities, setRecentActivities
+    } = useContext(Shared.AppContext)
 
     //navigation for projects
     const navigate = useNavigate()
@@ -62,15 +64,8 @@ const ItemTable = ({
             case "text": {
                 return (
                     <Items.Text
-                        userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
-                        state={state}
-                        setState={setState}
                         item={item}
                         data={`listItems.${index}.${key}`}
-                        rights={rights}
                     />
                 )
             }
@@ -246,13 +241,7 @@ const ItemTable = ({
                             {isItem && (!state.currentDialog?.name) &&
                                 <td onClick={(e) => e.stopPropagation()}>
                                     <Shared.ItemActions
-                                        userData={userData}
-                                        projects={projects}
-                                        activities={activities}
-                                        setData={setData}
-                                        setState={setState}
                                         item={item}
-                                        rights={rights}
                                     />
                                 </td>
                             }
