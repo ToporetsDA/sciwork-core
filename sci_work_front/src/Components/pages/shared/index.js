@@ -7,7 +7,7 @@ export { default as ItemTable }             from './ItemTable.js'
 export { default as ItemTiles }             from './ItemTiles.js'
 export { default as ToggleButton }          from './ToggleButton.js'
 
-export { AppContext, AppProvider }        from './UserContext'
+export { AppContext, AppProvider }          from './UserContext'
 //hooks
 export { default as useTimer }              from './useTimer.js'
 //methods

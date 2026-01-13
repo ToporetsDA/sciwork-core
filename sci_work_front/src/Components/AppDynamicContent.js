@@ -1,9 +1,10 @@
-import { useEffect, useContext } from 'react'
+// Libraries
+import { useEffect, useContext, useCallback } from 'react'
 import { useLocation, useNavigate } from "react-router-dom"
-
-import AppContent from './AppContent'
-
+// Styles, Classes, Constants
+// Methods, Components
 import * as Shared from './pages/shared'
+import AppContent from './AppContent'
 
 const AppDynamicContent = () => {
 
@@ -15,28 +16,28 @@ const AppDynamicContent = () => {
 
   const location = useLocation()
   const navigate = useNavigate()
+
+  const updateState = useCallback((page, project, activity) => {
+    if (state.currentPage === page && state.currentProject === project && state.currentActivity === activity) {
+      return
+    }
+    setState((prevState) => ({
+      ...prevState,
+      currentPage: page,
+      currentProject: project,
+      currentActivity: activity,
+      currentDialog: {
+        name: undefined,
+        params: []
+      }
+    }))
+  }, [state, setState])
   
   useEffect(() => {
     const pathParts = location.pathname.split('/').filter(Boolean)
 
     if (!isLoggedIn && pathParts[0] !== "HomePage") {
       navigate('/HomePage', { replace: true })
-    }
-
-    const updateState = (page, project, activity) => {
-      if (state.currentPage === page && state.currentProject === project && state.currentActivity === activity) {
-        return
-      }
-      setState((prevState) => ({
-        ...prevState,
-        currentPage: page,
-        currentProject: project,
-        currentActivity: activity,
-        currentDialog: {
-          name: undefined,
-          params: []
-        }
-      }))
     }
 
     let page = state.currentPage
@@ -80,7 +81,7 @@ const AppDynamicContent = () => {
 
     updateState(page, pr, act)
 
-  }, [location.pathname, state, setState, projects, isLoggedIn, navigate])
+  }, [updateState, location.pathname, state, setState, projects, isLoggedIn, navigate])
   
   return (
     <AppContent/>

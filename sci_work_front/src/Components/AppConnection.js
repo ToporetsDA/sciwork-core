@@ -1,16 +1,15 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+// Libraries
+import { useState, useRef, useEffect, useCallback, useContext } from 'react'
 import useWebSocket from 'react-use-websocket'
-
+// Styles, Classes, Constants
+import { createProjects, projectVerUp, createActivity, createActivities, activityVerUp } from './classes'
+// Methods, Components
+import * as Shared from './pages/shared'
 import LogIn from './dialogs/LogIn'
 
-import * as Shared from './pages/shared'
-
 const Connection = ({
-    state, setState,
-    userData, setUserData,
-    projects, setProjects,
-    activities, setActivities,
-    isLoggedIn, setLoggedIn,
+    setProjects,
+    setActivities,
     setRights,
     setUsers,
     isUserUpdatingProjects, setIsUserUpdatingProjects,
@@ -18,6 +17,14 @@ const Connection = ({
     isUserUpdatingUserData, setIsUserUpdatingUserData,
     previousVersionsRef
 }) => {
+
+    const {
+        state, setState,
+        userData, setUserData,
+        projects,
+        activities,
+        isLoggedIn, setLoggedIn
+    } = useContext(Shared.AppContext)
 
     const [servers, setServers] = useState([])
     const [loading, setLoading] = useState(true)
@@ -104,7 +111,7 @@ const Connection = ({
                     case "all": {
                         setUserData(data.user)
                         console.log(data.items)
-                        setProjects(data.items)
+                        setProjects(createProjects(data.items))
                         setRights(data.organisation.rights)
                         setUsers(data.users)
                         break
@@ -118,19 +125,19 @@ const Connection = ({
                         break
                     }
                     case "data": {
-                        setProjects(data)
+                        setProjects(createProjects(data))
                         break
                     }
                     case "project": {
                         const updatedData = currentData.map(item =>
                             item._id === data._id ? data : item
                         )
-                        setProjects(updatedData)
+                        setProjects(createProjects(updatedData))
                         break
                     }
                     case "activities": {//add along with activity templates
                         console.log("activities", data)
-                        setActivities(data)
+                        setActivities(createActivities(data))
                         break
                     }
                     case "activity": {
@@ -138,13 +145,15 @@ const Connection = ({
                         if (Shared.getItemById(activities, data._id)?._id) {
                             setActivities(prevActivities =>
                                 prevActivities.map(act =>
-                                    act._id === data._id ? data : act
+                                    act._id === data._id
+                                        ? createActivity(data)
+                                        : act
                                 )
                             )
                         }
                         //add
                         else {
-                            setActivities(prevActivities => [...prevActivities, data])
+                            setActivities(prevActivities => [...prevActivities, createActivity(data)])
                         }
                         break
                     }
@@ -188,18 +197,18 @@ const Connection = ({
                     }
                     else if (data.id.includes(".")) {
                         setActivities(prevItems => 
-                            prevItems.map(i => {
-                                return i._id === data.id
-                                    ? { ...i, __v: i.__v + 1 }
-                                    : i
+                            prevItems.map(a => {
+                                return a._id === data.id
+                                    ? activityVerUp(a)
+                                    : a
                             })
                         )
                     }
                     else if (!data.id.includes(".")) {
-                        setProjects(prevItems => 
+                        setProjects(prevItems =>
                             prevItems.map(p => {
                                 return p._id === data.id
-                                    ? { ...p, __v: p.__v + 1 }
+                                    ? projectVerUp(p)
                                     : p
                             })
                         )

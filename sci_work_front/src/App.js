@@ -1,131 +1,43 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+// Libraries
+import { useState, useEffect, useRef, useMemo, useCallback }  from 'react'
+import { BrowserRouter as Router, Routes, Route }             from 'react-router-dom'
+//Styles, Classes, Constants
 import './App.css'
-
-import { useTimer } from './Components/pages/shared'
-
-import AppConnection from './Components/AppConnection'
-import AppHeader from './Components/AppHeader'
-import AppNav from './Components/AppNav'
-import AppDynamicContent from './Components/AppDynamicContent'
-
-import * as Shared from './Components/pages/shared'
+import { createState, createUserData, createNotification } from './classes'
+import { DEFAULT_PROFILE_DATA, DEFAULT_ITEM_STRUCTURE } from './constants'
+//Methods, Components
+import * as Shared        from './Components/pages/shared'
+import { useTimer }       from './Components/pages/shared'
+import AppConnection      from './Components/AppConnection'
+import AppHeader          from './Components/AppHeader'
+import AppNav             from './Components/AppNav'
+import AppDynamicContent  from './Components/AppDynamicContent'
 
 const App = () => {
 
-  const [state, setState] = useState({
-    currentPage: 'HomePage',   //string
-    currentProject: undefined,  //string
-    currentActivity: undefined, //string
-    currentDialog: {
-      name: undefined,  //string
-      params: []        //[any]
-    }
-  })
-  
+  const [state, setState] = useState(() => createState("HomePage"))
+
   //user
   
-  //genStatus: 0 - item creator/organisation owner, 1 - manager (add/edit items), 2 - supervisor, 3 - user
-  const [userData, setUserData] = useState(
-    {
-      genStatus: -1,
-      currentSettings: {
-        notificationsPeriod: 5,
-        notificationsDelay: 15,
-        displayProjects: "grid"
-      }
-    }
-  )
-
+  const [userData, setUserData] = useState(() => createUserData())
   const [rights, setRights] = useState()
-
-  const defaultProfileData = {// [isRequired, type]
-    basic: {
-      name:         [true,  'string'],
-      middleName:   [false, 'string'],
-      surName:      [true,  'string'],
-      patronimic:   [false, 'string'],
-      statusName:   [true,  'string'],
-      mail:         [true,  'mail'],
-      safetyMail:   [false, 'mail'],
-      phone:        [false, 'phone'],
-      safetyPhone:  [false, 'phone'],
-    },
-    fixed: ['genStatus', 'statusName', 'id'],//fields that can not be edited
-    additional: {
-      //will be added in beta-version
-    }
-  }
 
   //items
 
-  const defaultItemStructure = {
-    project: {
-      name: 'text',
-      startDate: 'date',
-      endDate: 'date',
-    },
-    activity: {
-      name: 'text',
-      startDate: 'date',
-      endDate: 'date',
-      isTimed: 'checkbox',
-      startTime: 'time',
-      endTime: 'time',
-      type: 'list',
-      repeat: 'checkbox',
-      days: 'list',
-      thirdParty: 'checkbox',
-      serviceName: 'text'
-    },
-    lists: {
-      days: { many: true, options: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']},
-      type: { many: false, options: [/*'Dev',*/ 'Group', 'Text', 'Chat', 'List', 'Table', 'Attendance', 'Report', /*'Test'*/]}
-    },
-    checks: {
-      days:         {val: true, dep: "repeat"},
-      serviceName:  {val: true, dep: "thirdParty"},
-      startTime:    {val: true, dep: "isTimed"},
-      endTime:      {val: true, dep: "isTimed"},
-    }
-  }
-
-  const defaultStructure = useMemo(() => {
-    return {
-      project: {
-        name: '',
-        startDate: '',
-        endDate: '',
-        activities: [],
-        userList: []
-      },
-      activity: {
-        name: '',
-        startDate: '',
-        endDate: '',
-        isTimed: true,
-        startTime: '',
-        endTime: '',
-        type: 'Dev',
-        repeat: false,
-        days: [],
-        thirdParty: false,
-        serviceName: ''
-      }
-    }
-  }, [])
-
+  const defaultStructure = useMemo(() => DEFAULT_ITEM_STRUCTURE, [])
   const [projects, setProjects] = useState([])
-
   const [activities, setActivities] = useState([])
 
-  //header
+  //header !!!has to be mutable!!!
+
   const isCompany = true
 
   //nav
+
   const [recentActivities, setRecentActivities] = useState([])
 
   //login
+
   const [isLoggedIn, setLoggedIn] = useState(false)
 
   //connection
@@ -167,12 +79,21 @@ const App = () => {
       flag = setIsUserUpdatingActivies
     }
 
+    const saveChanges = (item) => { // save changes to item and set it's _id as flag
+      flag(item._id)
+      setter(prevItems => 
+        prevItems.map(i =>
+          i._id === item._id ? item : i
+        )
+      )
+    }
+
     switch(action) {
       case "add": {
         setPr()
         //projects
         if (!item._id.includes('.')) {
-
+          //save changes
           flag(item._id)
           setter(prevItems => [ ...prevItems, item ])
         }
@@ -201,12 +122,7 @@ const App = () => {
             container.activities.splice(index + 1, 0, activity)
           }
           
-          flag(project._id)
-          setter(prevItems => 
-            prevItems.map(i =>
-              i._id === clone._id ? clone : i
-            )
-          )
+          saveChanges(project)
         }
         break
       }
@@ -214,29 +130,19 @@ const App = () => {
         setPr()
         //project
         if (!item._id.includes('.')) {
-          flag(item._id)
-          setter(prevItems => 
-            prevItems.map(i =>
-              i._id === item._id ? item : i
-            )
-          )
+          saveChanges(item)
         }
         //activity
         else {
           const project = Shared.getItemById(projects, state.currentProject)
           if (!project) return
 
-          const { item: target } = Shared.findItemWithParent(project.activities, "_id", item._id, project)
-          if (!target) return
+          const { item: activity } = Shared.findItemWithParent(project.activities, "_id", item._id, project)
+          if (!activity) return
 
-          Object.assign(target, item)
-          console.log("now I should have updated activity", project, target, item)
-          flag(project._id)
-          setter(prevItems => 
-            prevItems.map(i =>
-              i._id === project._id ? project : i
-            )
-          )
+          Object.assign(activity, item)
+          
+          saveChanges(project)
         }
         break
       }
@@ -284,7 +190,6 @@ const App = () => {
         console.log("No such action to updateData")
       }
     }
-    // console.log("from updateData: ", data)
   }
 
   const updateUser = (newData, currentSettingsEdit) => {
@@ -294,6 +199,7 @@ const App = () => {
     }
 
     setIsUserUpdatingUserData(true)
+
     if (currentSettingsEdit) {
       setUserData((prevUserData) => ({
           ...prevUserData,
@@ -318,6 +224,7 @@ const App = () => {
   const period = useMemo(() => userData.currentSettings.notificationsPeriod, [userData])
   const delay = useMemo(() => userData.currentSettings.notificationsDelay, [userData])
 
+  //create Notifications
   const checkActivities = useCallback((now, period, delay) => {
 
     const updated = [...notificationsRef.current]
@@ -338,14 +245,7 @@ const App = () => {
         if (add) {
           const alreadyNotified = updated.find(n => n._id === _id)
           if (!alreadyNotified && activity.deleted !== true) {
-            updated.push({
-              _id,
-              state: "unseen",
-              page: activity.page || false,
-              content: "Starts soon",
-              generationDate: now.toISOString().slice(0, 10),
-              generationTime: now.toTimeString().slice(0, 5)
-            })
+            updated.push(createNotification(_id, "unseen", activity.page, "Starts soon", now))
           }
         }
         if (remove) {
@@ -426,6 +326,7 @@ const App = () => {
   more organisation data  (like class, department) (optional)
   */
 
+  // Values for Provider
   const vals = {
     //tech
     state: state,
@@ -433,8 +334,8 @@ const App = () => {
     isCompany: isCompany,
     rights: rights,
     organisationType: isCompany,
-    profileData: defaultProfileData,
-    itemStructure: defaultItemStructure,
+    profileData: DEFAULT_PROFILE_DATA,
+    itemStructure: DEFAULT_ITEM_STRUCTURE,
     defaultStructure: defaultStructure,
     //data
     userData: userData,
@@ -460,48 +361,40 @@ const App = () => {
   //Html
   return (
     <Router>
-      <div className="App">
-        <Shared.AppProvider
-          vals={vals}
-        >
-          <AppHeader/>
-          <div>
-            {isLoggedIn &&
-              <AppNav/>
-            }
-            <Routes>
-              <Route path="*" element={
-                <AppDynamicContent/>
-              } />
-            </Routes>
-          </div>
-        </Shared.AppProvider>
-      </div>
-    <AppConnection
-      state={state}
-      setState={setState}
-      //data
-      userData={userData}
-      setUserData={setUserData}
-      projects={projects}
-      setProjects={setProjects}
-      activities={activities}
-      setActivities={setActivities}
-      //tech+meta
-      isLoggedIn={isLoggedIn}
-      setLoggedIn={setLoggedIn}
-      setRights={setRights}
-      setUsers={setUsers}
-      //flags
-      isUserUpdatingProjects={isUserUpdatingProjects}
-      setIsUserUpdatingProjects={setIsUserUpdatingProjects}
-      isUserUpdatingActivities={isUserUpdatingActivities}
-      setIsUserUpdatingActivities={setIsUserUpdatingActivies}
-      isUserUpdatingUserData={isUserUpdatingUserData}
-      setIsUserUpdatingUserData={setIsUserUpdatingUserData}
-      //buffer
-      previousVersionsRef={previousVersionsRef}
-    />
+      <Shared.AppProvider
+        vals={vals}
+      >
+        <div className="App">
+            <AppHeader/>
+            <div>
+              {isLoggedIn &&
+                <AppNav/>
+              }
+              <Routes>
+                <Route path="*" element={
+                  <AppDynamicContent/>
+                } />
+              </Routes>
+            </div>
+        </div>
+        <AppConnection
+          //data
+          setProjects={setProjects}
+          setActivities={setActivities}
+          //tech+meta
+          setRights={setRights}
+          setUsers={setUsers}
+          //flags
+          isUserUpdatingProjects={isUserUpdatingProjects}
+          setIsUserUpdatingProjects={setIsUserUpdatingProjects}
+          isUserUpdatingActivities={isUserUpdatingActivities}
+          setIsUserUpdatingActivities={setIsUserUpdatingActivies}
+          isUserUpdatingUserData={isUserUpdatingUserData}
+          setIsUserUpdatingUserData={setIsUserUpdatingUserData}
+          //buffer
+          previousVersionsRef={previousVersionsRef}
+        />
+      </Shared.AppProvider>
   </Router>
   )
 }

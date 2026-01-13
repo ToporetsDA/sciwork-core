@@ -1,7 +1,11 @@
+// Libraries
 import { useEffect, useState, useCallback, useMemo, useContext } from 'react'
 import { useNavigate } from "react-router-dom"
+// Styles, Classes, Constants
 import '../../../css/components/pages/specific/ScheduleBoard.css'
-
+import { createScheduleItem } from '../../classes'
+import { DAYS_OF_WEEK_SHORT } from './constants'
+// Methods, Components
 import * as Shared from '../shared'
 
 const ScheduleBoard = ({
@@ -107,13 +111,6 @@ const ScheduleBoard = ({
     // Determine data to display based on the scale
     //I need to modify data first! I mean creating start-end activities before filtering by rangeToDisplay
 
-    const formatDate = (date) => {
-        const year = date.getFullYear()
-        const month = (date.getMonth() + 1).toString().padStart(2, '0') // Add leading zero if needed
-        const day = date.getDate().toString().padStart(2, '0') // Add leading zero if needed
-        return `${year}-${month}-${day}`
-    }
-
     const rangeToDisplay = useMemo(() => ({
         week: {
             start: new Date(intervalAnchor.getFullYear(), intervalAnchor.getMonth(), intervalAnchor.getDate() - ((intervalAnchor.getDay() === 0) ? 6 : intervalAnchor.getDay() - 1)),
@@ -138,29 +135,12 @@ const ScheduleBoard = ({
             .flatMap(activity => {
     
                 if (activity.startDate === activity.endDate) {// Single-day activity
-                    return [{
-                        ...activity,
-                        eventId: activity._id
-                    }]
+                    return createScheduleItem(activity, "activity")
                 }
     
                 // Multi-day activity
-                const startItem = {
-                    ...activity,
-                    name: `${activity.name} - Start`,
-                    startDate: activity.startDate,
-                    endDate: activity.startDate,
-                    type: 'activity',
-                    eventId: activity._id + '.start'
-                }
-                const endItem = {
-                    ...activity,
-                    name: `${activity.name} - End`,
-                    startDate: activity.endDate,
-                    endDate: activity.endDate,
-                    type: 'activity',
-                    eventId: activity._id + '.end'
-                }
+                const startItem = createScheduleItem(activity, "activity", "start")
+                const endItem = createScheduleItem(activity, "activity", "end")
 
                 let repeatItems = []
 
@@ -171,16 +151,11 @@ const ScheduleBoard = ({
                     start.setDate(start.getDate() + 1)
                     const end = new Date(activity.endDate)
                     const daysOfWeek = activity.days.map(day => {
-                        switch(day) {
-                            case 'Mon': return 1
-                            case 'Tue': return 2
-                            case 'Wed': return 3
-                            case 'Thu': return 4
-                            case 'Fri': return 5
-                            case 'Sat': return 6
-                            case 'Sun': return 0
-                            default: return -1
+                        const d = DAYS_OF_WEEK_SHORT.indexOf(day)
+                        if (d === -1) {
+                            return -1
                         }
+                        return (d + 1) % 7
                     })
             
                     // Loop through the days between startDate and endDate
@@ -188,15 +163,7 @@ const ScheduleBoard = ({
                         // Check if the day is one of the repeating days
                         if (daysOfWeek.includes(d.getDay())) {
 
-                            const repeatItem = {
-                                ...activity,
-                                name: `${activity.name} - Repeat (${d.toLocaleDateString()})`,
-                                startDate: formatDate(d),
-                                endDate: formatDate(d),
-                                type: 'activity',
-                                eventId: activity._id + '_' + d.toLocaleDateString() // Use the date as part of the ID to make it unique
-                            }
-            
+                            const repeatItem = createScheduleItem(activity, "activity", `repeat`, d)
                             repeatItems.push(repeatItem)
                         }
                     }
@@ -209,24 +176,8 @@ const ScheduleBoard = ({
 
         const filteredProjects = projects.flatMap(project => {
     
-            const startItem = {
-                ...project,
-                name: `${project.name} - Start`,
-                startDate: project.startDate,
-                endDate: project.startDate,
-                type: 'project',
-                eventId: project._id + '_0',
-                page: true
-            }
-            const endItem = {
-                ...project,
-                name: `${project.name} - End`,
-                startDate: project.endDate,
-                endDate: project.endDate,
-                type: 'project',
-                eventId: project._id + '_1',
-                page: true
-            }
+            const startItem = createScheduleItem(project, "project", "start")
+            const endItem = createScheduleItem(project, "project", "end")
 
             return [startItem, endItem]
         })

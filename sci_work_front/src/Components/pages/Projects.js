@@ -1,8 +1,11 @@
+// Libraries
 import { Suspense, useState, useEffect, useContext }  from 'react'
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners, useSensor, useSensors, } from '@dnd-kit/core'
 import { arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
+// Styles, Classes, Constants
 import '../../css/components/pages/Projects.css'
-
+import { DISPLAY_OPTIONS } from '../../constants'
+// Methods, Components
 import * as Shared from './shared'
 
 const Projects = ({
@@ -16,12 +19,6 @@ const Projects = ({
         activities,
         setData
     } = useContext(Shared.AppContext)
-
-    const displayOptions = new Map([
-        ['tiles', 'grid'],
-        ['list', 'flex'],
-        ['table', 'table']
-    ])
 
     const [activeId, setActiveId] = useState(null)
     const [prevDnd, setPrevDnd] = useState(null)
@@ -266,10 +263,10 @@ const Projects = ({
             <Shared.ControlPanel
                 setItemsToDisplay={setItemsToDisplay}
             />
-            <div className={`page-wrapper ${displayOptions.get(userData.currentSettings.displayProjects)}`}>
+            <div className={`page-wrapper ${DISPLAY_OPTIONS.get(userData.currentSettings.displayProjects)}`}>
                 {(state.currentPage === "Projects") ? (
                     <Suspense fallback={<div>Loading projects...</div>}>
-                        {displayOptions.get(userData.currentSettings.displayProjects) !== 'table' ?
+                        {DISPLAY_OPTIONS.get(userData.currentSettings.displayProjects) !== 'table' ?
                         (
                             getItemTiles("tiles", "Project")
                         ) : (

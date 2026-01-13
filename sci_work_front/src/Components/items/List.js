@@ -1,10 +1,11 @@
-import { useEffect, useState, useMemo } from 'react'
+// Libraries
+import { useEffect, useState, useMemo, useContext } from 'react'
 import { DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
+// Styles, Classes, Constants
 import '../../css/components/items/List.css'
-
+// Methods, Components
 import * as Shared from '../pages/shared'
-import * as Items from './'
 
 /*structure
 activity: {
@@ -47,19 +48,18 @@ activity: {
 */
 
 const List = ({
-    userData,
-    projects,
-    activities,
-    setData,
-    state, setState,
     item,
-    index,
     containerId,
-    containerType,
-    rights,
-    users, setUsers,
-    recentActivities, setRecentActivities
 }) => {
+
+    const {
+        userData,
+        projects,
+        activities,
+        setData,
+        state, setState,
+        rights
+    } = useContext(Shared.AppContext)
 
     const activity = Shared.getItemById(activities, item._id)
 
@@ -137,20 +137,9 @@ const List = ({
                     <Shared.ItemTiles
                         key={item._id}
                         
-                        userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
-                        state={state}
-                        setState={setState}
                         itemsToDisplay={items}
                         containerId={item._id}
                         containerType={item.type}
-                        rights={rights}
-                        users={users}
-                        setUsers={setUsers}
-                        recentActivities={recentActivities}
-                        setRecentActivities={setRecentActivities}
                     />
                 </SortableContext>
             </DndContext>
@@ -218,21 +207,12 @@ const List = ({
                 )
                 return (
                     <Shared.ItemTable
-                        userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
-                        state={state}
-                        setState={setState}
                         itemsToDisplay={items}
                         itemKeys={itemKeys}
                         itemTypes={activity?.content.liStructure}
                         editable={true}
                         isItem={false}
                         //linkActions
-                        rights={rights}
-                        recentActivities={recentActivities}
-                        setRecentActivities={setRecentActivities}
                     />
                 )
             }

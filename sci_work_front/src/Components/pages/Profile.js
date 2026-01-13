@@ -1,6 +1,8 @@
+// Libraries
 import { useState, useContext } from 'react'
+// Styles, Classes, Constants
 import '../../css/components/pages/Profile.css'
-
+// Methods, Components
 import * as Shared from './shared'
 
 const Profile = () => {
@@ -54,22 +56,24 @@ const Profile = () => {
                     <div className="account-field" key={key}>
                         {(editMode) ? (
                             <>
-                                {Shared.getInput(
-                                    key,
-                                    "text",
-                                    key === 'statusName'
-                                        ? (rights.names[userData.genStatus] || ' ')
-                                        : (tmpUserData[key] || ' '),
+                                {
+                                    Shared.getInput(
+                                        key,
+                                        "text",
+                                        key === 'statusName'
+                                            ? (rights.names[userData.genStatus] || ' ')
+                                            : (tmpUserData[key] || ' '),
                                         false,
-                                    (e) => {
-                                        if (!profileData.fixed.includes(key)) {
-                                            handleInputChange(key, e.target.value)
-                                        }
-                                    },
-                                    profileData.fixed.includes(key),
-                                    null,
-                                    80
-                                )}
+                                        (e) => {
+                                            if (!profileData.fixed.includes(key)) {
+                                                handleInputChange(key, e.target.value)
+                                            }
+                                        },
+                                        profileData.fixed.includes(key),
+                                        null,
+                                        80
+                                    )
+                                }
                                 <p className='required'>
                                     {isRequired && editMode && !profileData.fixed.includes(key) && '*'}
                                 </p>

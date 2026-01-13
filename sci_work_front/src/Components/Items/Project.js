@@ -1,19 +1,19 @@
-import { useNavigate } from "react-router-dom"
+// Libraries
+import { useNavigate, useContext } from "react-router-dom"
+// Styles, Classes, Constants
 import '../../css/components/items/Project.css'
-
+// Methods, Components
 import * as Shared from '../pages/shared'
 
 const Project = ({
-    userData,
-    projects,
-    setData,
-    state,
-    setState,
     item,
-    index,
-    rights,
-    recentActivities, setRecentActivities
+    index
 }) => {
+
+    const {
+        projects,
+        recentActivities, setRecentActivities
+    } = useContext(Shared.AppContext)
 
     const navigate = useNavigate()
 
@@ -37,12 +37,7 @@ const Project = ({
                 {item.startDate ? item.startDate : 'N/A'} - {item.endDate}
             </p>
             <Shared.ItemActions
-                userData={userData}
-                projects={projects}
-                setData={setData}
-                setState={setState}
                 item={item}
-                rights={rights}
             />
         </div>
     )

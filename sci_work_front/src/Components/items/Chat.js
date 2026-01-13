@@ -1,21 +1,19 @@
-import { useState } from 'react'
-
+// Libraries
+import { useState, useContext } from 'react'
+// Styles, Classes, Constants
+import { createMessage } from '../../classes'
+// Methods, Components
 import * as Shared from '../pages/shared'
 
 const Chat = ({
-    userData,
-    projects,
-    activities,
-    setData,
-    state, setState,
-    item,
-    index,
-    containerId,
-    containerType,
-    rights,
-    users, setUsers,
-    recentActivities, setRecentActivities
+    item
 }) => {
+
+    const {
+        userData,
+        activities,
+        setData
+    } = useContext(Shared.AppContext)
 
     const activity = Shared.getItemById(activities, item._id)
     //will need to save tmp message as "sending..."
@@ -40,12 +38,7 @@ const Chat = ({
 
         const date = formatDate(new Date())
 
-        const newMessage = {
-            _id: `${activity._id}.${activity.content?.messageCount}`,
-            sender: userData._id,
-            content: trimmed,
-            dateTime: date
-        }
+        const newMessage = createMessage(activity, userData, trimmed, date)
 
         activity.content.messageCount++
         activity.content.listItems.push(newMessage)
@@ -60,20 +53,9 @@ const Chat = ({
         <div className="wrapper">
             {item?.name}
             <Shared.ItemTiles
-                userData={userData}
-                projects={projects}
-                activities={activities}
-                setData={setData}
-                state={state}
-                setState={setState}
                 itemsToDisplay={activity?.content?.listItems || []}
                 containerId={item._id}
                 containerType={item.type}
-                rights={rights}
-                users={users}
-                setUsers={setUsers}
-                recentActivities={recentActivities}
-                setRecentActivities={setRecentActivities}
             />
             <div className="chat-input-row" style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
                 <input

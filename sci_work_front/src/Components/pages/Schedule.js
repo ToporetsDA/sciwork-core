@@ -1,14 +1,13 @@
+// Libraries
 import { useState, useCallback, useMemo } from 'react'
+// Styles, Classes, Constants
 import '../../css/components/pages/Schedule.css'
-
+import { DAYS_OF_WEEK, MONTHS } from '../../constants'
+// Methods, Components
+import * as Shared from './shared'
 import ScheduleBoard from './specific/ScheduleBoard'
 
-import * as Shared from './shared'
-
 const Schedule = () => {
-    
-    const daysOfWeek = useMemo(() => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], [])
-    const months = useMemo(() => ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'], [])
 
     //date data
     const now = useMemo(() => new Date(), [])
@@ -70,7 +69,7 @@ const Schedule = () => {
             const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay
             startOfWeek.setDate(startOfWeek.getDate() + mondayOffset)
     
-            return daysOfWeek.map((day, index) => {
+            return DAYS_OF_WEEK.map((day, index) => {
                 const dayDate = new Date(startOfWeek)
                 dayDate.setDate(dayDate.getDate() + index) // Increment day by index
                 
@@ -84,10 +83,10 @@ const Schedule = () => {
             })
         }
         if (currentScale === 'year') {
-            return months.map((month, index) => <div key={'v-' + index} className="top-label">{month}</div>)
+            return MONTHS.map((month, index) => <div key={'v-' + index} className="top-label">{month}</div>)
         }
         return []
-    }, [currentScale, intervalAnchor, daysOfWeek, months])
+    }, [currentScale, intervalAnchor])
 
     const scheduleHMap = useMemo(() => {
 
@@ -152,7 +151,7 @@ const Schedule = () => {
                     <p className='warning'>Not timed events are not displayed at weekly scale</p>
                 }
                 <p className='current-map'>
-                {currentScale!=='year' && months[intervalAnchor.getMonth()]} {intervalAnchor.getFullYear()}
+                {currentScale!=='year' && MONTHS[intervalAnchor.getMonth()]} {intervalAnchor.getFullYear()}
                 </p>
                 <div
                     className="schedule-v-map"

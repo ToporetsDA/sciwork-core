@@ -1,8 +1,11 @@
+// Libraries
 import { useContext }  from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+// Styles, Classes, Constants
 import '../../../css/components/pages/shared/Item.css'
-
+import { ITEM_TYPES } from '../../../constants'
+// Methods, Components
 import * as Shared from "./"
 import * as Items from '../../items'
 import * as SubItems from '../../items/subItems'
@@ -21,24 +24,12 @@ const Item = ({
         rights
     } = useContext(Shared.AppContext)
 
-    const types = {
-        Dev: "Dev",
-        Group: "Group",
-        Text: "Text",
-        List: "List",
-        Table: "List",
-        Attendance: "List",
-        Report: "List",
-        Chat: "Chat",
-        Page: "Dev"
-    }
-
     const isItem = (item !== true)
     //if there are no Items in project - ➕ Add below button is always visible
     const classCondition = (!isItem && index === 0)
 
     const getComponentType = () => {
-        const itemsType = types[item.type] || "Dev"
+        const itemsType = ITEM_TYPES[item.type] || "Dev"
         let type
         if (isItem) {
             switch (containerType) {

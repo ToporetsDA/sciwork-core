@@ -1,7 +1,10 @@
+// Libraries
 import { useContext }  from 'react'
 import { SortableContext } from '@dnd-kit/sortable'
+// Styles, Classes, Constants
 import '../../../css/components/pages/shared/ItemTiles.css'
-
+import { ITEM_TYPES_LIST_BASED } from '../../../constants'
+// Methods, Components
 import * as Shared from './'
 import * as Items from '../../items'
 
@@ -49,7 +52,7 @@ const ItemTiles = ({
     const canEdit = getAccess()
     const noParent = !containerId
     const isInContainerItem = containerType === "Group"
-    const isInListBasedItem = ["List", "Chat", "Attendance", "Report"].includes(containerType)
+    const isInListBasedItem = ITEM_TYPES_LIST_BASED.includes(containerType)
 
     return (
         <>

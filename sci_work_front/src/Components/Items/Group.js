@@ -1,8 +1,9 @@
+// Libraries
 import { useState } from 'react'
+// Styles, Classes, Constants
 import '../../css/components/items/Group.css'
-
+// Methods, Components
 import * as Shared from '../pages/shared'
-import * as Items from './'
 
 /*structure
 activity: {
@@ -17,15 +18,7 @@ activity: {
 */
 
 const Group = ({
-    userData,
-    projects,
-    activities,
-    setData,
-    state, setState,
-    item,
-    rights,
-    recentActivities,
-    setRecentActivities
+    item
 }) => {
 
     const [showActivities, setShowActivities] = useState(true)
@@ -48,18 +41,9 @@ const Group = ({
             </button>
             {showActivities && !item?.deleted &&
                 <Shared.ItemTiles
-                    userData={userData}
-                    projects={projects}
-                    activities={activities}
-                    setData={setData}
-                    state={state}
-                    setState={setState}
                     itemsToDisplay={item.activities}
                     containerId={item._id}
                     containerType={item.type}
-                    rights={rights}
-                    recentActivities={recentActivities}
-                    setRecentActivities={setRecentActivities}
                 />
             }
         </div>

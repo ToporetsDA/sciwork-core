@@ -1,21 +1,22 @@
+// Libraries
+import { useContext } from 'react'
 import { useNavigate } from "react-router-dom"
+// Styles, Classes, Constants
 import '../../css/components/items/Dev.css'
-
+// Methods, Components
 import * as Shared from '../pages/shared'
 
 const Dev = ({
-    userData, setUserData,
-    state, setState,
-    projects,
-    activities,
-    setData,
     item,
-    index,
-    rights,
-    recentActivities, setRecentActivities
+    index
 }) => {
     
     const navigate = useNavigate()
+
+    const {
+        projects,
+        recentActivities, setRecentActivities
+    } = useContext(Shared.AppContext)
 
     return (
         <div

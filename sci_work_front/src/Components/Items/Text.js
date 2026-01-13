@@ -1,6 +1,8 @@
-import { useState, useRef, useEffect} from 'react'
+// Libraries
+import { useState, useRef, useEffect, useContext } from 'react'
+// Styles, Classes, Constants
 import '../../css/components/items/Text.css'
-
+// Methods, Components
 import * as Shared from '../pages/shared'
 
 /* structure
@@ -16,15 +18,18 @@ import * as Shared from '../pages/shared'
 */
 
 const Text = ({
-    userData,
-    projects,
-    activities,
-    setData,
-    state, setState,
     item,
-    data = "text",
-    rights
+    data = "text"
 }) => {
+
+    const {
+        userData,
+        projects,
+        activities,
+        setData,
+        state,
+        rights
+    } = useContext(Shared.AppContext)
 
     const parts = item._id.split('.')
     const activityId = parts[0] + '.' + parts[1]
@@ -94,7 +99,7 @@ const Text = ({
         }
     }
 
-    let itemToEdit = (metaActivity?.userData) ? metaActivity : project
+    const itemToEdit = (metaActivity?.userData) ? metaActivity : project
 
     return (
         (rights.edit.includes(Shared.getAccess(itemToEdit, userData))) ? (

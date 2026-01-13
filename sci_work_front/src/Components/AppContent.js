@@ -1,9 +1,12 @@
+// Libraries
 import { useState, useEffect, Suspense, useContext } from 'react'
+// Styles, Classes, Constants
 import '../css/components/AppContent.css'
+import { createItemsToDisplay } from '../classes'
+// Methods, Components
+import * as Shared from './pages/shared'
 import * as Pages from './pages'
 import * as Dialogs from './dialogs'
-
-import * as Shared from './pages/shared'
 
 const AppContent = () => {
 
@@ -18,21 +21,22 @@ const AppContent = () => {
         return Dialogs[dialogName.replace(/\s+/g, '')]
     }
 
-    const DialogComponent = (state.currentDialog.name !== undefined && state.currentDialog.name !== "LogIn") ? loadDialogComponent(state.currentDialog.name) : undefined
+    const DialogComponent = (state.currentDialog.name !== undefined && state.currentDialog.name !== "LogIn")
+        ? loadDialogComponent(state.currentDialog.name)
+        : undefined
 
     // pages
     
     const loadPageComponent = (pageName) => {
-        let formattedPageName
         switch(pageName) {
             case"Subjects":
             case"Project": {
-                formattedPageName = "Projects"
-                break
+                return Pages["Projects".replace(/\s+/g, '')]
             }
-            default: {formattedPageName = pageName}
+            default: {
+                return Pages[pageName.replace(/\s+/g, '')]
+            }
         }
-        return Pages[formattedPageName.replace(/\s+/g, '')]
     }
 
     const PageComponent = state.currentPage ? loadPageComponent(state.currentPage) : undefined
@@ -41,17 +45,11 @@ const AppContent = () => {
 
     const project = Shared.getItemById(projects, state.currentProject)
 
-    const [itemsToDisplay, setItemsToDisplay] = useState({
-        projects: projects || [],
-        activities: project?.activities || []
-    })
+    const [itemsToDisplay, setItemsToDisplay] = useState(createItemsToDisplay(projects, project))
 
     useEffect(() => {
-        setItemsToDisplay({
-            projects: projects || [],
-            activities: project?.activities || []
-        })
-    }, [projects, project?.activities])
+        setItemsToDisplay(createItemsToDisplay(projects, project))
+    }, [projects, project])
 
     return (
         <main className="content">

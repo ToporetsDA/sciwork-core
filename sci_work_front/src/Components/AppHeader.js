@@ -1,9 +1,13 @@
+// Libraries
 import { useState, useRef, useEffect, useMemo, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+//Styles, Classes, Constants
 import '../css/components/AppHeader.css'
-import logo from '../logo.svg'
-
+import { PAGES, MORE_PAGES } from '../constants'
+//Methods, Components
 import * as Shared from './pages/shared'
+// Resources
+import logo from '../logo.svg'
 
 const AppHeader = () => {
 
@@ -21,15 +25,21 @@ const AppHeader = () => {
         return str.replace(/\s+/g, '')
     }
 
-    const [isDropdownOpen, setDropdownOpen] = useState(false)
+    const [isMoreOpen, setIsMoreOpen] = useState(false)
     const dropdownRef = useRef(null)
     
-    const pages = ['Home Page', 'Schedule', (organisationType) ? 'Projects' : 'Subjects']
-    const morePages = (userData.genStatus === 0) ? (
-        ['Profile', 'User List', 'Notifications', 'Settings']
-    ) : (
-        ['Profile', 'Notifications', 'Chats', 'Settings']
-    )
+    const pages = [...PAGES]
+    if (organisationType) {
+        pages[2] = 'Projects'
+    }
+    else {
+        pages[2] = 'Subjects'
+    }
+    
+    const morePages = [...MORE_PAGES]
+    if (userData.genStatus === 0) {
+        morePages.push('User List')
+    }
 
     const notificationsMark = useMemo(() => {
         if (isLoggedIn === true) {
@@ -39,23 +49,26 @@ const AppHeader = () => {
     }, [notifications, isLoggedIn])
 
     const setAllSeen = () => {
-        setNotifications(
-            notifications.map(n => {
-                if (n.state === "unseen") {
-                    return { ...n, state: "unread" } // Change "unseen" to "unread"
-                }
-                if (n.state === "unread") {
-                    return { ...n, state: "seen" } // Change "unread" to "seen"
-                }
-                return n // Leave other states as is
-            })
-        )
+        setNotifications(notifications.map(n => {
+            if (n.state === "unseen") {
+                const copy = new Notification(
+                    n._id,
+                    "seen",
+                    n.page,
+                    n.content,
+                    new Date(`${n.generationDate}T${n.generationTime}:00`))
+                return copy
+            }
+            else {
+                return n
+            }
+        }))
     }
 
     //go to page
     const handleClick = (page) => {
         navigate(`/${page}`)
-        setDropdownOpen(false)
+        setIsMoreOpen(false)
 
         if (page === "Notifications") {
             setAllSeen()
@@ -72,11 +85,6 @@ const AppHeader = () => {
         }))
     }
 
-    //open dropdown menu with more pages
-    const handleMore = () => {
-        setDropdownOpen(!isDropdownOpen)
-    }
-
     //log out
     const handleLogOut = () => {
         handleClick(format("Home Page"))
@@ -88,9 +96,9 @@ const AppHeader = () => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setDropdownOpen(false)
+                setIsMoreOpen(false)
             }
-        };
+        }
 
         document.addEventListener('mousedown', handleClickOutside)
         return () => {
@@ -128,23 +136,23 @@ const AppHeader = () => {
                             getLi(page)
                         ))}
                         <li
-                            onClick={handleMore}
+                            onClick={setIsMoreOpen(!isMoreOpen)}
                             ref={dropdownRef}
                         >
                             <p
-                                onClick={handleMore}
+                                onClick={setIsMoreOpen(!isMoreOpen)}
                                 style={{
-                                    fontWeight: isDropdownOpen ? 'bold' : 'normal',
+                                    fontWeight: isMoreOpen ? 'bold' : 'normal',
                                     pointerEvents: 'auto',
-                                    opacity: isDropdownOpen ? 0.5 : 1,
+                                    opacity: isMoreOpen ? 0.5 : 1,
                                 }}
                             >
                                 More
                             </p>
-                            {!isDropdownOpen && notificationsMark > 0 && (
+                            {!isMoreOpen && notificationsMark > 0 && (
                                     <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
                             )}
-                            {isDropdownOpen && (
+                            {isMoreOpen && (
                                 <ul className="more">
                                     {morePages.map((page) => (
                                         getLi(page)

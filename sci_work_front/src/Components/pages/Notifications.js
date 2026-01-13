@@ -1,6 +1,9 @@
-import { useEffect, useContext } from 'react'
+// Libraries
+import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+// Styles, Classes, Constants
 import '../../css/components/pages/Notifications.css'
-
+// Methods, Components
 import * as Shared from './shared'
 
 const Notifications = () => {
@@ -8,26 +11,21 @@ const Notifications = () => {
     const {
         notifications, setNotifications
     } = useContext(Shared.AppContext)
-    
-    useEffect(() => {
-        return () => {
-            setNotifications(prev => (
-                prev.map(n => n.state === "unseen"
-                    ? { ...n, state: "seen" }
-                    : n)
-            ))
-        }
-    }, [setNotifications])
+
+    const navigate = useNavigate()
 
     const changeNotificationState = (id) => {
         setNotifications((prevNotifications) => ([
             ...prevNotifications.map(n => {
-                console.log("note", n, id)
                 if (n._id === id) {
-                    return {
-                        ...n,
-                        state: "read"
-                    }
+                    const copy = new Notification(
+                        n._id,
+                        "read",
+                        n.page,
+                        n.content,
+                        new Date(`${n.generationDate}T${n.generationTime}:00`)
+                    )
+                return copy
                 }
                 else {
                     return n
@@ -36,10 +34,15 @@ const Notifications = () => {
         ]))
     }
 
+    const handleClick = (id) => {
+        navigate(`/Projects/${id}`)
+        changeNotificationState(id)
+    }
+
     const getStateDiv = (state) => {
         return (
             <div className={`notification-state ${state}`}>
-                {(state === "unread") &&
+                {(state === "seen") &&
                     <div className="notification-circle"></div>
                 }
                 {state}
@@ -62,7 +65,7 @@ const Notifications = () => {
                 //itemTypes
                 editable={false}
                 isItem={false}
-                linkActions={changeNotificationState}
+                linkActions={handleClick}
             />
         </div>
     )

@@ -1,7 +1,9 @@
+// Libraries
 import { useState, useMemo, useContext } from 'react'
 import { useNavigate } from "react-router-dom"
+// Styles, Classes, Constants
 import '../../../css/components/pages/shared/ItemTable.css'
-
+// Methods, Components
 import * as Shared from './'
 import * as Items from '../../items'
 

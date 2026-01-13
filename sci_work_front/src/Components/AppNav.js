@@ -1,7 +1,9 @@
+// Libraries
 import { useContext } from 'react'
 import { useNavigate } from "react-router-dom"
+// Styles, Classes, Constants
 import '../css/components/AppNav.css'
-
+// Methods, Components
 import * as Shared from './pages/shared'
 
 const AppNav = () => {
@@ -21,6 +23,7 @@ const AppNav = () => {
     setRecentActivities([])
   }
 
+  // create html for nested list item
   const getLi = (activity) => {
     return (
       <li
@@ -50,6 +53,7 @@ const AppNav = () => {
     return recentActivities.filter(recent => (recent._id.includes(item._id))).length > 0
   }
 
+  // get list of nested items (activities)
   const getList = (list, itemsField, isListField, checkVal, comparator) => {
 
     const filteredList = (comparator)
