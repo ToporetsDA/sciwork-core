@@ -29,7 +29,7 @@ const AppNav = () => {
       <li
         key={activity._id}
         onClick={
-          () => {navigate(Shared.goTo(activity, projects, recentActivities, setRecentActivities))}
+          () => {navigate(activity.goTo(projects, recentActivities, setRecentActivities))}
         }
         className={
           state.currentActivity === activity._id ? 'active' : ''

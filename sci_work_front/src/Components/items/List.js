@@ -64,7 +64,7 @@ const List = ({
     const activity = Shared.getItemById(activities, item._id)
 
     const project = Shared.getItemById(projects, state.currentProject)
-    const metaActivity = Shared.findItemWithParent(project.activities, "_id", activity._id, project).item
+    const { item: metaActivity } = project.findItemWithParent(project.activities, "_id", activity._id, project)
 
     const [settings, setSettings] = useState(activity.content?.currentSettings || {})
 
@@ -91,8 +91,8 @@ const List = ({
 
     useEffect(() => {
         const parent = Shared.getItemById(projects, containerId)
-        const metaItem = Shared.findItemWithParent(parent.activities, "_id", activity._id, parent)
-        const access = Shared.getAccess(metaItem.item, userData)
+        
+        const access = parent.getAccess(userData, activity._id)
 
         const change = (activity.content?.currentSettings?.type !== settings?.type) && settings?.type
 
@@ -250,10 +250,10 @@ const List = ({
             {showLi &&
                 <>
                     {/* EditStructure button */}
-                    {rights.edit.includes(Shared.getAccess(metaActivity, userData)) &&
+                    {rights.edit.includes(metaActivity.getAccess(userData)) &&
                         getDialog(metaActivity.type, "Edit Structure")
                     }
-                    {rights.edit.includes(Shared.getAccess(metaActivity, userData)) && metaActivity.type === "Table" &&
+                    {rights.edit.includes(metaActivity.getAccess(userData)) && metaActivity.type === "Table" &&
                         getDialog(metaActivity.type, "Add Item")
                     }
                     {/* list items */}

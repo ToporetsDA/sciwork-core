@@ -55,7 +55,7 @@ const App = () => {
 
   const previousVersionsRef = useRef({})
 
-  const updateData = (data) => {
+  const updateData = (data, sendUpdate = true) => {
 
     const { action, item } = data
 
@@ -80,7 +80,9 @@ const App = () => {
     }
 
     const saveChanges = (item) => { // save changes to item and set it's _id as flag
-      flag(item._id)
+      if (!sendUpdate) {
+        flag(item._id)
+      }
       setter(prevItems => 
         prevItems.map(i =>
           i._id === item._id ? item : i
@@ -107,7 +109,7 @@ const App = () => {
           const project = clone
           if (!project) return // fallback in case project is not found
 
-          const { parent: container } = Shared.findItemWithParent(project.activities, "_id", containerId, project)
+          const { parent: container } = project.findItemWithParent(project.activities, "_id", containerId, project)
           if (!container) return // fallback in case container is not found
 
           if (!container.activities) {
@@ -137,7 +139,7 @@ const App = () => {
           const project = Shared.getItemById(projects, state.currentProject)
           if (!project) return
 
-          const { item: activity } = Shared.findItemWithParent(project.activities, "_id", item._id, project)
+          const { item: activity } = project.findItemWithParent(project.activities, "_id", item._id, project)
           if (!activity) return
 
           Object.assign(activity, item)
@@ -150,23 +152,13 @@ const App = () => {
         setAct()
         const { type, activity } = item
 
-        //update whole activity
-        const regularUpdate = (activity) => {
-          flag(activity._id)
-          setter(prevItems => 
-            prevItems.map(i =>
-              i._id === activity._id ? activity : i
-            )
-          )
-        }
-
         switch(type) {
           case "Text":
           case "Table":
           case "Attendance":
           case "Report":
           case "List": {
-            regularUpdate(activity)
+            saveChanges(activity)
             break
           }
           case "Chat": {
@@ -175,7 +167,7 @@ const App = () => {
               console.log("send message", message)
             }
             else {
-              regularUpdate(activity)
+              saveChanges(activity)
             }
             break
           }

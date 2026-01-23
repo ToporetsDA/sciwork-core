@@ -18,14 +18,14 @@ const ItemActions = ({ item }) => {
     const project = Shared.getItemById(projects, parts[0])
     const accessibleItem = (parts.length < 3)
         ? item
-        : Shared.findItemWithParent(project.activities, "_id", parts[0] + '.' + parts[1], project).item
+        : project.findItemWithParent(project.activities, "_id", parts[0] + '.' + parts[1], project).item
     
     const condition = (parts.length === 1)
     const buttonClass = (condition) ? "button-mini" : "button-mini button-tool"
     const wrapperClass = (condition) ? "" : "actions"
 
     const getAccess = (rights, type, accessibleItem, userData) => {
-        return rights[type].includes(Shared.getAccess(accessibleItem, userData))
+        return rights[type].includes(accessibleItem.getAccess(accessibleItem, userData))
     }
     
     return (
@@ -39,7 +39,7 @@ const ItemActions = ({ item }) => {
                         className={buttonClass}
                         onClick={(e) => {
                             e.stopPropagation()
-                            Shared.deleteItem(projects, setData, item._id, false)
+                            item.deleteItem(false, projects, setData)
                         }}
                     >
                         ♻️
@@ -67,7 +67,7 @@ const ItemActions = ({ item }) => {
                             className={buttonClass}
                             onClick={(e) => {
                                 e.stopPropagation()
-                                Shared.deleteItem(projects, setData, item._id, true)
+                                item.deleteItem(true, projects, setData)
                             }}
                         >
                             🗑️

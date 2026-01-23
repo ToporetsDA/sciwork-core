@@ -145,7 +145,7 @@ const Projects = ({
             // console.log("Handling Item Drop Into a Container")
 
             const project = Shared.getItemById(projects, state.currentProject)
-            const { item: metaItem } = Shared.findItemWithParent(project.activities, "_id", over.id, project)
+            const { item: metaItem } = project.findItemWithParent(project.activities, "_id", over.id, project)
 
             if (!metaItem || metaItem?.type !== "Group") {
                 return // Skip "not containers"

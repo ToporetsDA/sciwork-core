@@ -41,10 +41,10 @@ const ItemTiles = ({
             return rights.edit.includes(userData.genStatus)
         }
         const project = Shared.getItemById(projects, parts[0])
-        const { item: activity } = Shared.findItemWithParent(project.activities, "_id", containerId, project)
+        const { item: activity } = project.findItemWithParent(project.activities, "_id", containerId, project)
         const access = (parts.length === 1)
-            ? Shared.getAccess(project, userData)
-            : Shared.getAccess(activity, userData)
+            ? project.getAccess(userData)
+            : activity.getAccess(userData)
         return rights.edit.includes(access)
     }
 

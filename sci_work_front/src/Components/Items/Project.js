@@ -27,7 +27,7 @@ const Project = ({
             ${(new Date(item.endDate) < new Date()) ? 'expired' : ''}
             `}
             onClick={() => {
-                navigate(Shared.goTo(item, projects, recentActivities, setRecentActivities))
+                navigate(item.goTo(projects, recentActivities, setRecentActivities))
             }}
         >
             <h3 className="name">

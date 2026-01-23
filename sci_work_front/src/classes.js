@@ -17,13 +17,116 @@ class State {
 }
 export const createState = (page, project, activity, dialog, params) => new State(page, project, activity, dialog, params)
 
-class Activity {
-  constructor(_id, name, template, content, __v = 0) {
+class Item {
+  constructor(_id, name) {
+    this.deleted = false
+
     this._id = _id
     this.name = name
+  }
+
+  getAccesss = (userData = {}, id = this._id) => {
+    const access = this?.userList?.find(user => user.id === userData._id)?.access     // project
+      ?? this
+        .findItemWithParent(this.activities, "_id", id, this.ю.getProjectId()).item   // activity's _id is in meta in project
+        .userList?.find(user => user.id === userData._id)?.access                     // metaActivity
+    return (typeof access === 'number') ? access : -1
+  }
+
+  goTo = (data, recentActivities, setRecentActivities) => {
+
+    if (this._id.includes(".")) { // if activity
+        //add this Item to recently visited
+        const activityExists = recentActivities.some(recent => recent._id === this._id)
+        if (activityExists === false) {
+            setRecentActivities((prevActivities) => [
+                ...prevActivities,
+                this
+            ])
+        }
+    }
+
+    if (!this._id.includes(".")) {
+        const project = data.find(p => p._id === this._id)
+        return `/Project/${project._id}`
+    }
+    else if (this.page === true) {
+
+        const project = data.find(p => p._id === this.getProjectId())
+        const activity = project.activities.find(a => a._id === this._id)
+        return `/Activity/${project._id}/${activity.id}`
+    }
+    else {
+        const project = data.find(p => p._id === this.getProjectId())
+        return `/Project/${project._id}`
+    }
+  }
+
+  deleteItem = (deleted, data, setData, sendUpdate = true) => {
+
+    const projectId = this._id.split('.')[0]
+    
+    const project = data.find(p => p._id === projectId)
+    let activities
+
+    if (this._id.includes(".")) {
+        //delete activity
+        activities = project.activities.map((activity) => {
+            return activity._id === (this._id) ? { ...activity, deleted } : activity
+        })
+    }
+    else {
+        //delete project
+        activities = project.activities.map((activity) => {
+            return { ...activity,  }
+        })
+    }
+
+    const updatedProject = {
+        ...project,
+        activities,
+        ...(!this._id.includes(".") && {deleted})
+    }
+
+    console.log("deleted:", this._id)
+
+    setData({ action: "edit", item: updatedProject }, sendUpdate)
+  }
+}
+
+class Activity extends Item {
+  constructor(_id, name, template, content, __v = 0) {
+    super(_id, name)
     this.template = template
     this.content = content
     this.__v = __v
+  }
+
+  getProjectId = () => {
+    return this._id.split('.')[0]
+  }
+
+  setFieldValue = (dataPath, value) => {
+    const parts = dataPath.split('.')
+    const newContent = structuredClone(this.content) // deep clone
+    let curr = newContent
+
+    for (let i = 0; i < parts.length - 1; i++) {
+        const key = parts[i]
+        const index = parseInt(key)
+        const k = isNaN(index) ? key : index
+
+        // Ensure path exists
+        if (curr[k] === undefined) curr[k] = {}
+
+        curr = curr[k]
+    }
+
+    const lastKey = parts[parts.length - 1]
+    const lastIndex = parseInt(lastKey)
+    curr[isNaN(lastIndex) ? lastKey : lastIndex] = value
+
+    return { ...this, content: newContent }
   }
 }
 export const createActivity = (_id, name, template, content, __v) =>
@@ -52,16 +155,53 @@ export const activityVerUp = (activity) =>
     activity.content,
     activity.__v + 1)
 
-class Project {
+class Project extends Item {
   constructor(_id, name, dndCount, startDate, endDate, activities, userList, __v = 0) {
-    this._id = _id
-    this.name = name
+    super(_id, name)
     this.dndCount = dndCount
     this.startDate = startDate
     this.endDate = endDate
     this.activities = activities
     this.userList = userList
     this.__v = __v
+  }
+
+  getAccess(userData = {}, id = this._id) {
+
+    const found = id.includes('.')
+      ? this.findItemWithParent(this.activities, "_id", id, this)
+      : { item: this }
+
+    const item = found?.item
+
+    const direct = item?.userList?.find(u => u.id === userData._id)?.access
+
+    return Number.isInteger(direct) ? direct : -1
+  }
+
+  findItemWithParent = (items, field = "_id", target, parent) => {
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        if (item[field] === target) {
+            return { item, parent, index: i }
+        }
+        if (item.activities) {
+            const result = this.findItemWithParent(item.activities, field, target, item)
+            if (result.item) return result
+        }
+    }
+    return { item: null, parent, index: null }
+  }
+
+  treeToArray = (list, field = "activities", result = []) => {
+    const itemList = list ?? this[field]
+    for (const item of itemList) {
+        result.push(item)
+        if (item[field]?.length) {
+            this.treeToArray(item[field], field, result)
+        }
+    }
+    return result
   }
 }
 export const createProject = (_id, name, dndCount, startDate, endDate, activities, userList, __v) =>

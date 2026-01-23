@@ -92,7 +92,7 @@ const Item = ({
     }
 
     const getAccess = (rights, type, accessibleItem, userData) => {
-        return rights[type].includes(Shared.getAccess(accessibleItem, userData))
+        return rights[type].includes(accessibleItem.getAccess(userData))
     }
 
     const getProjectAccess = (rights, type, item, userData) => {
@@ -105,7 +105,7 @@ const Item = ({
         const parts = item._id.split('.')
         const project = Shared.getItemById(projects, parts[0])
         const projectAccess = getAccess(rights, "fullView", project, userData)
-        const { item: activity } = Shared.findItemWithParent(project.activities, "_id", parts[0] + '.' + parts[1], project)
+        const { item: activity } = project.findItemWithParent(project.activities, "_id", parts[0] + '.' + parts[1], project)
         const activityView = (parts.length > 2) ? getAccess(rights, "fullView", activity, userData) : null
         const activityInteract = (parts.length > 2) ? getAccess(rights, "interact", activity, userData) : null
         

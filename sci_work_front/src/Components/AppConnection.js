@@ -158,7 +158,9 @@ const Connection = ({
                         break
                     }
                     case "delete": {//just _id
-                        Shared.deleteItem(currentData, setProjects, data._id)
+                        const item = Shared.getItemById(projects, data._id)
+                            || Shared.getItemById(activities, data._id)
+                        item?.deleteItem(true, currentData, setProjects, false)
                         break
                     }
                     case "organisation": {

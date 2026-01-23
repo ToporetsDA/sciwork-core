@@ -22,11 +22,6 @@ const ScheduleBoard = ({
     } = useContext(Shared.AppContext)
 
     const navigate = useNavigate()
-    const goTo = Shared.goTo
-
-    const projectId = (id) => {
-        return id.split('.')[0]
-    }
 
     //calculate scale values
     const getDaysInMonth = useCallback((month, year) => {
@@ -131,7 +126,7 @@ const ScheduleBoard = ({
         if (!projects) return []
     
         const filteredActivities = projects
-            .flatMap(project => Shared.treeToArray(project.activities, "activities"))
+            .flatMap(project => project.treeToArray("activities"))
             .flatMap(activity => {
     
                 if (activity.startDate === activity.endDate) {// Single-day activity
@@ -320,14 +315,14 @@ const ScheduleBoard = ({
                             }
                         }))
                     ) : (
-                        navigate(goTo(group[i], projects, recentActivities, setRecentActivities))
+                        navigate(group[i].goTo(projects, recentActivities, setRecentActivities))
                     )
                 }}
             >
                 {content}
             </div>
         )
-    }, [currentScale, firstDayOfMonth, projects, setState, weeksInMonth, intervalAnchor, goTo, navigate, recentActivities, setRecentActivities])
+    }, [currentScale, firstDayOfMonth, projects, setState, weeksInMonth, intervalAnchor, navigate, recentActivities, setRecentActivities])
 
     //schedule events as <div></div>s to display
     const eventsToDisplay = useMemo(() => {
@@ -336,7 +331,7 @@ const ScheduleBoard = ({
             let content = ``
 
             if (item?.type === 'activity') {
-                content += `${Shared.getItemById(projects, projectId(item._id)).name}: `
+                content += `${Shared.getItemById(projects, item.getProjectId()).name}: `
             }
 
             content += `${item.name}\n`

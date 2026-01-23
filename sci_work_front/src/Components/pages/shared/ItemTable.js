@@ -46,11 +46,7 @@ const ItemTable = ({
 
     const saveChanges = (key, value, activity, index) => {
     
-        const updatedActivity = Shared.setFieldValue(
-            activity,
-            `listItems.${index}.${key}`,
-            value
-        )
+        const updatedActivity = activity.setFieldValue(`listItems.${index}.${key}`, value)
 
         setData({action: "content", item: {type: "Table", activity: updatedActivity}})
     }
@@ -225,7 +221,7 @@ const ItemTable = ({
                                     if (linkActions) {
                                         linkActions(item._id)
                                     }
-                                    navigate(Shared.goTo(item, items, recentActivities, setRecentActivities))
+                                    navigate(item.goTo(items, recentActivities, setRecentActivities))
                                 }
                             }}
                         >
