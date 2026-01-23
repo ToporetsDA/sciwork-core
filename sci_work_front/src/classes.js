@@ -94,67 +94,6 @@ class Item {
   }
 }
 
-class Activity extends Item {
-  constructor(_id, name, template, content, __v = 0) {
-    super(_id, name)
-    this.template = template
-    this.content = content
-    this.__v = __v
-  }
-
-  getProjectId = () => {
-    return this._id.split('.')[0]
-  }
-
-  setFieldValue = (dataPath, value) => {
-    const parts = dataPath.split('.')
-    const newContent = structuredClone(this.content) // deep clone
-    let curr = newContent
-
-    for (let i = 0; i < parts.length - 1; i++) {
-        const key = parts[i]
-        const index = parseInt(key)
-        const k = isNaN(index) ? key : index
-
-        // Ensure path exists
-        if (curr[k] === undefined) curr[k] = {}
-
-        curr = curr[k]
-    }
-
-    const lastKey = parts[parts.length - 1]
-    const lastIndex = parseInt(lastKey)
-    curr[isNaN(lastIndex) ? lastKey : lastIndex] = value
-
-    return { ...this, content: newContent }
-  }
-}
-export const createActivity = (_id, name, template, content, __v) =>
-  new Activity(
-    _id,
-    name,
-    template,
-    content,
-    __v
-  )
-export const createActivities = (activity) =>
-  activity.map(a =>
-    createActivity(
-      a._id,
-      a.name,
-      a.template,
-      a.content,
-      a.__v
-    )
-  )
-export const activityVerUp = (activity) =>
-  createProject(
-    activity._id,
-    activity.name,
-    activity.template,
-    activity.content,
-    activity.__v + 1)
-
 class Project extends Item {
   constructor(_id, name, dndCount, startDate, endDate, activities, userList, __v = 0) {
     super(_id, name)
@@ -238,6 +177,67 @@ export const projectVerUp = (project) =>
     project.activities,
     project.userList,
     project.__v + 1)
+
+class Activity extends Item {
+  constructor(_id, name, template, content, __v = 0) {
+    super(_id, name)
+    this.template = template
+    this.content = content
+    this.__v = __v
+  }
+
+  getProjectId = () => {
+    return this._id.split('.')[0]
+  }
+
+  setFieldValue = (dataPath, value) => {
+    const parts = dataPath.split('.')
+    const newContent = structuredClone(this.content) // deep clone
+    let curr = newContent
+
+    for (let i = 0; i < parts.length - 1; i++) {
+        const key = parts[i]
+        const index = parseInt(key)
+        const k = isNaN(index) ? key : index
+
+        // Ensure path exists
+        if (curr[k] === undefined) curr[k] = {}
+
+        curr = curr[k]
+    }
+
+    const lastKey = parts[parts.length - 1]
+    const lastIndex = parseInt(lastKey)
+    curr[isNaN(lastIndex) ? lastKey : lastIndex] = value
+
+    return { ...this, content: newContent }
+  }
+}
+export const createActivity = (_id, name, template, content, __v) =>
+  new Activity(
+    _id,
+    name,
+    template,
+    content,
+    __v
+  )
+export const createActivities = (activity) =>
+  activity.map(a =>
+    createActivity(
+      a._id,
+      a.name,
+      a.template,
+      a.content,
+      a.__v
+    )
+  )
+export const activityVerUp = (activity) =>
+  createProject(
+    activity._id,
+    activity.name,
+    activity.template,
+    activity.content,
+    activity.__v + 1)
 
 class UserData {
   //genStatus:

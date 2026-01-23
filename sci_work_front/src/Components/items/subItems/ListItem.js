@@ -1,29 +1,30 @@
-import { useState } from 'react'
+// Libraries
+import { useState, useContext } from 'react'
+// Styles, Classes, Constants
 import '../../../css/components/items/subItems/ListItem.css'
-
+// Methods, Components
 import * as Shared from '../../pages/shared'
 import * as Items from '../../items'
 
 const ListItem = ({
-    userData,
-    projects,
-    activities,
-    setData,
-    state, setState,
     item,
     index,
     containerId,
-    containerType,
-    rights,
-    users, setUsers,
-    recentActivities, setRecentActivities
+    containerType
 }) => {
+
+    const {
+        userData,
+        projects,
+        activities,
+        setData
+    } = useContext(Shared.AppContext)
 
     const activity = Shared.getItemById(activities, containerId)
 
     const parts = containerId.split('.')
     const project = Shared.getItemById(projects, parts[0])
-    const {item: metaActivity} = Shared.findItemWithParent(project.activities, "_id", containerId, project)
+    const {item: metaActivity} = project.findItemWithParent(project.activities, "_id", containerId, project)
 
     const fieldsToRender = activity.content?.liStructure
 
@@ -32,8 +33,7 @@ const ListItem = ({
 
     const saveChanges = (key, value, activity, index) => {
 
-        const updatedActivity = Shared.setFieldValue(
-            activity,
+        const updatedActivity = activity.setFieldValue(
             `listItems.${index}.${key}`,
             value
         )
@@ -86,19 +86,10 @@ const ListItem = ({
                 </>
                 {(userData._id === item.creatorId) ? (//creator sees if other users left mark
                     <Shared.ItemTable
-                        userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
-                        state={state}
-                        setState={setState}
                         itemsToDisplay={markable.userEntries}
                         itemKeys={markableFields}
                         itemTypes={markableTypes}
-                        nested={false}
-                        rights={rights}
-                        recentActivities={recentActivities}
-                        setRecentActivities={setRecentActivities}
+                        // nested={false}
                     />
                 ) : (containerType !== "Report") ? (//other users see checkbox
                         <>
@@ -172,15 +163,8 @@ const ListItem = ({
                     <Items.Text
                         key={item._id + '.' + key}
 
-                        userData={userData}
-                        projects={projects}
-                        activities={activities}
-                        setData={setData}
-                        state={state}
-                        setState={setState}
                         item={item}
                         data={`listItems.${index}.${key}`}
-                        rights={rights}
                     />
                 )
             }

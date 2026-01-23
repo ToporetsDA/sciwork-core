@@ -1,23 +1,19 @@
-import React from 'react'
+// Libraries
+import { useContext } from 'react'
+// Styles, Classes, Constants
 import '../../../css/components/items/subItems/Message.css'
-
+// Methods, Components
 import * as Shared from '../../pages/shared'
-import * as Items from '../../items'
+// import * as Items from '../../items'
 
 const Message = ({
-    userData,
-    projects,
-    activities,
-    setData,
-    state, setState,
-    item,
-    index,
-    containerId,
-    containerType,
-    rights,
-    users, setUsers,
-    recentActivities, setRecentActivities
+    item
 }) => {
+
+    const {
+        userData,
+        users
+    } = useContext(Shared.AppContext)
 
     const getSender = (id) => {
         const user = Shared.getItemById(users, id)
