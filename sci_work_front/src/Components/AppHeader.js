@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, useMemo, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 //Styles, Classes, Constants
 import '../css/components/AppHeader.css'
-import { PAGES, MORE_PAGES } from '../constants'
+import { PAGES, MORE_PAGES } from '../Basics/constants'
 //Methods, Components
 import * as Shared from './pages/shared'
 // Resources

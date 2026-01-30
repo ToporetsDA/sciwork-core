@@ -1,17 +1,19 @@
-import { useState } from 'react'
+// Libraries
+import { useState, useContext } from 'react'
+//Styles, Classes, Constants
 import '../../css/components/dialogs/AddEditContent.css'
-
+import { TECH_FIELDS } from '../../Basics/constants'
+//Methods, Components
 import * as Shared from '../pages/shared'
 
-const AddEditContent = ({
-    userData, setUserData,
-    projects,
-    activities,
-    setData,
-    state, setState,
-    rights,
-    isCompany
-}) => {
+const AddEditContent = () => {
+
+    const {
+        userData,
+        activities,
+        setData,
+        state, setState
+    } = useContext(Shared.AppContext)
 
     let itemIndex = state.currentDialog.params[2]
     const containerId = state.currentDialog.params[3]
@@ -156,15 +158,13 @@ const AddEditContent = ({
         })
     }
 
-    const techFields = ["_id", "creatorId"]
-
     return (
         <div className="dialog-container">
             <div className="dialog-content">
                 <form className="add-edit-content-dialog-form">
                     {(editType.includes("Structure")) ? (
                         <>
-                            {Object.entries(structureFields).filter(([key, type]) => !techFields.includes(key)).map(([key, type]) => (
+                            {Object.entries(structureFields).filter(([key, type]) => !TECH_FIELDS.includes(key)).map(([key, type]) => (
                                 <div key={key}>
                                     {key !== "markable" &&
                                     <div
@@ -235,7 +235,7 @@ const AddEditContent = ({
                             {/* <p className='warning'>WARNING: deletion of a field will erase it from existing entries!</p> */}
                         </>
                     ) : (
-                        Object.entries(structureFields).filter(([key, type]) => !techFields.includes(key)).map(([key, type]) => {
+                        Object.entries(structureFields).filter(([key, type]) => !TECH_FIELDS.includes(key)).map(([key, type]) => {
                             switch(type) {
                                 case "text": {
                                     return (

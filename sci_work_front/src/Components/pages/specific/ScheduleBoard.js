@@ -3,8 +3,8 @@ import { useEffect, useState, useCallback, useMemo, useContext } from 'react'
 import { useNavigate } from "react-router-dom"
 // Styles, Classes, Constants
 import '../../../css/components/pages/specific/ScheduleBoard.css'
-import { createScheduleItem } from '../../classes'
-import { DAYS_OF_WEEK_SHORT } from './constants'
+import { createScheduleItem } from '../../Basics/classes'
+import { DAYS_OF_WEEK_SHORT } from './Basics/constants'
 // Methods, Components
 import * as Shared from '../shared'
 

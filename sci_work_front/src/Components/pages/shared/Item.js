@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 // Styles, Classes, Constants
 import '../../../css/components/pages/shared/Item.css'
-import { ITEM_TYPES } from '../../../constants'
+import { ACTIVITY_TYPES, SUB_ACTIVITY_TYPES, NO_ACTIONS_CONTAINER } from '../../../Basics/constants'
 // Methods, Components
 import * as Shared from "./"
 import * as Items from '../../items'
@@ -25,58 +25,12 @@ const Item = ({
     } = useContext(Shared.AppContext)
 
     const isItem = (item !== true)
-    //if there are no Items in project - ➕ Add below button is always visible
+    //if there are no Items in project ➕ Add below button is always visible
     const classCondition = (!isItem && index === 0)
 
-    const getComponentType = () => {
-        const itemsType = ITEM_TYPES[item.type] || "Dev"
-        let type
-        if (isItem) {
-            switch (containerType) {
-                case "Dev": {
-                    type = Items.Dev
-                    break
-                }
-                // Project
-                case "Project": {
-                    type = Items[itemsType]
-                    break
-                }
-                // activities
-                case "Group": {
-                    type = Items[itemsType]
-                    break
-                }
-                case "Text": {
-                    console.log(item._id, "is text")
-                    type = Items[itemsType]
-                    break
-                }
-                case "Attendance":
-                case "Table"://separate from ItemTiles
-                case "Report":
-                case "List": {
-                    type = SubItems.ListItem
-                    break
-                }
-                case "Chat": {
-                    type = SubItems.Message
-                    break
-                }
-                // case "Test": {
-                //     type = SubItems.Question
-                //     break
-                // }
-                // subActivities
-                default: {
-                    console.warn(`Unknown item type: ${item?.type} in container: ${containerType}`)
-                }
-            }
-        }
-        return type
-    }
+    const project = Shared.getItemById(projects, item?._id.split('.')[0])
     
-    const ItemComponent = getComponentType()
+    const ItemComponent = Items[ACTIVITY_TYPES[item.type]] ?? SubItems[SUB_ACTIVITY_TYPES[item.type]] ?? Items["Dev"]
 
     const {attributes, listeners, setNodeRef, transform, transition, isDragging} = useSortable({
         id: item._id, 
@@ -91,30 +45,23 @@ const Item = ({
         opacity: (isDragging) ? 0.5 : 1
     }
 
-    const getAccess = (rights, type, accessibleItem, userData) => {
-        return rights[type].includes(accessibleItem.getAccess(userData))
-    }
-
-    const getProjectAccess = (rights, type, item, userData) => {
-        return getAccess(rights, type, Shared.getItemById(projects, item._id.split('.')[0]), userData)
-    }
-
-    const noActions = ["Chat"]
-
     const accessCheck = () => {
         const parts = item._id.split('.')
         const project = Shared.getItemById(projects, parts[0])
-        const projectAccess = getAccess(rights, "fullView", project, userData)
-        const { item: activity } = project.findItemWithParent(project.activities, "_id", parts[0] + '.' + parts[1], project)
-        const activityView = (parts.length > 2) ? getAccess(rights, "fullView", activity, userData) : null
-        const activityInteract = (parts.length > 2) ? getAccess(rights, "interact", activity, userData) : null
+        const projectAccess = project.getAccessType(rights.fullView, userData)
+        const activityView = (parts.length > 2) ?
+            project.getAccessType(rights.fullView, userData, parts[0] + '.' + parts[1])
+            : null
+        const activityInteract = (parts.length > 2) ?
+            project.getAccessType(rights.interact, userData, parts[0] + '.' + parts[1])
+            : null
         
         const result = (item === true)
             ? item?.deleted
                 ? (parts.length > 2)
                     ? activityView
                     : projectAccess
-                : item?.userList?.some(user => user.id === userData._id) || activityInteract
+                : item.hasAccess(userData) || activityInteract
             : true
         
         return result
@@ -122,19 +69,19 @@ const Item = ({
 
     const deleted = item?.deleted ? "deleted" : ""
 
-    return accessCheck ? (
+    return accessCheck() ? (
         <div
             className={`activity-item ${deleted}`}
             ref={setNodeRef}
             {...attributes}
             style={style}
         >
-            {!noActions.includes(containerType) &&
+            {!NO_ACTIONS_CONTAINER.includes(containerType) &&
                 <div
                     className='item-actions'
                 >
                     {/* ➕ Add below button */}
-                    {(isItem ? getProjectAccess(rights, "edit", item, userData) : true) &&
+                    {(isItem ? project.getAccessType(rights.edit, userData) : true) &&
                         Shared.getDialogButton(
                             setState,
                             `add-button ${classCondition ? 'button-mini' : 'button-tool'}`,
@@ -144,7 +91,7 @@ const Item = ({
                             false
                         )
                     }
-                    {(isItem ? getProjectAccess(rights, "edit", item, userData) : true) && /* 🔘 DRAG HANDLE (6-dots) */
+                    {(isItem ? project.getAccessType(rights.edit, userData) : true) && /* 🔘 DRAG HANDLE (6-dots) */
                         <div
                             className="drag-handle button-tool"
                             {...listeners}
@@ -158,7 +105,7 @@ const Item = ({
             
             {isItem && accessCheck() &&
                 <>
-                    {!noActions.includes(containerType) &&
+                    {!NO_ACTIONS_CONTAINER.includes(containerType) &&
                         <Shared.ItemActions
                             item={item}
                         />

@@ -1,20 +1,12 @@
-import { useMemo, useCallback }  from 'react'
+// Libraries
+import { useMemo, useCallback, useContext }  from 'react'
+//Styles, Classes, Constants
 import '../../css/components/dialogs/AddEditUserList.css'
-
+import {ITEM_KEYS_ALLOWED, ITEM_TYPES_ALLOWED, ITEM_KEYS, ITEM_TYPES} from '../../Basics/constants'
+//Methods, Components
 import * as Shared from '../pages/shared'
 
-const AddEditUserList = ({
-    userData, setUserData,
-    projects,
-    activities,
-    setData,
-    state, setState,
-    rights,
-    users,
-    itemStructure,
-    defaultStructure,
-    isCompany}
-) => {
+const AddEditUserList = () => {
 
     /*
     chat will be styled list based activity
@@ -27,39 +19,36 @@ const AddEditUserList = ({
     Test can have more questions than allowed for attemps, if so - pick randomly
     */
 
+    const {
+        userData,
+        projects,
+        activities,
+        setData,
+        state, setState,
+        rights,
+        users
+    } = useContext(Shared.AppContext)
+
     //get item
-    const parts = state.currentDialog.params[0].split('.')
+    const fullId = state.currentDialog.params[0]
+    const parts = fullId.split('.')
+
     const project = Shared.getItemById(projects, parts[0])
-    const metaActivity = Shared.findItemWithParent(project.activities, "_id", (parts[0] + '.' + parts[1]), project).item
-    const activity = Shared.getItemById(activities, metaActivity?._id)
+    const { item: metaItem } = project.findItemWithParent(project.activities, "_id", fullId, project)
+    const activity = Shared.getItemById(activities, metaItem?._id)
+
+    const item = (parts.length < 3)
+        ? metaItem._id
+        : activity.content?.listItems[parts[2]]
+
+    const currentUserAccess = (parts.length < 3)
+        ? project.getAccess(userData, item._id)
+        : item?.userList?.find(u => u.id === userData._id)?.access
+
+    const userList = item?.userList
 
     //cant give yourself access
-    let usersData = users
-    let item
-
-    switch(parts.length) {
-        case 0:{
-            console.warn("no item _id")
-            break
-        }
-        case 1:{
-            item = project
-            break
-        }
-        case 2:{
-            item = metaActivity
-            break
-        }
-        default: {
-            usersData = users.filter(user => user._id !== userData._id)
-            item = activity.content?.listItems[parts[2]]
-        }
-    }
-
-    const currentUserParam = (parts.length < 2) ? item : metaActivity
-    const currentUserAccess = Shared.getAccess(currentUserParam, userData)
-
-    const userList = (parts.length < 3) ? item.userList : activity.content.listItems[parts[2]].userList
+    const usersData = users.filter(user => user._id !== userData._id)
 
     const closeDialog = useCallback(() => {
         setState((prevState) => ({
@@ -114,7 +103,7 @@ const AddEditUserList = ({
             setData({
                 action: "content",
                 item: {
-                    type: metaActivity.type,
+                    type: metaItem.type,
                     activity: updatedItem
                 }
             })
@@ -122,7 +111,7 @@ const AddEditUserList = ({
         }
         console.log("updatedItem", parts.length < 3, updatedItem, updatedUserList)
         
-    }, [usersData, item, metaActivity, activity, parts, setData])
+    }, [usersData, item, metaItem, activity, parts, setData])
 
     const handleRemoveUser = useCallback((userId) => {
         const updatedUserList = userList.filter(item => item.id !== userId)
@@ -179,7 +168,7 @@ const AddEditUserList = ({
     }, [handleRightChange, currentUserAccess, rights.names])
 
     const { usersWithAccess, usersWithoutAccess } = useMemo(() => {
-        const userList = item.userList || []
+        const userList = item?.userList || []
         const withAccess = []
         const withoutAccess = []
 
@@ -194,8 +183,13 @@ const AddEditUserList = ({
                     button = ""
                     select = rights.names[listItem.access]
                 }
+
+                const userAccess = (parts.length > 2)
+                    ? item?.userList?.find(u => u.id === user._id)?.access
+                    : project.getAccess(user, item._id)
+
                 //cant edit users with higher access
-                if (currentUserAccess > Shared.getAccess(item, user)) {
+                if (currentUserAccess > userAccess) {
                     select = rights.names[listItem.access]
                 }
 
@@ -209,45 +203,17 @@ const AddEditUserList = ({
         })
 
         return { usersWithAccess: withAccess, usersWithoutAccess: withoutAccess }
-    }, [usersData, item, currentUserAccess, rights.names, userData, handleAddUser, handleRemoveUser, getSelect])
-
-    const itemKeysAllowed = ["name", "middleName", "surName", "patronimic", "genStatus", "access", "accessLevel"]
-    const itemTypesAllowed = {
-        name: "plain",
-        middleName: "plain",
-        surName: "plain",
-        patronimic: "plain",
-        genStatus: "access",
-        access: "button",
-        accessLevel: "combobox"
-    }
-
-    const itemKeys = ["name", "middleName", "surName", "patronimic", "genStatus", "access"]
-    const itemTypes = {
-        name: "plain",
-        middleName: "plain",
-        surName: "plain",
-        patronimic: "plain",
-        genStatus: "access",
-        access: "button"
-    }
+    }, [usersData, parts, project, item, currentUserAccess, rights.names, userData, handleAddUser, handleRemoveUser, getSelect])
 
     const getTable = (itemsToDisplay, itemKeys, itemTypes) => {
         return (
             <Shared.ItemTable
-                userData={userData}
-                projects={projects}
-                activities={activities}
-                setData={setData}
-                state={state}
-                setState={setState}
                 itemsToDisplay={itemsToDisplay}
                 itemKeys={itemKeys}
                 itemTypes={itemTypes}
                 editable={true}
                 isItem={false}
                 //linkActions
-                rights={rights}
                 // recentActivities={recentActivities}
                 // setRecentActivities={setRecentActivities}
             />
@@ -257,17 +223,17 @@ const AddEditUserList = ({
     return (
         <div className="dialog-container">
             <div className="dialog-content">
-                <p>Users of {currentUserParam.name}</p>
+                <p>Users of {item.name}</p>
                 <div className="users-with-access">
                     <h3>Users with Access</h3>
                     <div className="scrollable-list">
-                        {getTable(usersWithAccess, itemKeysAllowed, itemTypesAllowed)}
+                        {getTable(usersWithAccess, ITEM_KEYS_ALLOWED, ITEM_TYPES_ALLOWED)}
                     </div>
                 </div>
                 <div className="users-without-access">
                     <h3>Users without Access</h3>
                     <div className="scrollable-list">
-                        {getTable(usersWithoutAccess, itemKeys, itemTypes)}
+                        {getTable(usersWithoutAccess, ITEM_KEYS, ITEM_TYPES)}
                     </div>
                 </div>
                 <button

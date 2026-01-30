@@ -1,11 +1,20 @@
-import { useState } from 'react'
+// Libraries
+import { useState, useContext } from 'react'
+//Styles, Classes, Constants
 import '../../css/components/dialogs/LogIn.css'
 import '../../css/base/dialog.css'
-
+//Methods, Components
 import * as Shared from '../pages/shared'
 
+const LogIn = ({
+    servers,
+    loginToServer
+}) => {
 
-const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
+    const {
+        setState,
+        isLoggedIn
+    } = useContext(Shared.AppContext)
 
     const [formValues, setFormValues] = useState(() => {
         return {
@@ -82,8 +91,30 @@ const LogIn = ({ setState, isLoggedIn, servers, loginToServer }) => {
                             )
                         }
 
-                        {Shared.getInput("login", "text", formValues.login, false, handleInputChange, false, null, 60)}
-                        {Shared.getInput("password", "text", formValues.password, false, handleInputChange, false, null, 60)}
+                        {
+                            Shared.getInput(
+                                "login",
+                                "text",
+                                formValues.login,
+                                false,
+                                handleInputChange,
+                                false,
+                                null,
+                                60
+                            )
+                        }
+                        {
+                            Shared.getInput(
+                                "password",
+                                "text",
+                                formValues.password,
+                                false,
+                                handleInputChange,
+                                false,
+                                null,
+                                60
+                            )
+                        }
 
                         <div>
                             <button

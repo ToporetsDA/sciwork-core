@@ -1,21 +1,22 @@
-import { useState, useMemo }  from 'react'
-import '../../css/components/dialogs/AddEditItem.css'
-
+// Libraries
+import { useState, useMemo, useContext }  from 'react'
 import { ObjectId } from 'bson'
-
+//Styles, Classes, Constants
+import '../../css/components/dialogs/AddEditItem.css'
+//Methods, Components
 import * as Shared from '../pages/shared'
 
-const AddEditItem = ({
-    userData, setUserData,
-    projects,
-    activities,
-    setData,
-    state, setState,
-    rights,
-    itemStructure,
-    defaultStructure,
-    isCompany
-}) => {
+const AddEditItem = () => {
+
+    const {
+        userData,
+        projects,
+        setData,
+        state, setState,
+        rights,
+        itemStructure,
+        defaultStructure
+    } = useContext(Shared.AppContext)
 
     const currentItem = state.currentDialog.params[0]
     const currentItemId = state.currentDialog.params[1]
@@ -88,7 +89,7 @@ const AddEditItem = ({
         const isSchedule = state.currentPage === 'Schedule'
         const project = Shared.getItemById(projects, state.currentProject)
         const itemWithUserList = (state.currentProject)
-            ? Shared.findItemWithParent(project.activities, "_id", currentItemId, project)?.item
+            ? project.findItemWithParent(project.activities, "_id", currentItemId)?.item
             : Shared.getItemById(projects, currentItemId)
             
         let canEdit = userData.genStatus
@@ -100,7 +101,7 @@ const AddEditItem = ({
         else if (containerId && currentItemId) {
             const item = (!containerId.includes('.'))
                 ? Shared.getItemById(projects, containerId)
-                : Shared.findItemWithParent(project.activities, "_id", currentItemId, project).item
+                : project.findItemWithParent(project.activities, "_id", currentItemId, project).item
             
             canEdit = item.userList.find(user => user.id === userData._id)?.access
         }
@@ -251,7 +252,7 @@ const AddEditItem = ({
         const project = Shared.getItemById(projects, state.currentProject)
         const formattedFormValues = formatFormValues(formValues)
 
-        const { item: parent } = Shared.findItemWithParent(project?.activities || [], "_id", containerId, project)
+        const { item: parent } = project.findItemWithParent(project?.activities || [], "_id", containerId, project)
 
         let newItem = {
             ...formattedFormValues,
@@ -290,7 +291,7 @@ const AddEditItem = ({
         else if (selectedType === "Activity") {
             //edit
             if (currentItemId) {
-                const { parent: container } = Shared.findItemWithParent(project.activities, "_id", currentItemId, project)
+                const { parent: container } = project.findItemWithParent(project.activities, "_id", currentItemId, project)
                 
                 const target = container.activities.find(act => act._id === currentItemId)
                 if (target) {

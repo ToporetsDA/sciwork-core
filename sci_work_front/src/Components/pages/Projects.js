@@ -4,7 +4,7 @@ import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners,
 import { arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
 // Styles, Classes, Constants
 import '../../css/components/pages/Projects.css'
-import { DISPLAY_OPTIONS } from '../../constants'
+import { DISPLAY_OPTIONS } from '../../Basics/constants'
 // Methods, Components
 import * as Shared from './shared'
 

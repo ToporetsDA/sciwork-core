@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect, useCallback, useContext } from 'react'
 import useWebSocket from 'react-use-websocket'
 // Styles, Classes, Constants
-import { createProjects, projectVerUp, createActivity, createActivities, activityVerUp } from './classes'
+import { createProjects, projectVerUp, createActivity, createActivities, activityVerUp } from './Basics/classes'
 // Methods, Components
 import * as Shared from './pages/shared'
 import LogIn from './dialogs/LogIn'

@@ -2,7 +2,7 @@
 import { useState, useCallback, useMemo } from 'react'
 // Styles, Classes, Constants
 import '../../css/components/pages/Schedule.css'
-import { DAYS_OF_WEEK, MONTHS } from '../../constants'
+import { DAYS_OF_WEEK, MONTHS } from '../../Basics/constants'
 // Methods, Components
 import * as Shared from './shared'
 import ScheduleBoard from './specific/ScheduleBoard'

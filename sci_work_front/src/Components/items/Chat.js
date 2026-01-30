@@ -1,7 +1,7 @@
 // Libraries
 import { useState, useContext } from 'react'
 // Styles, Classes, Constants
-import { createMessage } from '../../classes'
+import { createMessage } from '../../Basics/classes'
 // Methods, Components
 import * as Shared from '../pages/shared'
 

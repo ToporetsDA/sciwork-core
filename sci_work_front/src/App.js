@@ -3,8 +3,8 @@ import { useState, useEffect, useRef, useMemo, useCallback }  from 'react'
 import { BrowserRouter as Router, Routes, Route }             from 'react-router-dom'
 //Styles, Classes, Constants
 import './App.css'
-import { createState, createUserData, createNotification } from './classes'
-import { DEFAULT_PROFILE_DATA, DEFAULT_ITEM_STRUCTURE } from './constants'
+import { createUserData, createNotification } from './Basics/classes'
+import { DEFAULT_PROFILE_DATA, DEFAULT_ITEM_STRUCTURE } from './Basics/constants'
 //Methods, Components
 import * as Shared        from './Components/pages/shared'
 import { useTimer }       from './Components/pages/shared'
@@ -15,7 +15,15 @@ import AppDynamicContent  from './Components/AppDynamicContent'
 
 const App = () => {
 
-  const [state, setState] = useState(() => createState("HomePage"))
+  const [state, setState] = useState(() => {
+    this.currentPage = "HomePage"
+    this.currentProject = undefined
+    this.currentActivity = undefined
+    this.currentDialog = {
+      name: undefined,
+      params: []
+    }
+  })
 
   //user
   

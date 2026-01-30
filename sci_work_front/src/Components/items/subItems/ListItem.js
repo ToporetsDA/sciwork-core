@@ -2,6 +2,7 @@
 import { useState, useContext } from 'react'
 // Styles, Classes, Constants
 import '../../../css/components/items/subItems/ListItem.css'
+import { MARKABLE_FIELDS, MARKABLE_TYPES } from '../../../Basics/constants'
 // Methods, Components
 import * as Shared from '../../pages/shared'
 import * as Items from '../../items'
@@ -49,14 +50,6 @@ const ListItem = ({
     const handleMarkable = (key) => {
 
         const markable = activity?.content.listItems[index].markable
-        const markableFields = ["checker" ,"name", "middleName", "surName", "patronimic"]
-        const markableTypes = {
-            name: 'plain',
-            middleName: 'plain',
-            surName: 'plain',
-            patronimic: 'plain',
-            checker: 'checker'
-        }
 
         //allow marking if in time window
         const now = new Date()
@@ -87,8 +80,8 @@ const ListItem = ({
                 {(userData._id === item.creatorId) ? (//creator sees if other users left mark
                     <Shared.ItemTable
                         itemsToDisplay={markable.userEntries}
-                        itemKeys={markableFields}
-                        itemTypes={markableTypes}
+                        itemKeys={MARKABLE_FIELDS}
+                        itemTypes={MARKABLE_TYPES}
                         // nested={false}
                     />
                 ) : (containerType !== "Report") ? (//other users see checkbox

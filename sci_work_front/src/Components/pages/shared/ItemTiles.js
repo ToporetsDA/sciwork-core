@@ -3,7 +3,7 @@ import { useContext }  from 'react'
 import { SortableContext } from '@dnd-kit/sortable'
 // Styles, Classes, Constants
 import '../../../css/components/pages/shared/ItemTiles.css'
-import { ITEM_TYPES_LIST_BASED } from '../../../constants'
+import { ITEM_TYPES_LIST_BASED } from '../../../Basics/constants'
 // Methods, Components
 import * as Shared from './'
 import * as Items from '../../items'
@@ -44,7 +44,7 @@ const ItemTiles = ({
 
         const project = Shared.getItemById(projects, parts[0])
         
-        return rights.edit.includes(project.getAccess(userData, containerId))
+        return project.getAccessType(rights.edit, userData, containerId)
     }
 
     const noItems = itemsToDisplay.length === 0

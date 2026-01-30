@@ -4,7 +4,7 @@
 
 // --- App.js ---
 
-class State {
+/*class State {
   constructor(page = "HomePage", project = undefined, activity = undefined, dialog = undefined, params = []) {
     this.currentPage = page               // string
     this.currentProject = project         // string | undefined
@@ -15,7 +15,7 @@ class State {
     }
   }
 }
-export const createState = (page, project, activity, dialog, params) => new State(page, project, activity, dialog, params)
+export const createState = (page, project, activity, dialog, params) => new State(page, project, activity, dialog, params)*/
 
 class Item {
   constructor(_id, name) {
@@ -25,12 +25,25 @@ class Item {
     this.name = name
   }
 
-  getAccesss = (userData = {}, id = this._id) => {
-    const access = this?.userList?.find(user => user.id === userData._id)?.access     // project
-      ?? this
-        .findItemWithParent(this.activities, "_id", id, this.ю.getProjectId()).item   // activity's _id is in meta in project
-        .userList?.find(user => user.id === userData._id)?.access                     // metaActivity
+  getAccess = (userData = {}, id = this._id) => {
+    const parts = id.split('.')
+    const access =
+      this
+        .findItemWithParent(this.activities, "_id", id, parts[0]).item  // activity's _id is in meta in project
+        .userList?.find(user => user.id === userData._id)?.access ??    // project or metaActivity
+      this?.content?.listItems[parts[2]]
+        .userList?.find(user => user.id === userData._id)?.access       // List-based activity's item
+    
+
     return (typeof access === 'number') ? access : -1
+  }
+
+  getAccessType = (rightsType, user, id = this._id) => {
+    return rightsType.includes(this.getAccess(user, id))
+  }
+
+  hasAccess = (userData = {}, id = this._id) => {
+    return (this.getAccess(userData, id) >= 0)
   }
 
   goTo = (data, recentActivities, setRecentActivities) => {
@@ -100,12 +113,12 @@ class Project extends Item {
     this.dndCount = dndCount
     this.startDate = startDate
     this.endDate = endDate
-    this.activities = activities
+    this.activities = activities || {}
     this.userList = userList
     this.__v = __v
   }
 
-  getAccess(userData = {}, id = this._id) {
+  /*getAccess(userData = { _id: null }, id = this._id) {
 
     const found = id.includes('.')
       ? this.findItemWithParent(this.activities, "_id", id, this)
@@ -116,9 +129,9 @@ class Project extends Item {
     const direct = item?.userList?.find(u => u.id === userData._id)?.access
 
     return Number.isInteger(direct) ? direct : -1
-  }
+  }*/
 
-  findItemWithParent = (items, field = "_id", target, parent) => {
+  findItemWithParent = (items = this.activities, field = "_id", target, parent = this) => {
     for (let i = 0; i < items.length; i++) {
         const item = items[i]
         if (item[field] === target) {

@@ -2,7 +2,7 @@
 import { useState, useEffect, Suspense, useContext } from 'react'
 // Styles, Classes, Constants
 import '../css/components/AppContent.css'
-import { createItemsToDisplay } from '../classes'
+import { createItemsToDisplay } from '../Basics/classes'
 // Methods, Components
 import * as Shared from './pages/shared'
 import * as Pages from './pages'
@@ -54,10 +54,7 @@ const AppContent = () => {
     return (
         <main className="content">
             {DialogComponent &&
-                <DialogComponent
-                    itemsToDisplay={itemsToDisplay}
-                    setItemsToDisplay={setItemsToDisplay}
-                />
+                <DialogComponent/>
             }
             {PageComponent ? (
                 <Suspense fallback={<div>Loading...</div>}>

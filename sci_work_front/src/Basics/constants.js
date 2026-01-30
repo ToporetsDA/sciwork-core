@@ -142,7 +142,7 @@ export const MONTHS = Object.freeze([
 
 // --- Item.js ---
 
-export const ITEM_TYPES = Object.freeze({
+export const ACTIVITY_TYPES = Object.freeze({
     Dev: "Dev",
     Group: "Group",
     Text: "Text",
@@ -153,6 +153,13 @@ export const ITEM_TYPES = Object.freeze({
     Chat: "Chat",
     Page: "Dev"
 })
+
+export const SUB_ACTIVITY_TYPES = Object.freeze({
+    List: "ListItem",
+    Chat: "Message"
+})
+
+export const NO_ACTIONS_CONTAINER = ["Chat"]
 
 // --- ItemActions.js ---
 
@@ -170,6 +177,60 @@ export const ITEM_TYPES_LIST_BASED = Object.freeze([
 // --- ToggleButton.js ---
 
 // ==================================
+// Dialogs
+// ==================================
+
+// --- AddEditContent.js ---
+
+export const TECH_FIELDS = ["_id", "creatorId"]
+
+// --- AddEditItem.js ---
+
+// --- AddEditUserList.js ---
+
+export const ITEM_KEYS_ALLOWED = [
+    "name",
+    "middleName",
+    "surName",
+    "patronimic",
+    "genStatus",
+    "access",
+    "accessLevel"
+]
+
+export const ITEM_TYPES_ALLOWED = {
+    name: "plain",
+    middleName: "plain",
+    surName: "plain",
+    patronimic: "plain",
+    genStatus: "access",
+    access: "button",
+    accessLevel: "combobox"
+}
+
+export const ITEM_KEYS = [
+    "name",
+    "middleName",
+    "surName",
+    "patronimic",
+    "genStatus",
+    "access"
+]
+
+export const ITEM_TYPES = {
+    name: "plain",
+    middleName: "plain",
+    surName: "plain",
+    patronimic: "plain",
+    genStatus: "access",
+    access: "button"
+}
+
+// --- JointEventOverlap.js ---
+
+// --- LogIn.js ---
+
+// ==================================
 // Items
 // ==================================
 
@@ -184,3 +245,27 @@ export const ITEM_TYPES_LIST_BASED = Object.freeze([
 // --- Project.js ---
 
 // --- Text.js ---
+
+// ==================================
+// SubItems
+// ==================================
+
+// --- ListItem.js ---
+
+export const MARKABLE_FIELDS = [
+    "checker",
+    "name",
+    "middleName",
+    "surName",
+    "patronimic"
+]
+
+export const MARKABLE_TYPES = {
+    name: 'plain',
+    middleName: 'plain',
+    surName: 'plain',
+    patronimic: 'plain',
+    checker: 'checker'
+}
+
+// --- Message.js ---

@@ -1,19 +1,16 @@
-import React from 'react'
+// Libraries
+import { useContext } from 'react'
+//Styles, Classes, Constants
 import '../../css/components/dialogs/JointEventOverlap.css'
-
+//Methods, Components
 import * as Shared from '../pages/shared'
 
-const JointEventOverlapDialog = ({
-    userData, setUserData,
-    projects,
-    activities,
-    setData,
-    state, setState,
-    rights,
-    users,
-    recentActivities, setRecentActivities,
-    isCompany
-}) => {
+const JointEventOverlapDialog = () => {
+
+    const {
+        projects,
+        setState
+    } = useContext(Shared.AppContext)
 
     // Close the dialog
 
@@ -36,21 +33,12 @@ const JointEventOverlapDialog = ({
         >
             <div className="dialog-content">
                 <Shared.ItemTable
-                    userData={userData}
-                    projects={projects}
-                    activities={activities}
-                    setData={setData}
-                    state={state}
-                    setState={setState}
                     itemsToDisplay={projects}
                     itemKeys={["name", "startDate", "endDate"]}
                     //itemTypes
                     editable={false}
                     isItem={true}
                     //linkActions
-                    rights={rights}
-                    recentActivities={recentActivities}
-                    setRecentActivities={setRecentActivities}
                 />
                 <button
                     className='button-main'
