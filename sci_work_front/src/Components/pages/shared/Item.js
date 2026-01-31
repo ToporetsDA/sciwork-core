@@ -20,7 +20,7 @@ const Item = ({
     const {
         userData,
         projects,
-        setState,
+        setDialog,
         rights
     } = useContext(Shared.AppContext)
 
@@ -83,7 +83,7 @@ const Item = ({
                     {/* ➕ Add below button */}
                     {(isItem ? project.getAccessType(rights.edit, userData) : true) &&
                         Shared.getDialogButton(
-                            setState,
+                            setDialog,
                             `add-button ${classCondition ? 'button-mini' : 'button-tool'}`,
                             (!['List', 'Attendance', 'Report'].includes(containerType)) ? 'AddEditItem' : 'AddEditContent',
                             [true, false, index, containerId, "Add Item"],

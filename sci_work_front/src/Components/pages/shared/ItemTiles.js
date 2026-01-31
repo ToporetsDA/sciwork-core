@@ -1,5 +1,5 @@
 // Libraries
-import { useContext }  from 'react'
+import { useContext, useLocation }  from 'react'
 import { SortableContext } from '@dnd-kit/sortable'
 // Styles, Classes, Constants
 import '../../../css/components/pages/shared/ItemTiles.css'
@@ -17,9 +17,11 @@ const ItemTiles = ({
     const {
         userData,
         projects,
-        state,
         rights
     } = useContext(Shared.AppContext)
+
+    const { pathname } = useLocation()
+    const currentPage = pathname.split("/")[1] || "HomePage"
 
     const getItem = (item, index, dnd) => {
         const Component = (dnd) ? Shared.Item : Items.Project
@@ -54,7 +56,7 @@ const ItemTiles = ({
 
     return (
         <>
-            {(state.currentPage === "Projects" /*|| !rights.edit.includes(getAccess(container))*/) ?
+            {(currentPage === "Projects" /*|| !rights.edit.includes(getAccess(container))*/) ?
                 (
                     itemsToDisplay.map((item, index) => (
                         getItem(item, index, false)

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback, useContext }  from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback, useContext, useParams, useLocation }  from 'react'
 import '../../../css/components/pages/shared/ControlPanel.css'
 
 import * as Shared from './'
@@ -11,10 +11,15 @@ const ControlPanel = ({
 
     const {
         userData, setUserData,
-        state, setState,
         projects,
+        setDialog,
         rights
     } = useContext(Shared.AppContext)
+
+    const { projectId } = useParams()
+
+    const { pathname } = useLocation()
+    const currentPage = pathname.split("/")[1] || "HomePage"
 
     const filterOptions = {
         sort: ["A-Z", "Z-A", "start date", "end date"],
@@ -25,8 +30,8 @@ const ControlPanel = ({
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false)
     const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false)
     //current combobox values
-    const [currentSortOption, setCurrentSortOption] = useState(userData.currentSettings.sortFilter)
-    const [currentStateOption, setCurrentStateOption] = useState(userData.currentSettings.stateFilter)
+    // const [currentSortOption, setCurrentSortOption] = useState(userData.currentSettings.sortFilter)
+    // const [currentStateOption, setCurrentStateOption] = useState(userData.currentSettings.stateFilter)
     //toggle switch(s)
     const displayOptions = ["tiles", "list", "table"]
     //search
@@ -35,9 +40,10 @@ const ControlPanel = ({
     const sortDropdownRef = useRef(null)
     const stateDropdownRef = useRef(null)
 
+    // (V)
     useEffect(() => {
         setSearchQuery("")
-    }, [state.currentProject])
+    }, [projectId])
 
     const getAccess = (item) => {
         return item.userList.find(item => item.id === userData._id).access
@@ -45,12 +51,6 @@ const ControlPanel = ({
 
     //update filter values
 
-    useEffect(() => {
-        if (userData) {
-            setCurrentSortOption(userData.currentSettings.sortFilter)
-            setCurrentStateOption(userData.currentSettings.statusFilter)
-        }
-    }, [userData])
 
     const handleSortOptionSelect = (option) => {
         setUserData({ sortFilter: option }, true)
@@ -75,7 +75,8 @@ const ControlPanel = ({
         }
     }, [isSortDropdownOpen, isStateDropdownOpen])
 
-    useState(() => {
+    // (V)
+    useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside)
         return () => {
             document.removeEventListener('mousedown', handleClickOutside)
@@ -88,22 +89,25 @@ const ControlPanel = ({
         if (items.length === 0) {
             return []
         }
+
+        const option = userData.currentSettings.sortFilter
+
         return items.sort((a, b) => {
-            if (currentSortOption === "A-Z") {
+            if (option === "A-Z") {
                 return a.name.localeCompare(b.name)
             }
-            if (currentSortOption === "Z-A") {
+            if (option === "Z-A") {
                 return b.name.localeCompare(a.name)
             }
-            if (currentSortOption === "start date") {
+            if (option === "start date") {
                 return new Date(a.startDate) - new Date(b.startDate)
             }
-            if (currentSortOption === "end date") {
+            if (option === "end date") {
                 return new Date(a.endDate) - new Date(b.endDate)
             }
             return 0
         })
-    }, [currentSortOption])
+    }, [userData.currentSettings.sortFilter])
 
     //filter items 
 
@@ -113,15 +117,16 @@ const ControlPanel = ({
         filtered = filtered.filter(item => !item.deleted || (item.deleted && rights.fullView.includes(item.access)))
 
         // Filter by state first
-        if (currentStateOption !== "all") {
+        const stateOption = userData.currentSettings.statusFilter
+        if (stateOption !== "all") {
             filtered = filtered.filter(item => {
 
                 const endDate = new Date(item.endDate)
                 const timeDifference = (endDate - new Date()) / (24 * 60 * 60 * 1000) // days remaining
-                if (currentStateOption === "expired" && timeDifference < 0) {
+                if (stateOption === "expired" && timeDifference < 0) {
                     return true // Expired items
                 }
-                if (currentStateOption === "expiring" && timeDifference < 30 && timeDifference >= 0) {
+                if (stateOption === "expiring" && timeDifference < 30 && timeDifference >= 0) {
                     return true // Expiring items (within 30 days)
                 }
                 return false
@@ -137,7 +142,7 @@ const ControlPanel = ({
         }
 
         return filtered
-    }, [currentStateOption, searchQuery, rights.fullView])
+    }, [userData.currentSettings.statusFilter, searchQuery, rights.fullView])
 
     //data to display
 
@@ -146,13 +151,14 @@ const ControlPanel = ({
     }, [projects, filterItems, sortItems])
 
     const activitiesToDisplay = useMemo(() => {
-        const activities = Shared.getItemById(projects, state.currentProject).activities
+        const activities = Shared.getItemById(projects, projectId).activities
         return Array.isArray(activities)
             ? filterItems(sortItems([...activities]))
             : []
-    }, [projects, state.currentProject, filterItems, sortItems])
+    }, [projects, projectId, filterItems, sortItems])
 
     //return data to display it
+    // (V)
     useEffect(() => {
         setItemsToDisplay({
             projects: projectsToDisplay,
@@ -162,7 +168,7 @@ const ControlPanel = ({
 
     return (
         <div className='control-panel'>
-            {(state.currentPage === "Projects") &&
+            {(currentPage === "Projects") &&
                 <>
                     {Shared.getInput("Search", "text", searchQuery, false, (e) => setSearchQuery(e.target.value), false, null, 25)}
                     <Shared.ToggleButton
@@ -173,7 +179,7 @@ const ControlPanel = ({
                     />
                 </>
             }
-            {state.currentPage === "Schedule" &&
+            {currentPage === "Schedule" &&
                 <div className='scale'>
                     <Shared.CustomSelect
                         id={"server"}
@@ -198,9 +204,9 @@ const ControlPanel = ({
                     </button>
                 </div>
             }
-            {(state.currentPage === "Projects" || state.currentPage === "Project"  || state.currentPage === "Activity") &&
+            {(currentPage === "Projects" || currentPage === "Project"  || currentPage === "Activity") &&
                 <>
-                    {userData.currentSettings.displayProjects !== "table" && state.currentPage === "Projects" &&
+                    {userData.currentSettings.displayProjects !== "table" && currentPage === "Projects" &&
                     <div className='sort-and-filter'>
                         <div>
                             <button
@@ -208,7 +214,7 @@ const ControlPanel = ({
                                 onClick={() => {setIsSortDropdownOpen(!isSortDropdownOpen)}}
                                 ref={sortDropdownRef}
                             >
-                                {currentSortOption}
+                                {userData.currentSettings.sortFilter}
                             </button>
                             {isSortDropdownOpen && (
                                 <ul className="dropdown">
@@ -226,7 +232,7 @@ const ControlPanel = ({
                                 onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
                                 ref={stateDropdownRef}
                             >
-                                {currentStateOption}
+                                {userData.currentSettings.statusFilter}
                             </button>
                             {isStateDropdownOpen && (
                                 <ul className="dropdown">
@@ -240,15 +246,15 @@ const ControlPanel = ({
                         </div>
                     </div>
                     }
-                    {((state.currentPage !== "Projects")
-                    && ((state.currentProject) ? rights.edit.includes(getAccess(Shared.getItemById(projects, state.currentProject))) : false))
+                    {((currentPage !== "Projects")
+                    && ((projectId) ? rights.edit.includes(getAccess(Shared.getItemById(projects, projectId))) : false))
                     && (
                         <div>
                         {Shared.getDialogButton(
-                            setState,
+                            setDialog,
                             "add-item button-mini",
                             'AddEditUserList',
-                            [state.currentProject],
+                            [projectId],
                             "Add/Edit users",
                             false
                         )
@@ -258,10 +264,10 @@ const ControlPanel = ({
                 </>
             }
             {(rights.edit.includes(userData.genStatus)
-            && ["Projects"].includes(state.currentPage))
+            && ["Projects"].includes(currentPage))
             && (
                 Shared.getDialogButton(
-                    setState,
+                    setDialog,
                     "add-item button-mini",
                     'AddEditItem',
                     [true, false],

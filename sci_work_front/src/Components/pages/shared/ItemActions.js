@@ -10,7 +10,7 @@ const ItemActions = ({ item }) => {
         userData,
         projects,
         setData,
-        setState,
+        setDialog,
         rights
     } = useContext(Shared.AppContext)
 
@@ -43,7 +43,7 @@ const ItemActions = ({ item }) => {
                 ) : (
                     <>
                         {Shared.getDialogButton(
-                            setState,
+                            setDialog,
                             buttonClass,
                             "AddEditUserList",
                             [item._id],
@@ -52,7 +52,7 @@ const ItemActions = ({ item }) => {
                         )}
                         {(parts?.length < 3) &&
                         Shared.getDialogButton(
-                            setState,
+                            setDialog,
                             buttonClass,
                             "AddEditItem",
                             [item, item._id],

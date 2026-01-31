@@ -1,5 +1,5 @@
 // Libraries
-import { useState, useMemo, useContext } from 'react'
+import { useState, useMemo, useContext, useParams } from 'react'
 import { useNavigate } from "react-router-dom"
 // Styles, Classes, Constants
 import '../../../css/components/pages/shared/ItemTable.css'
@@ -28,13 +28,15 @@ const ItemTable = ({
         projects,
         activities,
         setData,
-        state,
+        dialog,
         rights,
         recentActivities, setRecentActivities
     } = useContext(Shared.AppContext)
 
     //navigation for projects
     const navigate = useNavigate()
+
+    const { projectId } = useParams()
 
     //find activity if activities
     const parts = (itemsToDisplay.length > 0) ? itemsToDisplay[0]._id.split('.') : []
@@ -191,7 +193,7 @@ const ItemTable = ({
                 {isItem &&
                     <th>Status</th>
                 }
-                {isItem && (!state.currentDialog?.name) &&
+                {isItem && (!dialog?.name) &&
                     <th>Actions</th>
                 }
                 </tr>
@@ -203,7 +205,7 @@ const ItemTable = ({
                     const isExpired = new Date(item.endDate) < new Date()
                     const status = isExpired ? 'Expired' : isExpiring ? 'Expiring' : 'Active'
 
-                    const items = (!state.currentProject) ? projects : activities
+                    const items = (!projectId) ? projects : activities
 
                     const idParts = item._id.split('.')
                     const i = parseInt(idParts[idParts.length - 1], 10)
@@ -236,7 +238,7 @@ const ItemTable = ({
                             {isItem &&
                                 <td>{status}</td>
                             }
-                            {isItem && (!state.currentDialog?.name) &&
+                            {isItem && (!dialog?.name) &&
                                 <td onClick={(e) => e.stopPropagation()}>
                                     <Shared.ItemActions
                                         item={item}

@@ -1,5 +1,5 @@
 // Libraries
-import { useContext } from 'react'
+import { useContext, useParams, useLocation } from 'react'
 import { useNavigate } from "react-router-dom"
 // Styles, Classes, Constants
 import '../css/components/AppNav.css'
@@ -9,7 +9,6 @@ import * as Shared from './pages/shared'
 const AppNav = () => {
   
   const {
-    state,
     projects,
     isLoggedIn,
     organisationType,
@@ -17,6 +16,10 @@ const AppNav = () => {
   } = useContext(Shared.AppContext)
 
   const navigate = useNavigate()
+  const { activityId } = useParams()
+
+  const { pathname } = useLocation()
+  const currentPage = pathname.split("/")[1] || "HomePage"
 
   //project.name and activity.name pairs
   const clearRecent = () => {
@@ -32,9 +35,9 @@ const AppNav = () => {
           () => {navigate(activity.goTo(projects, recentActivities, setRecentActivities))}
         }
         className={
-          state.currentActivity === activity._id ? 'active' : ''
+          activityId === activity._id ? 'active' : ''
         }
-        style={state.currentActivity === activity._id ? {
+        style={activityId === activity._id ? {
           fontWeight: 'bold',
           pointerEvents: 'none',
           opacity: 0.5,
@@ -114,11 +117,11 @@ const AppNav = () => {
       <>
         <ul className="nav-items">
           <h4
-            className={state.currentPage === 'Projects' ? 'active' : ''}
+            className={currentPage === 'Projects' ? 'active' : ''}
             style={{
-            fontWeight: state.currentPage === 'Projects' ? 'bold' : 'normal',
-            pointerEvents: state.currentPage === 'Projects' ? 'none' : 'auto',
-            opacity: state.currentPage === 'Projects' ? 0.5 : 1,
+            fontWeight: currentPage === 'Projects' ? 'bold' : 'normal',
+            pointerEvents: currentPage === 'Projects' ? 'none' : 'auto',
+            opacity: currentPage === 'Projects' ? 0.5 : 1,
             }}
           >
             {organisationType === true ? 'Projects' : 'Subjects'}

@@ -1,41 +1,47 @@
 // Libraries
-import { Suspense, useState, useEffect, useContext }  from 'react'
+import { Suspense, useState, useEffect, useContext, useParams, useLocation }  from 'react'
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners, useSensor, useSensors, } from '@dnd-kit/core'
 import { arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
 // Styles, Classes, Constants
 import '../../css/components/pages/Projects.css'
+import { createItemsToDisplay } from '../../Basics/classes'
 import { DISPLAY_OPTIONS } from '../../Basics/constants'
 // Methods, Components
 import * as Shared from './shared'
 
-const Projects = ({
-    itemsToDisplay, setItemsToDisplay
-}) => {
+const Projects = () => {
 
     const {
         userData,
-        state,
         projects, 
         activities,
         setData
     } = useContext(Shared.AppContext)
 
+    const { projectId } = useParams()
+
+    const { pathname } = useLocation()
+    const currentPage = pathname.split("/")[1] || "HomePage"
+
+    const [itemsToDisplay, setItemsToDisplay] = useState(createItemsToDisplay(projects, projectId))
+
     const [activeId, setActiveId] = useState(null)
     const [prevDnd, setPrevDnd] = useState(null)
 
     const [containers, setContainers] = useState([])
+    // (V)
     useEffect(() => {
-        if (state.currentProject) {
-            const project = Shared.getItemById(projects, state.currentProject)
+        if (projectId) {
+            const project = Shared.getItemById(projects, projectId)
             if (activities.length === project.dndCount) {
                 setContainers([...project.activities])
             }
         }
-    }, [projects, activities, state.currentProject])
+    }, [projects, activities, projectId])
 
     const saveDndUpdate = () => {
         const project = {
-            ...Shared.getItemById(projects, state.currentProject),
+            ...Shared.getItemById(projects, projectId),
             activities: containers
         }
         setData({action: "edit", item: project})
@@ -49,7 +55,7 @@ const Projects = ({
         })
     )
 
-    if (state.currentProject && containers.length !== Shared.getItemById(projects, state.currentProject).activities.length) {
+    if (projectId && containers.length !== Shared.getItemById(projects, projectId).activities.length) {
         return (
             <>Loading Activities</>
         )
@@ -144,7 +150,7 @@ const Projects = ({
         ) {
             // console.log("Handling Item Drop Into a Container")
 
-            const project = Shared.getItemById(projects, state.currentProject)
+            const project = Shared.getItemById(projects, projectId)
             const { item: metaItem } = project.findItemWithParent(project.activities, "_id", over.id, project)
 
             if (!metaItem || metaItem?.type !== "Group") {
@@ -220,11 +226,11 @@ const Projects = ({
     const getItemTiles = (content, item) => {
         switch(content) {
             case "tiles": {
-                const items = (state.currentPage === "Projects") ? itemsToDisplay.projects : containers
+                const items = (projectId === "Projects") ? itemsToDisplay.projects : containers
                 return (
                     <Shared.ItemTiles
                         itemsToDisplay={items}
-                        containerId={state.currentProject}
+                        containerId={projectId}
                         containerType={item}
                     />
                 )
@@ -235,7 +241,7 @@ const Projects = ({
                         key={item._id}
                         
                         item={item}
-                        containerId={state.currentProject}
+                        containerId={projectId}
                         containerType={"Project"}
                     />
                 )
@@ -264,7 +270,7 @@ const Projects = ({
                 setItemsToDisplay={setItemsToDisplay}
             />
             <div className={`page-wrapper ${DISPLAY_OPTIONS.get(userData.currentSettings.displayProjects)}`}>
-                {(state.currentPage === "Projects") ? (
+                {(currentPage === "Projects") ? (
                     <Suspense fallback={<div>Loading projects...</div>}>
                         {DISPLAY_OPTIONS.get(userData.currentSettings.displayProjects) !== 'table' ?
                         (

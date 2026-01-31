@@ -1,6 +1,6 @@
 // Libraries
-import { useState, useEffect, useRef, useMemo, useCallback }  from 'react'
-import { BrowserRouter as Router, Routes, Route }             from 'react-router-dom'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { BrowserRouter as Router, } from 'react-router-dom'
 //Styles, Classes, Constants
 import './App.css'
 import { createUserData, createNotification } from './Basics/classes'
@@ -11,19 +11,9 @@ import { useTimer }       from './Components/pages/shared'
 import AppConnection      from './Components/AppConnection'
 import AppHeader          from './Components/AppHeader'
 import AppNav             from './Components/AppNav'
-import AppDynamicContent  from './Components/AppDynamicContent'
+import AppContent         from './Components/AppContent'
 
 const App = () => {
-
-  const [state, setState] = useState(() => {
-    this.currentPage = "HomePage"
-    this.currentProject = undefined
-    this.currentActivity = undefined
-    this.currentDialog = {
-      name: undefined,
-      params: []
-    }
-  })
 
   //user
   
@@ -43,6 +33,13 @@ const App = () => {
   //nav
 
   const [recentActivities, setRecentActivities] = useState([])
+
+  // dialogs
+
+  const [dialog, setDialog] = useState(() => {
+    this.name = undefined
+    this.params = []
+  })
 
   //login
 
@@ -111,7 +108,7 @@ const App = () => {
         else {
           const {containerId, index, activity} = item
 
-          let clone = Shared.getItemById(projects, state.currentProject)
+          let clone = Shared.getItemById(projects, dialog.currentProject)
           clone.dndCount++
 
           const project = clone
@@ -144,7 +141,7 @@ const App = () => {
         }
         //activity
         else {
-          const project = Shared.getItemById(projects, state.currentProject)
+          const project = Shared.getItemById(projects, dialog.currentProject)
           if (!project) return
 
           const { item: activity } = project.findItemWithParent(project.activities, "_id", item._id, project)
@@ -270,7 +267,7 @@ const App = () => {
     }
   }, [projects])
 
-  //load existing messages on log in
+  // (V) load existing messages on log in
   useEffect(() => {
     if (isLoggedIn !== true) {
       return
@@ -289,7 +286,7 @@ const App = () => {
     }
   }, [checkActivities, delay, userData._id, isLoggedIn])
   
-  //save existing messages to storage on each change
+  // (V) save existing messages to storage on each change
   useEffect(() => {
     if (isLoggedIn !== true) {
       return
@@ -329,7 +326,7 @@ const App = () => {
   // Values for Provider
   const vals = {
     //tech
-    state: state,
+    dialog: dialog,
     isLoggedIn: isLoggedIn,
     isCompany: isCompany,
     rights: rights,
@@ -347,7 +344,7 @@ const App = () => {
     recentActivities: recentActivities,
     
     //tech
-    setState: setState,
+    setDialog: setDialog,
     setLoggedIn: setLoggedIn,
     //data
     setUserData: updateUser,
@@ -370,11 +367,7 @@ const App = () => {
               {isLoggedIn &&
                 <AppNav/>
               }
-              <Routes>
-                <Route path="*" element={
-                  <AppDynamicContent/>
-                } />
-              </Routes>
+              <AppContent/>
             </div>
         </div>
         <AppConnection

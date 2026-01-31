@@ -1,73 +1,49 @@
 // Libraries
-import { useState, useEffect, Suspense, useContext } from 'react'
+import { Suspense, useContext } from 'react'
+import { Routes, Route } from "react-router-dom"
 // Styles, Classes, Constants
 import '../css/components/AppContent.css'
-import { createItemsToDisplay } from '../Basics/classes'
 // Methods, Components
-import * as Shared from './pages/shared'
+import { AppContext } from './pages/shared'
 import * as Pages from './pages'
 import * as Dialogs from './dialogs'
 
 const AppContent = () => {
 
     const {
-        state,
-        projects
-    } = useContext(Shared.AppContext)
-
-    // dialogs
+        state
+    } = useContext(AppContext)
 
     const loadDialogComponent = (dialogName) => {
         return Dialogs[dialogName.replace(/\s+/g, '')]
     }
 
-    const DialogComponent = (state.currentDialog.name !== undefined && state.currentDialog.name !== "LogIn")
-        ? loadDialogComponent(state.currentDialog.name)
-        : undefined
+    const DialogComponent =
+        (state.currentDialog.name && state.currentDialog.name !== "LogIn")
+            ? loadDialogComponent(state.currentDialog.name)
+            : null
 
-    // pages
-    
-    const loadPageComponent = (pageName) => {
-        switch(pageName) {
-            case"Subjects":
-            case"Project": {
-                return Pages["Projects".replace(/\s+/g, '')]
-            }
-            default: {
-                return Pages[pageName.replace(/\s+/g, '')]
-            }
-        }
-    }
+  return (
+    <main className="content">
+        {DialogComponent && <DialogComponent />}
 
-    const PageComponent = state.currentPage ? loadPageComponent(state.currentPage) : undefined
+        <Suspense fallback={<div>Loading...</div>}>
+            <Routes>
+                <Route path="/HomePage" element={<Pages.HomePage />} />
+                <Route path="/Notifications" element={<Pages.Notifications />} />
+                <Route path="/Profile" element={<Pages.Profile />} />
+                <Route path="/Schedule" element={<Pages.Schedule />} />
+                <Route path="/Settings" element={<Pages.Settings />} />
 
-    // more for pages
-
-    const project = Shared.getItemById(projects, state.currentProject)
-
-    const [itemsToDisplay, setItemsToDisplay] = useState(createItemsToDisplay(projects, project))
-
-    useEffect(() => {
-        setItemsToDisplay(createItemsToDisplay(projects, project))
-    }, [projects, project])
-
-    return (
-        <main className="content">
-            {DialogComponent &&
-                <DialogComponent/>
-            }
-            {PageComponent ? (
-                <Suspense fallback={<div>Loading...</div>}>
-                    <PageComponent
-                        itemsToDisplay={itemsToDisplay}
-                        setItemsToDisplay={setItemsToDisplay}
-                    />
-                </Suspense>
-            ) : (
-                <div>No page to display</div>
-            )}
-        </main>
-    )
+                <Route path="/Projects" element={<Pages.Projects />}>
+                    <Route path=":projectId" element={<Pages.Projects />} >
+                        <Route path=":activityId" element={<Pages.Projects />} />
+                    </Route>
+                </Route>
+            </Routes>
+        </Suspense>
+    </main>
+  )
 }
 
 export default AppContent

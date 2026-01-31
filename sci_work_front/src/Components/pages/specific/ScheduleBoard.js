@@ -17,7 +17,7 @@ const ScheduleBoard = ({
 
     const {
         projects,
-        setState,
+        setDialog,
         recentActivities, setRecentActivities
     } = useContext(Shared.AppContext)
 
@@ -307,13 +307,10 @@ const ScheduleBoard = ({
                 }}
                 onClick={() => {
                     (isJoint) ? (
-                        setState((prevState) => ({
-                            ...prevState,
-                            currentDialog: {
-                                name: 'JointEventOverlap',
-                                params: [group]
-                            }
-                        }))
+                        setDialog({
+                            name: 'JointEventOverlap',
+                            params: [group]
+                        })
                     ) : (
                         navigate(group[i].goTo(projects, recentActivities, setRecentActivities))
                     )
@@ -322,7 +319,7 @@ const ScheduleBoard = ({
                 {content}
             </div>
         )
-    }, [currentScale, firstDayOfMonth, projects, setState, weeksInMonth, intervalAnchor, navigate, recentActivities, setRecentActivities])
+    }, [currentScale, firstDayOfMonth, projects, setDialog, weeksInMonth, intervalAnchor, navigate, recentActivities, setRecentActivities])
 
     //schedule events as <div></div>s to display
     const eventsToDisplay = useMemo(() => {

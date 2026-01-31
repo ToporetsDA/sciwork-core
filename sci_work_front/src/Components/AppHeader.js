@@ -1,5 +1,5 @@
 // Libraries
-import { useState, useRef, useEffect, useMemo, useContext } from 'react'
+import { useState, useRef, useEffect, useMemo, useContext, useLocation } from 'react'
 import { useNavigate } from 'react-router-dom'
 //Styles, Classes, Constants
 import '../css/components/AppHeader.css'
@@ -12,7 +12,7 @@ import logo from '../logo.svg'
 const AppHeader = () => {
 
     const {
-        state, setState,
+        setState,
         userData,
         isLoggedIn, setLoggedIn,
         notifications, setNotifications,
@@ -20,6 +20,9 @@ const AppHeader = () => {
     } = useContext(Shared.AppContext)
 
     const navigate = useNavigate()
+
+    const { pathname } = useLocation()
+    const currentPage = pathname.split("/")[1] || "HomePage"
 
     const format = (str) => {
         return str.replace(/\s+/g, '')
@@ -67,7 +70,10 @@ const AppHeader = () => {
 
     //go to page
     const handleClick = (page) => {
-        navigate(`/${page}`)
+
+        const uniPage = (page === "Subjects") ? "Projects" : page
+
+        navigate(`/${uniPage}`)
         setIsMoreOpen(false)
 
         if (page === "Notifications") {
@@ -92,7 +98,7 @@ const AppHeader = () => {
         setLoggedIn(false)
     }
 
-    //close dropdown menu if clicked outside
+    // (V) close dropdown menu if clicked outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -111,11 +117,11 @@ const AppHeader = () => {
             <li
                 key={format(page)}
                 onClick={() => handleClick(format(page))}
-                className={state.currentPage === format(page) ? 'active' : ''}
+                className={currentPage === format(page) ? 'active' : ''}
                 style={{
-                fontWeight: state.currentPage === format(page) ? 'bold' : 'normal',
-                pointerEvents: state.currentPage === format(page) ? 'none' : 'auto',
-                opacity: state.currentPage === format(page) ? 0.5 : 1,
+                fontWeight: currentPage === format(page) ? 'bold' : 'normal',
+                pointerEvents: currentPage === format(page) ? 'none' : 'auto',
+                opacity: currentPage === format(page) ? 0.5 : 1,
                 }}
             >
                 <p>{page}</p>
