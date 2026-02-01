@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowJs": true,              // щоб TypeScript розумів .js файли
+    "checkJs": false,             // не перевіряти JS файли
+    "jsx": "react-jsx",           // щоб TS розумів JSX в tsx/jsx файлах
+    "noEmit": true,               // нічого фізично не компілювати
+    "strict": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/styles.d.ts"             // щоб декларації SASS завжди підхоплювались
+  ]
+}

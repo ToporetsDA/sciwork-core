@@ -16,6 +16,7 @@
     "react-router-dom": "^7.1.5",
     "react-scripts": "5.0.1",
     "react-use-websocket": "^4.11.1",
+    "sass": "^1.97.3",
     "sci_work_front": "file:",
     "web-vitals": "^2.1.4"
   },
