@@ -24,25 +24,39 @@ const Text = ({
 }) => {
 
     const {
+        projectId, activityId,
         userData,
         projects,
         activities,
         setData,
-        state,
         rights
     } = useContext(AppContext)
 
-    const parts = item._id.split('.')
-    const activityId = parts[0] + '.' + parts[1]
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
+    const project = getItemById(projects, projectId)
+    const { item: metaActivity } = project.findItemWithParent(project.activities, "_id", activityId, project)
+
     const activity = getItemById(activities, activityId)
 
-    const project = getItemById(projects, state.currentProject)
-    const { item: metaActivity } = project.findItemWithParent(project.activities, "_id", activity._id, project)
+    const itemToEdit = (metaActivity?.userData) ? metaActivity : project
 
     const [isEditing, setIsEditing] = useState(false)
     const [savedHtml, setSavedHtml] = useState('')
     const editorRef = useRef(null)
     const toolbarRef = useRef(null)
+
+    // --- helpers ---
+
+    const exec = (cmd, value = null) => {
+        document.execCommand(cmd, false, value)
+    }
+
+    // ==================================
+    // text editor logic
+    // ==================================
 
     useEffect(() => {
         setSavedHtml(
@@ -65,15 +79,29 @@ const Text = ({
         }
     }, [isEditing])
 
-    const exec = (cmd, value = null) => {
-        document.execCommand(cmd, false, value)
-    }
-
-    const handleSave = () => {
+    const handleSave = () => { 
         const newHtml = editorRef.current.innerHTML
-        const updatedActivity = activity.setFieldValue(data, newHtml)
 
-        setData({ action: "content", item: { type: "Text", activity: updatedActivity } })
+        setData({
+            domain: "activities",
+            id: activity._id,
+            recipe: (draft) => {
+                // аналог setFieldValue, але без створення нового обʼєкта
+                const parts = data.split('.')
+                let curr = draft.content
+
+                for (let i = 0; i < parts.length - 1; i++) {
+                    const key = isNaN(parts[i]) ? parts[i] : Number(parts[i])
+                    if (!curr[key]) curr[key] = {}
+                    curr = curr[key]
+                }
+
+                const lastKey = parts[parts.length - 1]
+                const k = isNaN(lastKey) ? lastKey : Number(lastKey)
+                curr[k] = newHtml
+            }
+        })
+
         setIsEditing(false)
     }
 
@@ -100,7 +128,7 @@ const Text = ({
         }
     }
 
-    const itemToEdit = (metaActivity?.userData) ? metaActivity : project
+    // ==================================
 
     return (
         (rights.edit.includes(itemToEdit.getAccess(userData))) ? (

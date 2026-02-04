@@ -9,22 +9,32 @@ import { AppContext } from '../pageAssets/shared'
 
 const AddEditItem = () => {
 
-    const {
+    const { //can not apply url-based itemIds in dialogs
+        currentPage,
+        projectId,
         userData,
         projects,
         setData,
-        state, setState,
+        dialog, setDialog,
         rights,
         itemStructure,
         defaultStructure
     } = useContext(AppContext)
 
-    const currentItem = state.currentDialog.params[0]
-    const currentItemId = state.currentDialog.params[1]
-    const activityIndex = state.currentDialog.params[2]
-    const containerId = state.currentDialog.params[3]
+    // ==================================
+    // const, helpers and state management
+    // ==================================
 
-    const selectedType = state.currentProject ? "Activity" : "Project"
+    const currentItem = dialog.params[0]
+    const currentItemId = dialog.params[1]
+    const activityIndex = dialog.params[2]
+    const containerId = dialog.params[3]
+
+    const selectedType = projectId ? "Activity" : "Project"
+
+    const currentStructure = itemStructure[selectedType.toLowerCase()]
+
+    // --- helpers ---
 
     const formatLabel = (key) => key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())
 
@@ -35,108 +45,9 @@ const AddEditItem = () => {
             .replace(/^./, (c) => c.toLowerCase())
     }
 
-    // Initialize form values based on default type
-
-    const initializeFormValues = (defaultValues, structure) => {
-        if (currentItem === true) {
-            // If currentItem is 'true', return default values for a new item
-            return Object.keys(defaultValues).reduce((acc, key) => {
-                acc[key] = defaultValues[key] || (structure[key] === 'checkbox' ? false : '') // Fallback to empty string if no default
-                return acc
-            }, {})
-        } else if (currentItem !== undefined) {
-            // If currentItem is an object, fill with its values
-            return Object.keys(defaultValues).reduce((acc, key) => {
-                acc[key] = currentItem[key] !== undefined ? currentItem[key] : defaultValues[key] || (structure[key] === 'checkbox' ? false : '') // Fallback to default if missing
-                return acc
-            }, {})
-        }
-        return {} // Return empty object if currentItem is undefined
-    }
-
-    const [formValues, setFormValues] = useState(() => {
-        return initializeFormValues(defaultStructure[selectedType.toLowerCase()], itemStructure[selectedType.toLowerCase()])
-    })
-
-    // Reset form values for the new type
-
-    const handleInputChange = (e) => {
-        const { name, type, checked, value } = e.target
-        setFormValues((prev) => ({
-            ...prev,
-            [unformatLabel(name)]: type === 'checkbox' ? checked : value
-        }))
-    }
-
-    // Update set of selected days
-    const toggleListSelection = (field, value, many) => {
-        setFormValues((prev) => {
-
-            const currentList = [...prev[field]] || []
-            const baseList = many ? currentList : currentList.filter((v) => v === value)
-            const updatedList = baseList.includes(value)
-                ? baseList.filter((v) => v !== value)
-                : [...baseList, value]
-            
-            return {
-            ...prev,
-            [field]: updatedList
-            }
-        })
-    }
-
-    //show item-fields
-    const showItemFields = useMemo(() => {
-        const isSchedule = state.currentPage === 'Schedule'
-        const project = getItemById(projects, state.currentProject)
-        const itemWithUserList = (state.currentProject)
-            ? project.findItemWithParent(project.activities, "_id", currentItemId)?.item
-            : getItemById(projects, currentItemId)
-            
-        let canEdit = userData.genStatus
-        //edit
-        if (itemWithUserList?._id) {
-            canEdit = itemWithUserList.userList.find(user => user.id === userData._id)?.access
-        }
-        //add
-        else if (containerId && currentItemId) {
-            const item = (!containerId.includes('.'))
-                ? getItemById(projects, containerId)
-                : project.findItemWithParent(project.activities, "_id", currentItemId, project).item
-            
-            canEdit = item.userList.find(user => user.id === userData._id)?.access
-        }
-        
-        return (
-            !isSchedule
-            && (
-                (selectedType === 'Project')
-                || (selectedType === 'Activity' && state.currentProject)
-            )
-            && (rights.edit.includes(canEdit))
-        )
-    }, [userData, projects, state, selectedType, currentItemId, containerId, rights.edit])
-
-    //conditions for fields that should appear based on other fields values
-    const fieldConditionCheck = (key) => {
-        const check = itemStructure.checks?.[key]
-        if (!check) return true // no condition => always show
-        return formValues[check.dep] === check.val
-    }
-
-    // Close the dialog
-
-    const closeDialog = () => {
-        setState((prevState) => ({
-            ...prevState,
-            currentDialog: {
-                name: undefined,
-                params: []
-            }
-        }))
-    }
-
-    //save changes
+    // ==================================
+    // item logic management
+    // ==================================
 
     const [errors, setErrors] = useState({})
 
@@ -176,7 +87,7 @@ const AddEditItem = () => {
             }
 
             if (selectedType === 'Activity') {
-                const project = getItemById(projects, getItemById(projects, state.currentProject))
+                const project = getItemById(projects, getItemById(projects, projectId))
                 
                 if (startDate < project.startDate || startDate >= project.endDate) {
                     errors.startDate = "Start date must be within project's lifetime."
@@ -250,7 +161,7 @@ const AddEditItem = () => {
             return
         }
 
-        const project = getItemById(projects, state.currentProject)
+        const project = getItemById(projects, projectId)
         const formattedFormValues = formatFormValues(formValues)
 
         const { item: parent } = project.findItemWithParent(project?.activities || [], "_id", containerId, project)
@@ -318,7 +229,115 @@ const AddEditItem = () => {
         closeDialog()
     }
 
-    const currentStructure = itemStructure[selectedType.toLowerCase()]
+    // ==================================
+    // form logic management
+    // ==================================
+
+    // Initialize form values based on default type
+
+    const initializeFormValues = (defaultValues, structure) => {
+        if (currentItem === true) {
+            // If currentItem is 'true', return default values for a new item
+            return Object.keys(defaultValues).reduce((acc, key) => {
+                acc[key] = defaultValues[key] || (structure[key] === 'checkbox' ? false : '') // Fallback to empty string if no default
+                return acc
+            }, {})
+        } else if (currentItem !== undefined) {
+            // If currentItem is an object, fill with its values
+            return Object.keys(defaultValues).reduce((acc, key) => {
+                acc[key] = currentItem[key] !== undefined ? currentItem[key] : defaultValues[key] || (structure[key] === 'checkbox' ? false : '') // Fallback to default if missing
+                return acc
+            }, {})
+        }
+        return {} // Return empty object if currentItem is undefined
+    }
+
+    const [formValues, setFormValues] = useState(() => {
+        return initializeFormValues(defaultStructure[selectedType.toLowerCase()], itemStructure[selectedType.toLowerCase()])
+    })
+
+    // Reset form values for the new type
+
+    const handleInputChange = (e) => {
+        const { name, type, checked, value } = e.target
+        setFormValues((prev) => ({
+            ...prev,
+            [unformatLabel(name)]: type === 'checkbox' ? checked : value
+        }))
+    }
+
+    // Update set of selected days
+    const toggleListSelection = (field, value, many) => {
+        setFormValues((prev) => {
+
+            const currentList = [...prev[field]] || []
+            const baseList = many ? currentList : currentList.filter((v) => v === value)
+            const updatedList = baseList.includes(value)
+                ? baseList.filter((v) => v !== value)
+                : [...baseList, value]
+            
+            return {
+            ...prev,
+            [field]: updatedList
+            }
+        })
+    }
+
+    // ==================================
+    // form display management
+    // ==================================
+
+    //show item-fields
+    const showItemFields = useMemo(() => {
+        const isSchedule = currentPage === 'Schedule'
+        const project = getItemById(projects, projectId)
+        const itemWithUserList = (projectId)
+            ? project.findItemWithParent(project.activities, "_id", currentItemId)?.item
+            : getItemById(projects, currentItemId)
+            
+        let canEdit = userData.genStatus
+        //edit
+        if (itemWithUserList?._id) {
+            canEdit = itemWithUserList.userList.find(user => user.id === userData._id)?.access
+        }
+        //add
+        else if (containerId && currentItemId) {
+            const item = (!containerId.includes('.'))
+                ? getItemById(projects, containerId)
+                : project.findItemWithParent(project.activities, "_id", currentItemId, project).item
+            
+            canEdit = item.userList.find(user => user.id === userData._id)?.access
+        }
+        
+        return (
+            !isSchedule
+            && (
+                (selectedType === 'Project')
+                || (selectedType === 'Activity' && projectId)
+            )
+            && (rights.edit.includes(canEdit))
+        )
+    }, [userData, projects, currentPage, projectId, selectedType, currentItemId, containerId, rights.edit])
+
+    //conditions for fields that should appear based on other fields values
+    const fieldConditionCheck = (key) => {
+        const check = itemStructure.checks?.[key]
+        if (!check) {  // no condition => always show
+            return true
+        }
+        return formValues[check.dep] === check.val
+    }
+
+    // ==================================
+    // dialog logic
+    // ==================================
+
+    const closeDialog = () => {
+        setDialog({
+            name: undefined,
+            params: []
+        })
+    }
 
     const disableTypes = (type) => {
         switch(type) {
@@ -333,11 +352,13 @@ const AddEditItem = () => {
         return false
     }
 
+    // ==================================
+
     return (
         <div className="add-edit-item-dialog dialog-container">
             <div className="dialog-content">
                 <h2>{currentItem === true 
-                    ? (state.currentProject ? 'Add new Activity' : 'Add New Project')
+                    ? (projectId ? 'Add new Activity' : 'Add New Project')
                     : `Edit: ${currentItem.name}`}
 
                 </h2>

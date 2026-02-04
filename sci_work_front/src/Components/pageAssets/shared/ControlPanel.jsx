@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useMemo, useCallback, useContext, useParams, useLocation }  from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback, useContext }  from 'react'
 
 import '../../../Styles/components/pageAssets/shared/ControlPanel.sass'
 
+import { DISPLAY_OPTIONS_CONTROLS } from '../../../lib/constants'
 import { getDialogButton, getInput, getItemById } from '../../../lib/helpers'
 
 import { AppContext, CustomSelect, ToggleButton } from '.'
@@ -13,16 +14,17 @@ const ControlPanel = ({
 }) => {
 
     const {
-        userData, setUserData,
+        currentPage, projectId,
+        userData,
         projects,
+        setData,
         setDialog,
         rights
     } = useContext(AppContext)
 
-    const { projectId } = useParams()
-
-    const { pathname } = useLocation()
-    const currentPage = pathname.split("/")[1] || "HomePage"
+    // ==================================
+    // const, helpers and state management
+    // ==================================
 
     const filterOptions = {
         sort: ["A-Z", "Z-A", "start date", "end date"],
@@ -32,37 +34,52 @@ const ControlPanel = ({
     //to display combobox options
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false)
     const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false)
-    //current combobox values
-    // const [currentSortOption, setCurrentSortOption] = useState(userData.currentSettings.sortFilter)
-    // const [currentStateOption, setCurrentStateOption] = useState(userData.currentSettings.stateFilter)
-    //toggle switch(s)
-    const displayOptions = ["tiles", "list", "table"]
     //search
     const [searchQuery, setSearchQuery] = useState("")
 
     const sortDropdownRef = useRef(null)
     const stateDropdownRef = useRef(null)
 
-    // (V)
-    useEffect(() => {
-        setSearchQuery("")
-    }, [projectId])
+    
 
     const getAccess = (item) => {
         return item.userList.find(item => item.id === userData._id).access
     }
 
+    // ==================================
+    // tools logic management
+    // ==================================
+
     //update filter values
 
+    useEffect(() => {
+        setSearchQuery("")
+    }, [projectId])
 
-    const handleSortOptionSelect = (option) => {
-        setUserData({ sortFilter: option }, true)
-        setIsSortDropdownOpen(false)
-    }
+    const handleOptionSelect = (option, filter) => {
+        
+        setData({
+            domain: "user",
+            id: userData._id,
+            recipe: (draft) => {
+                draft.currentSettings[filter] = option
+            }
+        })
 
-    const handleStateOptionSelect = (option) => {
-        setUserData({statusFilter: option}, true)
-        setIsStateDropdownOpen(false)
+        const type = filter.replace("Filter", "")
+        switch(type) {
+            case "sort": {
+                setIsSortDropdownOpen(false)
+                break
+            }
+            case "status": {
+                setIsStateDropdownOpen(false)
+                break
+            }
+            default: {
+                console.warn("No such filter!")
+            }
+        }
     }
 
     //close filter option lists on click outside
@@ -78,7 +95,6 @@ const ControlPanel = ({
         }
     }, [isSortDropdownOpen, isStateDropdownOpen])
 
-    // (V)
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside)
         return () => {
@@ -147,6 +163,10 @@ const ControlPanel = ({
         return filtered
     }, [userData.currentSettings.statusFilter, searchQuery, rights.fullView])
 
+    // ==================================
+    // display logic management
+    // ==================================
+
     //data to display
 
     const projectsToDisplay = useMemo(() => {
@@ -161,13 +181,21 @@ const ControlPanel = ({
     }, [projects, projectId, filterItems, sortItems])
 
     //return data to display it
-    // (V)
     useEffect(() => {
         setItemsToDisplay({
             projects: projectsToDisplay,
             activities: activitiesToDisplay
         })
     }, [projectsToDisplay, activitiesToDisplay, setItemsToDisplay])
+
+    //toggleButton adapter
+    const handleToggle = (updateObj) => {
+        const field = Object.keys(updateObj)[0]
+        const option = updateObj[field]
+        handleOptionSelect(option, field)
+    }
+
+    // ==================================
 
     return (
         <div className='control-panel'>
@@ -176,9 +204,9 @@ const ControlPanel = ({
                     {getInput("Search", "text", searchQuery, false, (e) => setSearchQuery(e.target.value), false, null, 25)}
                     <ToggleButton
                         data={userData.currentSettings}
-                        setter={setUserData}
+                        setter={handleToggle}
                         field={"displayProjects"}
-                        displayOptions={displayOptions}
+                        displayOptions={DISPLAY_OPTIONS_CONTROLS}
                     />
                 </>
             }
@@ -222,7 +250,7 @@ const ControlPanel = ({
                             {isSortDropdownOpen && (
                                 <ul className="dropdown">
                                     {filterOptions.sort.map((option, index) => (
-                                        <li key={index} onClick={() => { handleSortOptionSelect(option)}}>
+                                        <li key={index} onClick={() => { handleOptionSelect(option, "sortFilter")}}>
                                             {option}
                                         </li>
                                     ))}
@@ -240,7 +268,7 @@ const ControlPanel = ({
                             {isStateDropdownOpen && (
                                 <ul className="dropdown">
                                     {filterOptions.state.map((option, index) => (
-                                        <li key={index} onClick={() => handleStateOptionSelect(option)}>
+                                        <li key={index} onClick={() => handleOptionSelect(option, "statusFilter")}>
                                             {option}
                                         </li>
                                     ))}

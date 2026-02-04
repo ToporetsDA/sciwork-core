@@ -20,13 +20,20 @@ const Group = ({
     item
 }) => {
 
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
     const [showActivities, setShowActivities] = useState(true)
+
+    // --- helpers ---
 
     const toggleActivities = () => {
         setShowActivities(prev => !prev)
     }
 
-    // console.log("item in Group component", activities)
+    // ==================================
+
     return (
         <div
             className='wrapper'

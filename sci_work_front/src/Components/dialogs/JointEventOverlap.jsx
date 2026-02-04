@@ -6,22 +6,19 @@ import { AppContext, ItemTable } from '../pageAssets/shared'
 
 const JointEventOverlapDialog = () => {
 
-    const {
+    const { //can not apply url-based itemIds in dialogs
         projects,
-        setState
+        setDialog
     } = useContext(AppContext)
 
     // Close the dialog
 
     const closeDialog = (e) => {
         if (e.target === e.currentTarget) {
-            setState((prevState) => ({
-                ...prevState,
-                currentDialog: {
-                    name: undefined,
-                    params: []
-                }
-            }))
+            setDialog({
+                name: undefined,
+                params: []
+            })
         }
     }
 

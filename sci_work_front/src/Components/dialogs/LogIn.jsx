@@ -12,10 +12,16 @@ const LogIn = ({
     loginToServer
 }) => {
 
-    const {
+    const { //can not apply url-based itemIds in dialogs
         setDialog,
         isLoggedIn
     } = useContext(AppContext)
+
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
+    const [canReg, setCanReg] = useState(false)
 
     const [formValues, setFormValues] = useState(() => {
         return {
@@ -25,7 +31,11 @@ const LogIn = ({
         }
     })
 
-    const [canReg, setCanReg] = useState(false)
+    const [type, setType] = useState({type: "Log in"})
+
+    // ==================================
+    // dialog logic
+    // ==================================
 
     const handleInputChange = (e) => {
         const { name, value } = e.target
@@ -55,7 +65,7 @@ const LogIn = ({
         }
     }
 
-    const [type, setType] = useState({type: "Log in"})
+    // ==================================
 
     return (
         <>

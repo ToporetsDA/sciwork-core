@@ -1,5 +1,4 @@
-import { useState, useMemo, useContext, useParams } from 'react'
-import { useNavigate } from "react-router-dom"
+import { useState, useMemo, useContext } from 'react'
 
 import '../../../Styles/components/pageAssets/shared/ItemTable.sass'
 
@@ -26,6 +25,8 @@ const ItemTable = ({
 }) => {
 
     const {
+        navigate,
+        projectId,
         projects,
         activities,
         setData,
@@ -34,10 +35,9 @@ const ItemTable = ({
         recentActivities, setRecentActivities
     } = useContext(AppContext)
 
-    //navigation for projects
-    const navigate = useNavigate()
-
-    const { projectId } = useParams()
+    // ==================================
+    // const, helpers and state management
+    // ==================================
 
     //find activity if activities
     const parts = (itemsToDisplay.length > 0) ? itemsToDisplay[0]._id.split('.') : []
@@ -47,16 +47,65 @@ const ItemTable = ({
     //column types for activities
     const liKeys = itemKeys.filter(val => val !== 'tech')
 
-    const saveChanges = (key, value, activity, index) => {
-    
-        const updatedActivity = activity.setFieldValue(`listItems.${index}.${key}`, value)
+    //sorting, not saveable
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null })
 
-        setData({action: "content", item: {type: "Table", activity: updatedActivity}})
-    }
+    const sortedItems = useMemo(() => {
+        if (!sortConfig.key || !sortConfig.direction) return itemsToDisplay
+
+        const sorted = [...itemsToDisplay].sort((a, b) => {
+            let valA = a[sortConfig.key]
+            let valB = b[sortConfig.key]
+
+            const getPrimitive = (val) => {
+                if (typeof val === 'boolean') return val ? 1 : 0
+                if (typeof val === 'number') return val
+                if (typeof val === 'string') {
+                    // Strip HTML if needed
+                    const tempDiv = document.createElement('div')
+                    tempDiv.innerHTML = val
+                    return tempDiv.textContent || tempDiv.innerText || ''
+                }
+                return ''
+            }
+
+            valA = getPrimitive(valA)
+            valB = getPrimitive(valB)
+
+            if (valA < valB) return -1
+            if (valA > valB) return 1
+            return 0
+        })
+
+        return sortConfig.direction === 'desc' ? sorted.reverse() : sorted
+    }, [itemsToDisplay, sortConfig])
+
+    // --- helpers ---
 
     // get now "hh:mm"
     const getTime = () => {
         return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }
+
+    // ==================================
+    // table display management
+    // ==================================
+
+    const saveChanges = (key, value, activity, index) => {
+    
+        const updatedActivity = activity.setFieldValue(`listItems.${index}.${key}`, value)
+
+        setData({
+            domain: "activities",
+            id: activity._id,
+            recipe: (draft) => {
+                // instance mismatch fallback
+                const idx = draft.findIndex(a => a._id === activity._id)
+                if (idx !== -1) {
+                    draft[idx] = updatedActivity
+                }
+            }
+        })
     }
 
     const getTileContent = (key, item, index) => {
@@ -131,9 +180,6 @@ const ItemTable = ({
         
     }
 
-    //sorting, not saveable
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: null })
-
     const handleSort = (key) => {
         if (sortConfig.key === key) {
             if (sortConfig.direction === 'asc') {
@@ -148,35 +194,7 @@ const ItemTable = ({
         }
     }
 
-    const sortedItems = useMemo(() => {
-        if (!sortConfig.key || !sortConfig.direction) return itemsToDisplay
-
-        const sorted = [...itemsToDisplay].sort((a, b) => {
-            let valA = a[sortConfig.key]
-            let valB = b[sortConfig.key]
-
-            const getPrimitive = (val) => {
-                if (typeof val === 'boolean') return val ? 1 : 0
-                if (typeof val === 'number') return val
-                if (typeof val === 'string') {
-                    // Strip HTML if needed
-                    const tempDiv = document.createElement('div')
-                    tempDiv.innerHTML = val
-                    return tempDiv.textContent || tempDiv.innerText || ''
-                }
-                return ''
-            }
-
-            valA = getPrimitive(valA)
-            valB = getPrimitive(valB)
-
-            if (valA < valB) return -1
-            if (valA > valB) return 1
-            return 0
-        })
-
-        return sortConfig.direction === 'desc' ? sorted.reverse() : sorted
-    }, [itemsToDisplay, sortConfig])
+    // ==================================
 
     return (
         <table className="item-table">

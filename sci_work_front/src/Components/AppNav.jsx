@@ -1,5 +1,4 @@
-import { useContext, useParams, useLocation } from 'react'
-import { useNavigate } from "react-router-dom"
+import { useContext } from 'react'
 
 import '../Styles/components/AppNav.sass'
 
@@ -8,17 +7,13 @@ import { AppContext } from './pageAssets/shared'
 const AppNav = () => {
   
   const {
+    navigate,
+    currentPage, activityId,
     projects,
     isLoggedIn,
     organisationType,
     recentActivities, setRecentActivities
   } = useContext(AppContext)
-
-  const navigate = useNavigate()
-  const { activityId } = useParams()
-
-  const { pathname } = useLocation()
-  const currentPage = pathname.split("/")[1] || "HomePage"
 
   //project.name and activity.name pairs
   const clearRecent = () => {

@@ -4,6 +4,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates } from '@dnd-ki
 
 import '../../Styles/components/items/List.sass'
 
+import { ITEMS_WITH_DIALOG_BUTTON } from '../../lib/constants'
 import { getDialogButton, getItemById } from '../../lib/helpers'
 
 import { AppContext, ItemTable, ItemTiles, ToggleButton } from '../pageAssets/shared'
@@ -54,18 +55,23 @@ const List = ({
 }) => {
 
     const {
+        projectId, activityId,
         userData,
         projects,
         activities,
         setData,
-        state, setState,
+        setDialog,
         rights
     } = useContext(AppContext)
 
-    const activity = getItemById(activities, item._id)
+    // ==================================
+    // const, helpers and state management
+    // ==================================
 
-    const project = getItemById(projects, state.currentProject)
-    const { item: metaActivity } = project.findItemWithParent(project.activities, "_id", activity._id, project)
+    const activity = getItemById(activities, activityId)
+    const project = getItemById(projects, projectId)
+
+    const { item: metaActivity } = project.findItemWithParent(project.activities, "_id", activityId, project)
 
     const [settings, setSettings] = useState(activity.content?.currentSettings || {})
 
@@ -82,6 +88,11 @@ const List = ({
         }),
     )
 
+    const [showLi, setShowLi] = useState(true)
+    
+
+    // --- helpers ---
+
     useEffect(() => {
         setItems(allItems.filter(i => !i.deleted))
         setSettings((prevSettings) => ({
@@ -92,23 +103,29 @@ const List = ({
 
     useEffect(() => {
         const parent = getItemById(projects, containerId)
-        
-        const access = parent.getAccess(userData, activity._id)
-
+        const access = parent.getAccess(userData, activityId)
         const change = (activity.content?.currentSettings?.type !== settings?.type) && settings?.type
 
         if (rights.edit.includes(access) && change) {
             console.log("default ul/ol changed")
-            const updatedActivity = {
-                ...activity,
-                content: {
-                    ...activity.content,
-                    currentSettings: settings
+            
+            setData({
+                domain: "activities",
+                id: activityId,
+                recipe: (draft) => {
+                    draft.content.currentSettings = settings
                 }
-            }
-            setData({action: "content", item: {type: "List", activity: updatedActivity}})
+            })
         }
-    }, [rights.edit, projects, setData, userData, containerId, activity, settings])
+    }, [rights.edit, projects, setData, userData, containerId, activity, activityId, settings])
+
+    const toggleLi = () => {
+        setShowLi(prev => !prev)
+    }
+
+    // ==================================
+    // dnd management
+    // ==================================
 
     const handleDragEnd = (event) => {
         const { active, over } = event
@@ -117,16 +134,20 @@ const List = ({
             const newIndex = items.findIndex(i => i._id === over.id)
             const newItems = arrayMove(items, oldIndex, newIndex)
             setItems(newItems)
-            const updatedActivity = {
-                ...activity,
-                content: {
-                    ...activity.content,
-                    listItems: newItems
+
+            setData({
+                domain: "activities",
+                id: activityId,
+                recipe: (draft) => {
+                    draft.content.listItems = newItems
                 }
-            }
-            setData({action: "content", item: {type: item.type, activity: updatedActivity}})
+            })
         }
     }
+
+    // ==================================
+    // display logic management
+    // ==================================
 
     const getItemTiles = () => {
         return (
@@ -148,9 +169,8 @@ const List = ({
     }
 
     const getDialog = (itemType, type) => {
-        const hasDialogButton = ["List", "Attendance", "Table", /*no Chat*/]
 
-        if (!hasDialogButton.includes(itemType)) {
+        if (!ITEMS_WITH_DIALOG_BUTTON.includes(itemType)) {
             return
         }
         else {
@@ -159,7 +179,7 @@ const List = ({
                     className='list-actions'
                 >
                 {getDialogButton(
-                    setState,
+                    setDialog,
                     "button-mini",
                     "AddEditContent",
                     [true, false, false, activity._id, type],
@@ -229,10 +249,7 @@ const List = ({
         }
     }
 
-    const [showLi, setShowLi] = useState(true)
-    const toggleLi = () => {
-        setShowLi(prev => !prev)
-    }
+    // ==================================
 
     return (
         <div className="wrapper">

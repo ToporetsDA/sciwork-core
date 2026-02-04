@@ -16,6 +16,10 @@ const ItemActions = ({ item }) => {
         rights
     } = useContext(AppContext)
 
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
     const parts = item?._id.split('.')
     const project = getItemById(projects, parts[0])
     const accessibleItem = (parts.length < 3)
@@ -25,6 +29,8 @@ const ItemActions = ({ item }) => {
     const condition = (parts.length === 1)
     const buttonClass = (condition) ? "button-mini" : "button-mini button-tool"
     const wrapperClass = (condition) ? "" : "actions"
+
+    // ==================================
     
     return (
         <>

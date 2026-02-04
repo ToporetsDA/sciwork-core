@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, useCallback, useContext, useParams, useLocation } from 'react'
-import useWebSocket from 'react-use-websocket'
+import { useState, useEffect, useCallback, useContext } from 'react'
+import { useWebSocket } from 'react-use-websocket'
 
 import { createProjects, projectVerUp, createActivity, createActivities, activityVerUp } from '../lib/classes'
 import { getItemById } from '../lib/helpers'
@@ -8,28 +8,25 @@ import { AppContext } from './pageAssets/shared'
 import { LogIn } from './dialogs'
 
 const Connection = ({
+    onReady,
     setProjects,
     setActivities,
     setRights,
     setUsers,
-    isUserUpdatingProjects, setIsUserUpdatingProjects,
-    isUserUpdatingActivities, setIsUserUpdatingActivities,
-    isUserUpdatingUserData, setIsUserUpdatingUserData,
     previousVersionsRef
 }) => {
 
     const {
-        dialog, setDialog,
+        dialog,
         userData, setUserData,
         projects,
         activities,
-        isLoggedIn, setLoggedIn
+        setLoggedIn
     } = useContext(AppContext)
 
-    const { projectId, activityId } = useParams()
-
-    const { pathname } = useLocation()
-    const currentPage = pathname.split("/")[1] || "HomePage"
+    // ==================================
+    // const, vars, helpers and state management
+    // ==================================
 
     const [servers, setServers] = useState([])       // список з бекенду
     const [loading, setLoading] = useState(true)     // UI-флаг
@@ -37,32 +34,32 @@ const Connection = ({
     const [formValues, setFormValues] = useState()   // дані форми
     const [wsUrl, setWsUrl] = useState(null)         // websocket endpoint
 
-
-    const format = (str) => {
-        return str.replace(/\s+/g, '')
-    }
-
-    //create server address string
-    const serverAddress = (address) => {
-        // Get the address without the scheme (http:// or https://)
-        let serverAddress = address.split('://')[1]
-        
-        // Remove trailing slash if present
-        if (serverAddress.endsWith('/')) {
-            serverAddress = serverAddress.slice(0, -1)
+    //get list of working servers
+    useEffect(() => {
+        const fetchServers = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/servers/list') //load from outside later
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                
+                const data = await response.json();
+                setServers(data)
+                setLoading(false)
+            } catch (error) {
+                console.error("Failed to fetch servers:", error)
+                setLoading(false)
+            }
         }
-        
-        // Extract the domain and port
-        const [domain, port] = serverAddress.split(':')
-        
-        // Increment the port by 1
-        const newPort = parseInt(port, 10) + 1
-        
-        // Reassemble the address with the new port
-        return `${domain}:${newPort}`
-    }
 
-    const { sendMessage, readyState } = useWebSocket(wsUrl, {
+        fetchServers()
+    }, [])
+
+    // ==================================
+    // request management
+    // ==================================
+
+    const { sendMessage } = useWebSocket(wsUrl, {
         onOpen: () => {
             console.log('WebSocket connection established.')
             // Send the login message after the connection is established
@@ -91,11 +88,15 @@ const Connection = ({
         sendMessage(JSON.stringify(message))
         console.log('Sent message:', message)
 
-         // Reset flags
-        setIsUserUpdatingProjects(false)
-        setIsUserUpdatingActivities(false)
-        setIsUserUpdatingUserData(false)
-    }, [sendMessage, sessionToken, setIsUserUpdatingProjects, setIsUserUpdatingActivities, setIsUserUpdatingUserData])
+    }, [sendMessage, sessionToken])
+
+    useEffect(() => {
+        onReady(sendMsg)
+    }, [ onReady, sendMsg ])
+
+    // ==================================
+    // response management
+    // ==================================
 
     const handleResponseData = useCallback((response) => {
         const { type, data } = response.data
@@ -249,55 +250,29 @@ const Connection = ({
         }
     }, [handleResponseConfirm, handleResponseData, setLoggedIn])
 
-    //send update ONLY when page changes
-    const lastSentPage = useRef({
-        currentPage: 'HomePage',
-        currentProject: undefined,
-        currentActivity: undefined
-    })
-    
-    // (V)
-    useEffect(() => {
-        if (
-            (lastSentPage.current.currentPage === currentPage && lastSentPage.current.currentProject === projectId)
-            || !isLoggedIn
-        ) {
-            return
-        }
-        const location = projectId || currentPage
-        sendMsg("goTo", { page: format(location), isId: (!!projectId)})
-        lastSentPage.current = {
-            currentPage: currentPage,
-            currentProject: projectId,
-            currentActivity: activityId
-        }
-    }, [sendMsg, currentPage, projectId, activityId, isLoggedIn])
+    // ==================================
+    // log in logic
+    // ==================================
 
-    // Track user-initiated changes to data
-    const updateByUser = useCallback((item, toDo, itemType) => {
-
-        if (readyState === 1) { // Check if WebSocket is open
-            sendMsg(toDo, item)
-            console.log("Sent update:")
-        } else {
-            console.error(`WebSocket is not open. Cannot send ${itemType} update.`)
+    //create server address string
+    const serverAddress = (address) => {
+        // Get the address without the scheme (http:// or https://)
+        let serverAddress = address.split('://')[1]
+        
+        // Remove trailing slash if present
+        if (serverAddress.endsWith('/')) {
+            serverAddress = serverAddress.slice(0, -1)
         }
-
-    }, [readyState, sendMsg])
-
-    // Trigger user-initiated updates
-    // (V)
-    useEffect(() => {
-        if (isUserUpdatingProjects) {
-            updateByUser(getItemById(projects, isUserUpdatingProjects), "addEditData", "metadata")
-        }
-        if (isUserUpdatingActivities) {
-            updateByUser(getItemById(activities, isUserUpdatingActivities), "addEditContent", "content")
-        }
-        if (isUserUpdatingUserData) {
-            updateByUser(userData, "addEditUser", "user")
-        }
-    }, [projects, activities, userData, updateByUser, isUserUpdatingProjects, isUserUpdatingActivities, isUserUpdatingUserData])
+        
+        // Extract the domain and port
+        const [domain, port] = serverAddress.split(':')
+        
+        // Increment the port by 1
+        const newPort = parseInt(port, 10) + 1
+        
+        // Reassemble the address with the new port
+        return `${domain}:${newPort}`
+    }
 
     //on login
     const loginToServer = async (formValues) => {
@@ -337,28 +312,6 @@ const Connection = ({
         }
     }
 
-    //get list of working servers
-    // (V)
-    useEffect(() => {
-        const fetchServers = async () => {
-            try {
-                const response = await fetch('http://localhost:3000/servers/list')
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`)
-                }
-                
-                const data = await response.json();
-                setServers(data)
-                setLoading(false)
-            } catch (error) {
-                console.error("Failed to fetch servers:", error)
-                setLoading(false)
-            }
-        }
-
-        fetchServers()
-    }, [])
-
     return (
         <div>
             {loading ? (
@@ -367,8 +320,6 @@ const Connection = ({
                 <>
                     {dialog.name === "LogIn" &&
                         <LogIn
-                            setState={setDialog}
-                            isLoggedIn={isLoggedIn}
                             servers={servers}
                             loginToServer={loginToServer}
                         />

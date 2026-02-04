@@ -12,15 +12,22 @@ const Chat = ({
 }) => {
 
     const {
+        activityId,
         userData,
         activities,
         setData
     } = useContext(AppContext)
 
-    const activity = getItemById(activities, item._id)
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
+    const activity = getItemById(activities, activityId)
     //will need to save tmp message as "sending..."
 
     const [chatInput, setChatInput] = useState("")
+
+    // --- helpers ---
 
     const formatDate = (date) => {
         const pad = n => String(n).padStart(2, '0')
@@ -34,23 +41,34 @@ const Chat = ({
         return `${hours}:${minutes}-${day}.${month}.${year}`
     }
 
+    // ==================================
+    // chat logic
+    // ==================================
+
     const handleAddMessage = () => {
         const trimmed = chatInput.trim()
-        if (!trimmed) return
+        if (!trimmed) {
+            return
+        }
 
         const date = formatDate(new Date())
-
         const newMessage = createMessage(activity, userData, trimmed, date)
 
-        activity.content.messageCount++
-        activity.content.listItems.push(newMessage)
+        setData({
+            domain: "activities",
+            id: activity._id,
+            recipe: (draft) => {
+                draft.content.messageCount++
+                draft.content.listItems.push(newMessage)
+            }
+        })
 
-        setData({ action: "content", item: { type: "Chat", activity } })
         setChatInput("") // clear input after sending
     }
 
-    console.log("messages", activity?.content?.listItems)
+    // ==================================
 
+    // console.log("messages", activity?.content?.listItems)
     return (
         <div className="wrapper">
             {item?.name}

@@ -1,11 +1,11 @@
-import { Suspense, useContext } from 'react'
+import { lazy, Suspense, useContext } from 'react'
 import { Routes, Route } from "react-router-dom"
 
 import '../Styles/components/AppContent.sass'
 
 import { AppContext } from './pageAssets/shared'
 
-import * as Pages from './pages'
+import { HomePage, Notifications, Profile, Settings } from './pages'
 import * as Dialogs from './dialogs'
 
 const AppContent = () => {
@@ -22,6 +22,10 @@ const AppContent = () => {
         (state.currentDialog.name && state.currentDialog.name !== "LogIn")
             ? loadDialogComponent(state.currentDialog.name)
             : null
+    
+    //heavy pages
+    const Projects = lazy(() => import("./pages/Projects"))
+    const Schedule = lazy(() => import("./pages/Schedule"))
 
   return (
     <main className="content">
@@ -29,15 +33,15 @@ const AppContent = () => {
 
         <Suspense fallback={<div>Loading...</div>}>
             <Routes>
-                <Route path="/HomePage" element={<Pages.HomePage />} />
-                <Route path="/Notifications" element={<Pages.Notifications />} />
-                <Route path="/Profile" element={<Pages.Profile />} />
-                <Route path="/Schedule" element={<Pages.Schedule />} />
-                <Route path="/Settings" element={<Pages.Settings />} />
+                <Route path="/HomePage" element={<HomePage />} />
+                <Route path="/Notifications" element={<Notifications />} />
+                <Route path="/Profile" element={<Profile />} />
+                <Route path="/Schedule" element={<Schedule />} />
+                <Route path="/Settings" element={<Settings />} />
 
-                <Route path="/Projects" element={<Pages.Projects />}>
-                    <Route path=":projectId" element={<Pages.Projects />} >
-                        <Route path=":activityId" element={<Pages.Projects />} />
+                <Route path="/Projects" element={<Projects />}>
+                    <Route path=":projectId" element={<Projects />} >
+                        <Route path=":activityId" element={<Projects />} />
                     </Route>
                 </Route>
             </Routes>

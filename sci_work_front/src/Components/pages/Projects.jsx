@@ -1,5 +1,5 @@
-import { Suspense, useState, useEffect, useContext, useParams, useLocation }  from 'react'
-import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners, useSensor, useSensors, } from '@dnd-kit/core'
+import { Suspense, useState, useEffect, useContext }  from 'react'
+import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, pointerWithin, rectIntersection, useSensor, useSensors, } from '@dnd-kit/core'
 import { arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
 
 import '../../Styles/components/pages/Projects.sass'
@@ -13,16 +13,16 @@ import { AppContext, ControlPanel, Item, ItemTable, ItemTiles } from '../pageAss
 const Projects = () => {
 
     const {
+        currentPage, projectId,
         userData,
         projects, 
         activities,
         setData
     } = useContext(AppContext)
 
-    const { projectId } = useParams()
-
-    const { pathname } = useLocation()
-    const currentPage = pathname.split("/")[1] || "HomePage"
+    // ==================================
+    // const, helpers and state management
+    // ==================================
 
     const [itemsToDisplay, setItemsToDisplay] = useState(createItemsToDisplay(projects, projectId))
 
@@ -30,23 +30,6 @@ const Projects = () => {
     const [prevDnd, setPrevDnd] = useState(null)
 
     const [containers, setContainers] = useState([])
-    // (V)
-    useEffect(() => {
-        if (projectId) {
-            const project = getItemById(projects, projectId)
-            if (activities.length === project.dndCount) {
-                setContainers([...project.activities])
-            }
-        }
-    }, [projects, activities, projectId])
-
-    const saveDndUpdate = () => {
-        const project = {
-            ...getItemById(projects, projectId),
-            activities: containers
-        }
-        setData({action: "edit", item: project})
-    }
 
     // DND Handlers
     const sensors = useSensors(
@@ -56,10 +39,37 @@ const Projects = () => {
         })
     )
 
+    // ==================================
+    // lazy loading fallback
+    // ==================================
+
+    useEffect(() => {
+        if (projectId) {
+            const project = getItemById(projects, projectId)
+            if (activities.length === project.dndCount) {
+                setContainers([...project.activities])
+            }
+        }
+    }, [projects, activities, projectId])
+
     if (projectId && containers.length !== getItemById(projects, projectId).activities.length) {
         return (
             <>Loading Activities</>
         )
+    }
+
+    // ==================================
+    // dnd management
+    // ==================================
+
+    const saveDndUpdate = () => {
+        setData({
+            domain: "projects",        // editing project
+            id: projectId,             // project's _id
+            recipe: (draft) => {       // draft — Immer draft of Project object
+                draft.activities = containers  // update
+            }
+        })
     }
 
     const findValueOfContainer = (id, type) => {
@@ -265,6 +275,17 @@ const Projects = () => {
         }
     }
 
+    // handle cross-level dnd
+    const collisionDetection = (args) => {
+        const pointer = pointerWithin(args)
+        if (pointer.length > 0) {
+            return pointer
+        }
+        return rectIntersection(args)
+    }
+
+    // ==================================
+
     return (
         <>
             <ControlPanel
@@ -291,7 +312,9 @@ const Projects = () => {
                     <Suspense fallback={<div>Loading activities...</div>}>
                         <DndContext
                             sensors={sensors}
-                            collisionDetection={closestCorners}
+                            collisionDetection={collisionDetection}
+                            // collisionDetection={pointerWithin}
+                            // collisionDetection={closestCorners}
                             onDragStart={handleDragStart}
                             onDragMove={handleDragMove}
                             onDragEnd={handleDragEnd}
@@ -312,6 +335,7 @@ const Projects = () => {
                 )}
             </div>
         </>
-    )}
+    )
+}
 
 export default Projects

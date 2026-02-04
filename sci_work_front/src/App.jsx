@@ -1,222 +1,176 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback, useNavigate, useParams, useLocation } from 'react'
 import { BrowserRouter as Router, } from 'react-router-dom'
+import { produceWithPatches } from "immer"
 
 import './App.css'
 
-import { createUserData, createNotification } from './lib/classes'
-import { DEFAULT_PROFILE_DATA, DEFAULT_ITEM_STRUCTURE } from './lib/constants'
-import { getItemById, getFromLocalStorage, daysTillEvent } from './lib/helpers'
-import { useTimer } from './lib/hooks'
+import { createUserData, createNotification }               from './lib/classes'
+import { DEFAULT_PROFILE_DATA, DEFAULT_ITEM_STRUCTURE }     from './lib/constants'
+import { getItemById, getFromLocalStorage, daysTillEvent }  from './lib/helpers'
+import { useTimer }                                         from './lib/hooks'
 
 import { AppProvider } from './Components/pageAssets/shared'
 
-import AppConnection from './Components/AppConnection'
-import AppHeader from './Components/AppHeader'
-import AppNav from './Components/AppNav'
-import AppContent from './Components/AppContent'
+import AppConnection  from './Components/AppConnection'
+import AppHeader      from './Components/AppHeader'
+import AppNav         from './Components/AppNav'
+import AppContent     from './Components/AppContent'
 
 const App = () => {
 
+  // ==================================
+  // const, helpers and state management
+  // ==================================
+
   //user
-  
   const [userData, setUserData] = useState(() => createUserData())
   const [rights, setRights] = useState()
 
   //items
-
   const defaultStructure = useMemo(() => DEFAULT_ITEM_STRUCTURE, [])
   const [projects, setProjects] = useState([])
   const [activities, setActivities] = useState([])
 
   //header !!!has to be mutable!!!
-
   const isCompany = true
 
   //nav
-
   const [recentActivities, setRecentActivities] = useState([])
 
   // dialogs
-
   const [dialog, setDialog] = useState(() => {
     this.name = undefined
     this.params = []
   })
 
   //login
-
   const [isLoggedIn, setLoggedIn] = useState(false)
 
-  //connection
-
-  const [isUserUpdatingProjects, setIsUserUpdatingProjects] = useState(false)
-  const [isUserUpdatingActivities, setIsUserUpdatingActivies] = useState(false)
-  const [isUserUpdatingUserData, setIsUserUpdatingUserData] = useState(false)
-
+  //other users
   const [users, setUsers] = useState()
 
-  const updateUsers = (itemId) => {
-    // this method will get users's data of users related to Item
-    // for now all users are loaded at login
+  //page state
+  const { pathname } = useLocation()
+  const currentPage = pathname.split("/")[1] || "HomePage"
+  const { projectId, activityId } = useParams()
+  const lastSentPage = useRef({
+    currentPage: 'HomePage',
+    currentProject: undefined,
+    currentActivity: undefined
+  })
+
+  // --- helpers ---
+
+  // remove all spaces
+  const format = (str) => {
+      return str.replace(/\s+/g, '')
   }
 
-  const previousVersionsRef = useRef({})
+  // ==================================
 
-  const updateData = (data, sendUpdate = true) => {
+  // const updateUsers = (itemId) => {
+  //   // this method will get users's data of users related to Item
+  //   // for now all users are loaded at login
+  // }
 
-    const { action, item } = data
+  // ==================================
+  // update logic
+  // ==================================
 
-    if (!previousVersionsRef.current[item._id]) {
-      previousVersionsRef.current[item._id] = structuredClone(item) // or deep copy
+  const socketRef = useRef(null)
+
+  const sendPatch = (type, id, patches) => {
+
+    //null handling on not logged in
+    if (!socketRef.current) {
+      console.warn("Socket not ready yet")
+      return
     }
 
-    //by default update data
-    // let source = projects || []
-    let setter
-    let flag
+    socketRef.current("update", {
+      _id: id,
+      fields: patches.map(p => ({
+        path: p.path,   // масив ключів/індексів Immer
+        value: p.value
+      }))
+    })
+  }
 
-    const setPr = () => {
-      //projects
-      setter = setProjects
-      flag = setIsUserUpdatingProjects
+  const updateWithPatches = (setter, getState, recipe, onPatch) => {
+    const [nextState, patches] = produceWithPatches(getState(), recipe)
+    setter(nextState)
+    if (patches.length) {
+      onPatch(patches)
     }
-    const setAct = () =>  {
-      //activities
-      setter = setActivities
-      flag = setIsUserUpdatingActivies
-    }
+  }
 
-    const saveChanges = (item) => { // save changes to item and set it's _id as flag
-      if (!sendUpdate) {
-        flag(item._id)
-      }
-      setter(prevItems => 
-        prevItems.map(i =>
-          i._id === item._id ? item : i
+  const updateData = ({ domain, id, recipe }) => { //user update entry point
+    switch(domain) {
+      case "projects": {
+        updateWithPatches(
+          setProjects,
+          () => projects,
+          draft => {
+            const item = getItemById(draft, id)
+            if (item) recipe(item)
+          },
+          patches => sendPatch(domain, id, patches)
         )
-      )
-    }
-
-    switch(action) {
-      case "add": {
-        setPr()
-        //projects
-        if (!item._id.includes('.')) {
-          //save changes
-          flag(item._id)
-          setter(prevItems => [ ...prevItems, item ])
-        }
-        //activities
-        else {
-          const {containerId, index, activity} = item
-
-          let clone = getItemById(projects, dialog.currentProject)
-          clone.dndCount++
-
-          const project = clone
-          if (!project) return // fallback in case project is not found
-
-          const { parent: container } = project.findItemWithParent(project.activities, "_id", containerId, project)
-          if (!container) return // fallback in case container is not found
-
-          if (!container.activities) {
-            container.activities = []
-          }
-
-          if (index === false || index === null || index >= container.activities.length) {
-            // push to the end
-            container.activities.push(activity)
-          } else {
-            // insert after the index
-            container.activities.splice(index + 1, 0, activity)
-          }
-          
-          saveChanges(project)
-        }
         break
       }
-      case "edit": {
-        setPr()
-        //project
-        if (!item._id.includes('.')) {
-          saveChanges(item)
-        }
-        //activity
-        else {
-          const project = getItemById(projects, dialog.currentProject)
-          if (!project) return
 
-          const { item: activity } = project.findItemWithParent(project.activities, "_id", item._id, project)
-          if (!activity) return
-
-          Object.assign(activity, item)
-          
-          saveChanges(project)
-        }
+      case "activities": {
+        updateWithPatches(
+          setActivities,
+          () => activities,
+          draft => {
+            const item = getItemById(draft, id)
+            if (item) recipe(item)
+          },
+          patches => sendPatch(domain, id, patches)
+        )
         break
       }
-      case "content": {
-        setAct()
-        const { type, activity } = item
 
-        switch(type) {
-          case "Text":
-          case "Table":
-          case "Attendance":
-          case "Report":
-          case "List": {
-            saveChanges(activity)
-            break
-          }
-          case "Chat": {
-            if (!activity) {
-              const { message } = item
-              console.log("send message", message)
-            }
-            else {
-              saveChanges(activity)
-            }
-            break
-          }
-          default: {
-            console.warn("No such activity type")
-          }
-        }
-        
+      case "user": {
+        updateWithPatches(
+          setUserData,
+          () => userData,
+          draft => {
+            recipe(draft)
+          },
+          patches => sendPatch(domain, id, patches)
+        )
         break
       }
       default: {
-        console.log("No such action to updateData")
+        console.warn("No such item domain. Update not sent")
       }
     }
   }
 
-  const updateUser = (newData, currentSettingsEdit) => {
-
-    if (!previousVersionsRef.current[userData._id]) {
-      previousVersionsRef.current[userData._id] = structuredClone(userData) // or deep copy
+  // page tracker
+  
+  useEffect(() => {
+    if (
+      (lastSentPage.current.currentPage === currentPage && lastSentPage.current.currentProject === projectId)
+      || !isLoggedIn
+    ) {
+      return
     }
-
-    setIsUserUpdatingUserData(true)
-
-    if (currentSettingsEdit) {
-      setUserData((prevUserData) => ({
-          ...prevUserData,
-          currentSettings: {
-              ...prevUserData.currentSettings,
-              ...newData
-          }
-      }))
+    const location = projectId || currentPage
+    socketRef.current("goTo", { page: format(location), isId: (!!projectId)})
+    lastSentPage.current = {
+      currentPage: currentPage,
+      currentProject: projectId,
+      currentActivity: activityId
     }
-    else {
-      setUserData((prevUserData) => ({
-          ...prevUserData,
-          ...newData,
-      }))
-    }
-  }
+  }, [ currentPage, projectId, activityId, isLoggedIn])
 
-  //notifications
+  // ==================================
+  // notifications logic
+  // ==================================
+
   const [notifications, setNotifications] = useState([]) // [{userId, notifications[obj, ...]}, ...]
   const notificationsRef = useRef([])
 
@@ -269,7 +223,7 @@ const App = () => {
     }
   }, [projects])
 
-  // (V) load existing messages on log in
+  // load existing messages on log in
   useEffect(() => {
     if (isLoggedIn !== true) {
       return
@@ -288,7 +242,7 @@ const App = () => {
     }
   }, [checkActivities, delay, userData._id, isLoggedIn])
   
-  // (V) save existing messages to storage on each change
+  // save existing messages to storage on each change
   useEffect(() => {
     if (isLoggedIn !== true) {
       return
@@ -310,6 +264,8 @@ const App = () => {
   // Run the timer hook every set minutes
   useTimer(checkActivities, period, delay, isLoggedIn)
 
+  // ==================================
+
   /*!!! for beta-version !!!
 
   profile image (optional)
@@ -325,9 +281,16 @@ const App = () => {
   more organisation data  (like class, department) (optional)
   */
 
+  // ==================================
+  // Provider logic
+  // ==================================
+
   // Values for Provider
   const vals = {
     //tech
+    currentPage: currentPage,
+    projectId: projectId,
+    activityId: activityId,
     dialog: dialog,
     isLoggedIn: isLoggedIn,
     isCompany: isCompany,
@@ -346,18 +309,18 @@ const App = () => {
     recentActivities: recentActivities,
     
     //tech
+    navigate: useNavigate(),
     setDialog: setDialog,
     setLoggedIn: setLoggedIn,
     //data
-    setUserData: updateUser,
     setData: updateData,
-    setUsers: updateUsers,
     //metadata
     setNotifications: setNotifications,
     setRecentActivities: setRecentActivities,
   }
 
-  //Html
+  // ==================================
+
   return (
     <Router>
       <AppProvider
@@ -373,21 +336,13 @@ const App = () => {
             </div>
         </div>
         <AppConnection
+          onReady={fn => socketRef.current = fn}
           //data
           setProjects={setProjects}
           setActivities={setActivities}
           //tech+meta
           setRights={setRights}
           setUsers={setUsers}
-          //flags
-          isUserUpdatingProjects={isUserUpdatingProjects}
-          setIsUserUpdatingProjects={setIsUserUpdatingProjects}
-          isUserUpdatingActivities={isUserUpdatingActivities}
-          setIsUserUpdatingActivities={setIsUserUpdatingActivies}
-          isUserUpdatingUserData={isUserUpdatingUserData}
-          setIsUserUpdatingUserData={setIsUserUpdatingUserData}
-          //buffer
-          previousVersionsRef={previousVersionsRef}
         />
       </AppProvider>
   </Router>

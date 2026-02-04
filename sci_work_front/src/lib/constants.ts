@@ -138,6 +138,8 @@ export const MONTHS = Object.freeze([
 
 // --- ControlPanel.js ---
 
+export const DISPLAY_OPTIONS_CONTROLS = ["tiles", "list", "table"]
+
 // --- CustomSelect.js ---
 
 // --- Item.js ---
@@ -241,6 +243,8 @@ export const ITEM_TYPES = {
 // --- Group.js ---
 
 // --- List.js ---
+
+export const ITEMS_WITH_DIALOG_BUTTON = ["List", "Attendance", "Table", /*no Chat*/]
 
 // --- Project.js ---
 

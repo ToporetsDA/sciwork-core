@@ -1,5 +1,4 @@
 import { useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 import '../../Styles/components/pages/Notifications.sass'
 
@@ -8,10 +7,13 @@ import { AppContext, ItemTable } from '../pageAssets/shared'
 const Notifications = () => {
 
     const {
+        navigate,
         notifications, setNotifications
     } = useContext(AppContext)
 
-    const navigate = useNavigate()
+    // ==================================
+    // notification logic management
+    // ==================================
 
     const changeNotificationState = (id) => {
         setNotifications((prevNotifications) => ([
@@ -38,6 +40,10 @@ const Notifications = () => {
         changeNotificationState(id)
     }
 
+    // ==================================
+    // notification display management
+    // ==================================
+
     const getStateDiv = (state) => {
         return (
             <div className={`notification-state ${state}`}>
@@ -55,6 +61,8 @@ const Notifications = () => {
             state: getStateDiv(n.state)
         }
     })
+
+    // ==================================
 
     return (
         <div className="notifications-container .page-wrapper-no-cp">

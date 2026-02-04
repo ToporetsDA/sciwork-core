@@ -3,7 +3,7 @@ import { useMemo, useCallback, useContext }  from 'react'
 import '../../Styles/components/dialogs/AddEditUserList.sass'
 
 import {ITEM_KEYS_ALLOWED, ITEM_TYPES_ALLOWED, ITEM_KEYS, ITEM_TYPES} from '../../lib/constants'
-import { getItemById } from '../../lib/helpers'
+import { getItemById, updateTreeItemField } from '../../lib/helpers'
 
 import { AppContext, ItemTable } from '../pageAssets/shared'
 
@@ -20,22 +20,27 @@ const AddEditUserList = () => {
     Test can have more questions than allowed for attemps, if so - pick randomly
     */
 
-    const {
+    const { //can not apply url-based itemIds in dialogs
         userData,
         projects,
         activities,
         setData,
-        state, setState,
+        dialog, setDialog,
         rights,
         users
     } = useContext(AppContext)
 
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
     //get item
-    const fullId = state.currentDialog.params[0]
+    const fullId = dialog.params[0]
     const parts = fullId.split('.')
 
     const project = getItemById(projects, parts[0])
     const { item: metaItem } = project.findItemWithParent(project.activities, "_id", fullId, project)
+
     const activity = getItemById(activities, metaItem?._id)
 
     const item = (parts.length < 3)
@@ -51,68 +56,75 @@ const AddEditUserList = () => {
     //cant give yourself access
     const usersData = users.filter(user => user._id !== userData._id)
 
+    // ==================================
+    // userList logic
+    // ==================================
+
     const closeDialog = useCallback(() => {
-        setState((prevState) => ({
-            ...prevState,
-            currentDialog: {
-                name: undefined,
-                params: []
-            }
-        }))
-    }, [setState])
+        setDialog({
+            name: undefined,
+            params: []
+        })
+    }, [setDialog])
 
     const saveChanges = useCallback((updatedUserList) => {
-        let updatedItem
-        if (parts.length < 3) {
-            console.log("item update", )
-            updatedItem = {
-                ...item,
-                userList: updatedUserList
-            }
-            console.log("updatedItem", updatedItem)
-            setData({ action: "edit", item: updatedItem })
-        }
-        else {
-            console.log("activity update", )
-            updatedItem = structuredClone(activity)
-            const listItem = updatedItem.content.listItems[parts[2]]
-            listItem.userList = updatedUserList
-
-            console.log("updatedUserList", listItem.userList)
-
-            const userList = listItem.userList
-            const addedUser = usersData.find(user => user._id === userList[userList.length - 1].id)
-
-            console.log("addedUser", usersData.find(user => user._id === userList[userList.length - 1].id))
-
-            const entries = listItem.markable.userEntries
-            const edit = entries.some(e => e._id === addedUser._id)
-
-            const updatedEntry = {
-                _id: addedUser._id,
-                name: addedUser.name,
-                middleName: addedUser.middleName,
-                surName: addedUser.surName,
-                patronimic: addedUser.patronimic,
-                checker: [false, "--:--"]
-            }
-
-            listItem.markable.userEntries = edit
-                ? entries.map(e => e._id === addedUser._id ? updatedEntry : e)
-                : [...entries, updatedEntry]
-
+        if (parts.length === 1) {
             setData({
-                action: "content",
-                item: {
-                    type: metaItem.type,
-                    activity: updatedItem
+                domain: "projects",
+                id: project._id,
+                recipe: (draft) => {
+                    draft.userList = updatedUserList
                 }
             })
-            
         }
-        console.log("updatedItem", parts.length < 3, updatedItem, updatedUserList)
-        
-    }, [usersData, item, metaItem, activity, parts, setData])
+        else if (parts.length === 2) {
+            setData({
+                domain: "projects",
+                id: project._id,
+                recipe: (draft) => {
+                    draft.activities = updateTreeItemField(
+                        draft.activities,
+                        metaItem._id,
+                        "activities",
+                        "userList",
+                        updatedUserList
+                    )
+                }
+            })
+        }
+        else {
+            setData({
+                domain: "activities",
+                id: metaItem._id,
+                recipe: (draft) => {
+                    // draft — це вже сам об'єкт activity
+                    const listItem = draft.content.listItems[parts[2]]
+                    listItem.userList = updatedUserList
+
+                    const userList = listItem.userList
+                    const addedUser = usersData.find(
+                        u => u._id === userList[userList.length - 1].id
+                    )
+
+                    const entries = listItem.markable.userEntries
+                    const edit = entries.some(e => e._id === addedUser._id)
+
+                    const updatedEntry = {
+                        _id: addedUser._id,
+                        name: addedUser.name,
+                        middleName: addedUser.middleName,
+                        surName: addedUser.surName,
+                        patronimic: addedUser.patronimic,
+                        checker: [false, "--:--"]
+                    }
+
+                    listItem.markable.userEntries = edit
+                        ? entries.map(e => e._id === addedUser._id ? updatedEntry : e)
+                        : [...entries, updatedEntry]
+                }
+            })
+        }
+    }, [usersData, metaItem, project._id, parts, setData])
 
     const handleRemoveUser = useCallback((userId) => {
         const updatedUserList = userList.filter(item => item.id !== userId)
@@ -136,7 +148,9 @@ const AddEditUserList = () => {
         saveChanges(updatedUserList)
     }, [userList, saveChanges])
 
-    //fields
+    // ==================================
+    // dialog logic management
+    // ==================================
 
     //add/remove access button
     const getButton = (buttonClass, clickHandler, param, text) => {
@@ -206,6 +220,10 @@ const AddEditUserList = () => {
         return { usersWithAccess: withAccess, usersWithoutAccess: withoutAccess }
     }, [usersData, parts, project, item, currentUserAccess, rights.names, userData, handleAddUser, handleRemoveUser, getSelect])
 
+    // ==================================
+    // dialog display management
+    // ==================================
+
     const getTable = (itemsToDisplay, itemKeys, itemTypes) => {
         return (
             <ItemTable
@@ -220,6 +238,8 @@ const AddEditUserList = () => {
             />
         )
     }
+
+  // ==================================
 
     return (
         <div className="dialog-container">

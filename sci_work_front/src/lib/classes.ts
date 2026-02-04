@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { updateTreeItemField } from './helpers'
+
 // ==================================
 // Main
 // ==================================
@@ -51,6 +53,12 @@ abstract class Item {
 
   abstract getAccess(userData?: { _id?: string }, id?: string): number
 
+  abstract deleteItem(
+    deleted: boolean,
+    data: Project[],
+    setData: (update: { domain: string; id: string; recipe: (draft: any) => void }) => void
+  ): void
+
   getAccessType(rightsType: number[], user: { _id?: string }, id: string = this._id): boolean {
     return rightsType.includes(this.getAccess(user, id))
   }
@@ -89,30 +97,6 @@ abstract class Item {
       return `/Project/${project?._id}`
     }
   }
-
-  deleteItem(
-    deleted: boolean,
-    data: Project[],
-    setData: (update: { action: string; item: Project }, sendUpdate?: boolean) => void,
-    sendUpdate: boolean = true
-  ): void {
-    const projectId = this._id.split('.')[0]
-    const project = data.find((p) => p._id === projectId)
-    if (!project) {
-      return
-    }
-
-    let activities = project.activities
-    if (this._id.includes(".")) {
-      activities = project.activities.map((activity) =>
-        activity._id === this._id ? { ...activity, deleted } : activity
-      )
-    }
-
-    const updatedProject = createProjectFromObject({ ...project, activities, ...(this._id.includes(".") ? {} : { deleted }) })
-    console.log("deleted:", this._id)
-    setData({ action: "edit", item: updatedProject }, sendUpdate)
-  }
 }
 
 class Project extends Item {
@@ -149,6 +133,31 @@ class Project extends Item {
         ?.userList?.find(u => u.id === userData._id)?.access
 
     return typeof access === "number" ? access : -1
+  }
+
+  deleteItem(
+    deleted: boolean,
+    data: Project[],
+    setData: (update: { domain: string; id: string; recipe: (draft: any) => void }) => void
+  ): void {
+
+    const project = data.find(p => p._id === this._id)
+    if (!project) return
+
+    setData({
+      domain: "projects",
+      id: this._id,
+      recipe: draft => {
+        draft.deleted = deleted
+      }
+    })
+
+    if (deleted) {
+      console.log("deleted:", this._id)
+    }
+    else {
+      console.log("recovered:", this._id)
+    }
   }
 
   findItemWithParent<T extends Project | MetaActivity>(
@@ -258,6 +267,33 @@ class Activity extends Item {
         ?.userList?.find((u: User) => u.id === userData._id)?.access
 
     return typeof access === "number" ? access : -1
+  }
+
+  deleteItem(
+    deleted: boolean,
+    data: Project[],
+    setData: (update: { domain: string; id: string; recipe: (draft: any) => void }) => void
+  ): void {
+    const projectId = this._id.split('.')[0]
+    const project = data.find(p => p._id === projectId)
+    if (!project) {
+      return
+    }
+
+    setData({
+      domain: "projects",
+      id: projectId,
+      recipe: draft => {
+        draft.activities = updateTreeItemField(draft.activities, draft._id, "activivties", "deleted", deleted)
+      }
+    })
+
+    if (deleted) {
+      console.log("deleted:", this._id)
+    }
+    else {
+      console.log("recovered:", this._id)
+    }
   }
 
   getProjectId(): string {

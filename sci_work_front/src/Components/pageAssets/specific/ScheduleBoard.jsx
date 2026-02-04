@@ -22,6 +22,10 @@ const ScheduleBoard = ({
         recentActivities, setRecentActivities
     } = useContext(AppContext)
 
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
     const navigate = useNavigate()
 
     //calculate scale values
@@ -32,19 +36,15 @@ const ScheduleBoard = ({
     const [firstDay, setFirstDay] = useState(
         new Date(intervalAnchor.getMonth() + 1, intervalAnchor.getFullYear() - 1, 1).getDay()
     )
-
     const firstDayOfMonth = useMemo(() => {
         return (firstDay === 0) ? 7 : firstDay
     }, [firstDay])
-
     const [lastDayOfMonth, setLastDayOfMonth] = useState(
         new Date(intervalAnchor.getMonth() + 1, intervalAnchor.getFullYear(), 0).getDay()
     )
-    
     const [totalDaysInMonth, setTotalDaysInMonth] = useState(
         getDaysInMonth(intervalAnchor.getMonth() + 1, intervalAnchor.getFullYear())
     )
-
     const weeksInMonth = useCallback((month, year) => {
         setFirstDay(new Date(year, month - 1, 1).getDay())
         setLastDayOfMonth(new Date(year, month, 0).getDay())
@@ -53,6 +53,10 @@ const ScheduleBoard = ({
         // Return total weeks: full weeks + 1 if there's a partial week at the end of month
         return fullWeeks + (lastDayOfMonth !== 0 ? 1 : 0)
     }, [getDaysInMonth, firstDayOfMonth, lastDayOfMonth, totalDaysInMonth])
+
+    // ==================================
+    // BG display logic
+    // ==================================
 
     //set grid resolution
     useEffect(() => {
@@ -121,6 +125,10 @@ const ScheduleBoard = ({
             end: new Date(intervalAnchor.getFullYear(), 11, 31),
         },
     }), [intervalAnchor])
+
+    // ==================================
+    // event data management
+    // ==================================
 
     // ranged data for current scale
     const scaledData = useMemo(() => {
@@ -387,6 +395,8 @@ const ScheduleBoard = ({
         return eventDivs
         
     }, [projects, currentScale, renderEvents, scaledDataWithOverlaps])
+
+    // ==================================
 
     return (
         <div

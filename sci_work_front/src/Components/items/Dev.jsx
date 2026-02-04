@@ -1,5 +1,4 @@
 import { useContext } from 'react'
-import { useNavigate } from "react-router-dom"
 
 import '../../Styles/components/items/Dev.sass'
 
@@ -9,10 +8,9 @@ const Dev = ({
     item,
     index
 }) => {
-    
-    const navigate = useNavigate()
 
     const {
+        navigate,
         projects,
         recentActivities, setRecentActivities
     } = useContext(AppContext)

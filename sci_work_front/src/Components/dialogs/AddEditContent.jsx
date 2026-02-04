@@ -9,16 +9,21 @@ import { AppContext } from '../pageAssets/shared'
 
 const AddEditContent = () => {
 
-    const {
+    const { //can not apply url-based itemIds in dialogs
         userData,
         activities,
         setData,
-        state, setState
+        setDialog,
+        dialog,
     } = useContext(AppContext)
 
-    let itemIndex = state.currentDialog.params[2]
-    const containerId = state.currentDialog.params[3]
-    const editType =  state.currentDialog.params[4]
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
+    let itemIndex = dialog.params[2]
+    const containerId = dialog.params[3]
+    const editType =  dialog.params[4]
 
     const activity = getItemById(activities, containerId)
     const listStructure = activity.content?.liStructure || {}
@@ -37,36 +42,9 @@ const AddEditContent = () => {
 
     const [errors, setErrors] = useState({})
 
-    //handle dialog behaviors
-
-    const closeDialog = () => {
-        setState(prev => ({
-            ...prev,
-            currentDialog: { name: undefined, params: [] }
-        }))
-    }
-
-    const handleInputChange = (e) => {
-        const { name, value, type, checked, dataset } = e.target
-        const section = dataset.section
-
-        console.log("updating form values", name, value, type, checked, section)
-
-        if (section === "markable") {
-            setFormValues((prev) => ({
-            ...prev,
-            markable: {
-                ...prev.markable,
-                [name]: value,
-            },
-            }))
-        } else {
-            setFormValues((prev) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value,
-            }))
-        }
-    }
+    // ==================================
+    // form logic management
+    // ==================================
 
     const handleStructureChange = (key, type) => {
         setStructureFields(prev => ({
@@ -114,7 +92,6 @@ const AddEditContent = () => {
     }
 
     const handleSubmit = () => {
-
         const errors = validate()
         if (Object.keys(errors).length > 0) {
             setErrors(errors)
@@ -122,42 +99,69 @@ const AddEditContent = () => {
             return
         }
 
-        const updatedActivity = { ...activity }
-
-        if (!editType.includes("Structure")) {
-            let newItem = {
-                ...formValues,
-                _id: activity._id + '.' + listItems.length,
-                creatorId: userData._id,
-                userList: [{
-                    id: userData._id,
-                    access: 0
-                }]
-            }
-
-            if (activity.content?.currentSettings?.markable) {
-                newItem.markable.userEntries = []
-            }
-
-            updatedActivity.content.listItems = [...listItems]
-            updatedActivity.content.listItems.splice(itemIndex + 1, 0, newItem)
-
-            itemIndex++
-        }
-        else {
-            updatedActivity.content.liStructure = { ...structureFields }
-            console.log("I updated structure")
-        }
-
-        console.log("updatedActivity", updatedActivity)
         setData({
-            action: "content",
-            item: {
-                type: "List",
-                activity: updatedActivity
+            domain: "activities",
+            id: activity._id,
+            recipe: (draft) => {
+                if (!editType.includes("Structure")) {
+                    // створюємо новий елемент
+                    const newItem = {
+                        ...formValues,
+                        _id: draft._id + '.' + listItems.length,
+                        creatorId: userData._id,
+                        userList: [{ id: userData._id, access: 0 }]
+                    }
+
+                    if (draft.content?.currentSettings?.markable) {
+                        newItem.markable = { userEntries: [] }
+                    }
+
+                    // вставляємо новий елемент у listItems
+                    draft.content.listItems = [...listItems]
+                    draft.content.listItems.splice(itemIndex + 1, 0, newItem)
+                    itemIndex++
+                } else {
+                    draft.content.liStructure = { ...structureFields }
+                    console.log("I updated structure")
+                }
             }
         })
     }
+
+    // ==================================
+    // dialog logic
+    // ==================================
+
+    const closeDialog = () => {
+        setDialog(prev => ({
+            name: undefined,
+            params: []
+        }))
+    }
+
+    const handleInputChange = (e) => {
+        const { name, value, type, checked, dataset } = e.target
+        const section = dataset.section
+
+        console.log("updating form values", name, value, type, checked, section)
+
+        if (section === "markable") {
+            setFormValues((prev) => ({
+            ...prev,
+            markable: {
+                ...prev.markable,
+                [name]: value,
+            },
+            }))
+        } else {
+            setFormValues((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value,
+            }))
+        }
+    }
+
+    // ==================================
 
     return (
         <div className="dialog-container">

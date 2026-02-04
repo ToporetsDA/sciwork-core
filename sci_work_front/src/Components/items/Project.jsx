@@ -1,4 +1,4 @@
-import { useNavigate, useContext } from "react-router-dom"
+import { useContext } from "react-router-dom"
 
 import '../../Styles/components/items/Project.sass'
 
@@ -10,11 +10,10 @@ const Project = ({
 }) => {
 
     const {
+        navigate,
         projects,
         recentActivities, setRecentActivities
     } = useContext(AppContext)
-
-    const navigate = useNavigate()
 
     return (
         <div

@@ -16,36 +16,46 @@ const ListItem = ({
 }) => {
 
     const {
+        projectId, activityId,
         userData,
         projects,
         activities,
         setData
     } = useContext(AppContext)
 
-    const activity = getItemById(activities, containerId)
+    // ==================================
+    // const, helpers and state management
+    // ==================================
 
-    const parts = containerId.split('.')
-    const project = getItemById(projects, parts[0])
+    const project = getItemById(projects, projectId)
     const {item: metaActivity} = project.findItemWithParent(project.activities, "_id", containerId, project)
+
+    const activity = getItemById(activities, activityId)
 
     const fieldsToRender = activity.content?.liStructure
 
     //for Report activity
     const [reportInput, setReportInput] = useState("")
 
-    const saveChanges = (key, value, activity, index) => {
-
-        const updatedActivity = activity.setFieldValue(
-            `listItems.${index}.${key}`,
-            value
-        )
-        console.log("mark", key, value, updatedActivity)
-        setData({action: "content", item: {type: "List", activity: updatedActivity}})
-    }
+    // --- helpers ---
 
     // get now "hh:mm"
     const getTime = () => {
         return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }
+
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
+    const saveChanges = (key, value, activity, index) => {
+        setData({
+            domain: "activities",
+            id: activityId,
+            recipe: (draft) => {
+                draft.listItems[index][key] = value
+            }
+        })
     }
 
     const handleMarkable = (key) => {
@@ -54,7 +64,6 @@ const ListItem = ({
 
         //allow marking if in time window
         const now = new Date()
-
         const allowedDay = new Date(markable.date)
 
         const start = new Date(allowedDay)

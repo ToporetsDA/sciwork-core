@@ -154,3 +154,27 @@ export const getSelect = (
     </select>
   )
 }
+
+export const updateTreeItem = (arr: any[], targetId: string, field: string, val: any): any[] => {
+  return arr.map(a => {
+    if (a._id === targetId) {
+      return { ...a, val }
+    } 
+    if (a[field] && a[field].length) {
+      return { ...a, [field]: updateTreeItem(a[field], targetId, field, val) }
+    }
+    return a
+  })
+}
+
+export const updateTreeItemField = (arr: any[], targetId: string, field: string, valField: string, val: any): any[] => {
+  return arr.map(a => {
+    if (a._id === targetId) {
+      return { ...a, [valField]: val }
+    } 
+    if (a[field] && a[field].length) {
+      return { ...a, [field]: updateTreeItemField(a[field], targetId, field, valField, val) }
+    }
+    return a
+  })
+}

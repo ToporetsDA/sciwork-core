@@ -27,7 +27,13 @@ const Item = ({
         rights
     } = useContext(AppContext)
 
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
     const isItem = (item !== true)
+    const deleted = item?.deleted ? "deleted" : ""
+
     //if there are no Items in project ➕ Add below button is always visible
     const classCondition = (!isItem && index === 0)
 
@@ -47,6 +53,10 @@ const Item = ({
         transform: CSS.Transform.toString(transform),
         opacity: (isDragging) ? 0.5 : 1
     }
+
+    // ==================================
+    // item display logic
+    // ==================================
 
     const accessCheck = () => {
         const parts = item._id.split('.')
@@ -70,7 +80,7 @@ const Item = ({
         return result
     }
 
-    const deleted = item?.deleted ? "deleted" : ""
+    // ==================================
 
     return accessCheck() ? (
         <div

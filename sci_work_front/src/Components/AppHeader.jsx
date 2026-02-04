@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect, useMemo, useContext, useLocation } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useRef, useEffect, useMemo, useContext } from 'react'
 
 import '../Styles/components/AppHeader.sass'
 import { PAGES, MORE_PAGES } from '../lib/constants'
@@ -11,17 +10,14 @@ import logo from '../logo.svg'
 const AppHeader = () => {
 
     const {
-        setState,
+        navigate,
+        currentPage,
+        setDialog,
         userData,
         isLoggedIn, setLoggedIn,
         notifications, setNotifications,
         organisationType
     } = useContext(AppContext)
-
-    const navigate = useNavigate()
-
-    const { pathname } = useLocation()
-    const currentPage = pathname.split("/")[1] || "HomePage"
 
     const format = (str) => {
         return str.replace(/\s+/g, '')
@@ -81,12 +77,9 @@ const AppHeader = () => {
     }
 
     const handleDialog = (dialog, params) => {
-        setState((prevState) => ({
-            ...prevState,
-            currentDialog: {
-                name: dialog,
-                params: params
-            }
+        setDialog((prevState) => ({
+            name: dialog,
+            params: params
         }))
     }
 

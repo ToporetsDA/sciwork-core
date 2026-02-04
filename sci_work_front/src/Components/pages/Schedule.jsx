@@ -5,9 +5,14 @@ import '../../Styles/components/pages/Schedule.sass'
 import { DAYS_OF_WEEK, MONTHS } from '../../lib/constants'
 
 import { ControlPanel } from '../pageAssets/shared'
+
 import ScheduleBoard from '../pageAssets/specific/ScheduleBoard'
 
 const Schedule = () => {
+
+    // ==================================
+    // const, helpers and state management
+    // ==================================
 
     //date data
     const now = useMemo(() => new Date(), [])
@@ -16,41 +21,7 @@ const Schedule = () => {
     const [currentScale, setCurrentScale] = useState('week')
     const [gridValues, setGridValues] = useState({ rows: 24, columns: 7 })
 
-    //update displayed period
-    const editIntervalAnchor = useCallback((val) => {
-        setIntervalAnchor((prevAnchor) => {
-            if (val === 0) {
-                return now
-            }
-    
-            const newAnchor = new Date(prevAnchor)
-    
-            switch (currentScale) {
-                case 'week':
-                    newAnchor.setDate(prevAnchor.getDate() + val * 7)
-                    break
-                case 'month':
-                    newAnchor.setMonth(prevAnchor.getMonth() + val)
-                    break;
-                case 'year':
-                    newAnchor.setFullYear(prevAnchor.getFullYear() + val)
-                    break
-                default:
-            }
-    
-            return newAnchor
-        })
-    }, [currentScale, now])
-
-    //calculate scale values
-    const getWeekOfYear = (date) => {
-        const startOfYear = new Date(date.getFullYear(), 0, 1)
-        const diff = date - startOfYear
-        const oneDay = 1000 * 60 * 60 * 24
-        const weekNumber = Math.floor(diff / oneDay / 7)
-        return weekNumber + 1 // Week number starts from 1
-    }
-
+    //styles
     const scheduleBoard = {
         display: 'grid',
         gridTemplateRows: `repeat(${gridValues.rows}, 1fr)`,
@@ -138,6 +109,47 @@ const Schedule = () => {
         })
         
     }, [currentScale, gridValues, intervalAnchor])
+
+    // ==================================
+    // schedule map display logic
+    // ==================================
+
+    //update displayed period
+    const editIntervalAnchor = useCallback((val) => {
+        setIntervalAnchor((prevAnchor) => {
+            if (val === 0) {
+                return now
+            }
+    
+            const newAnchor = new Date(prevAnchor)
+    
+            switch (currentScale) {
+                case 'week':
+                    newAnchor.setDate(prevAnchor.getDate() + val * 7)
+                    break
+                case 'month':
+                    newAnchor.setMonth(prevAnchor.getMonth() + val)
+                    break;
+                case 'year':
+                    newAnchor.setFullYear(prevAnchor.getFullYear() + val)
+                    break
+                default:
+            }
+    
+            return newAnchor
+        })
+    }, [currentScale, now])
+
+    //calculate scale values
+    const getWeekOfYear = (date) => {
+        const startOfYear = new Date(date.getFullYear(), 0, 1)
+        const diff = date - startOfYear
+        const oneDay = 1000 * 60 * 60 * 24
+        const weekNumber = Math.floor(diff / oneDay / 7)
+        return weekNumber + 1 // Week number starts from 1
+    }
+
+    // ==================================
 
     return (
         <>

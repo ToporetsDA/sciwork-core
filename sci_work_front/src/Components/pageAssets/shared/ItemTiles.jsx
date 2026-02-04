@@ -1,4 +1,4 @@
-import { useContext, useLocation }  from 'react'
+import { useContext }  from 'react'
 import { SortableContext } from '@dnd-kit/sortable'
 
 import '../../../Styles/components/pageAssets/shared/ItemTiles.sass'
@@ -16,13 +16,24 @@ const ItemTiles = ({
 }) => {
 
     const {
+        currentPage,
         userData,
         projects,
         rights
     } = useContext(AppContext)
 
-    const { pathname } = useLocation()
-    const currentPage = pathname.split("/")[1] || "HomePage"
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
+    const noItems = itemsToDisplay.length === 0
+    const noParent = !containerId
+    const isInContainerItem = containerType === "Group"
+    const isInListBasedItem = ITEM_TYPES_LIST_BASED.includes(containerType)
+
+    // ==================================
+    // list management
+    // ==================================
 
     const getItem = (item, index, dnd) => {
         const Component = (dnd) ? Item : Items.Project
@@ -50,10 +61,7 @@ const ItemTiles = ({
         return project.getAccessType(rights.edit, userData, containerId)
     }
 
-    const noItems = itemsToDisplay.length === 0
-    const noParent = !containerId
-    const isInContainerItem = containerType === "Group"
-    const isInListBasedItem = ITEM_TYPES_LIST_BASED.includes(containerType)
+    // ==================================
 
     return (
         <>

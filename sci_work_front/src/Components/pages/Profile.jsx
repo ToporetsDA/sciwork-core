@@ -10,14 +10,23 @@ import { AppContext } from '../pageAssets/shared'
 const Profile = () => {
 
     const {
-        userData, setUserData,
+        setData,
+        userData,
         profileData,
         rights
     } = useContext(AppContext)
 
+    // ==================================
+    // const, helpers and state management
+    // ==================================
+
     const [editMode, setEditMode] = useState(false)
     const [tmpUserData, setTempData] = useState({ ...userData })
     const [errors, setErrors] = useState({})
+
+    // ==================================
+    // userData update management
+    // ==================================
   
     const handleInputChange = (field, value) => {
         setTempData({ ...tmpUserData, [field]: value })
@@ -41,9 +50,18 @@ const Profile = () => {
             alert("Please fill out all required fields.")
             return
         }
-        setUserData({...userData, ...tmpUserData}, false)
+        
+        setData({
+            domain: "user",
+            id: userData._id,
+            recipe: (draft) => {
+                Object.assign(draft, tmpUserData)
+            }
+        })
         setEditMode(false)
     }
+
+    // ==================================
     
     return (
         <div className="account-page .page-wrapper-no-cp">
