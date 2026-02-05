@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo, useContext } from 'react'
+import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
 import '../../../Styles/components/pageAssets/specific/ScheduleBoard.sass'
@@ -21,6 +22,8 @@ const ScheduleBoard = ({
         setDialog,
         recentActivities, setRecentActivities
     } = useContext(AppContext)
+
+    const { t } = useTranslation("pageAssets.specific.scheduleBoard")
 
     // ==================================
     // const, helpers and state management
@@ -143,8 +146,8 @@ const ScheduleBoard = ({
                 }
     
                 // Multi-day activity
-                const startItem = createScheduleItem(activity, "activity", "start")
-                const endItem = createScheduleItem(activity, "activity", "end")
+                const startItem = createScheduleItem(activity, "activity", "start", t("ScheduleItem.start"))
+                const endItem = createScheduleItem(activity, "activity", "end", t("ScheduleItem.end"))
 
                 let repeatItems = []
 
@@ -167,7 +170,7 @@ const ScheduleBoard = ({
                         // Check if the day is one of the repeating days
                         if (daysOfWeek.includes(d.getDay())) {
 
-                            const repeatItem = createScheduleItem(activity, "activity", `repeat`, d)
+                            const repeatItem = createScheduleItem(activity, "activity", `repeat`, t("ScheduleItem.repeat"), d)
                             repeatItems.push(repeatItem)
                         }
                     }
@@ -180,8 +183,8 @@ const ScheduleBoard = ({
 
         const filteredProjects = projects.flatMap(project => {
     
-            const startItem = createScheduleItem(project, "project", "start")
-            const endItem = createScheduleItem(project, "project", "end")
+            const startItem = createScheduleItem(project, "project", "start", t("ScheduleItem.start"))
+            const endItem = createScheduleItem(project, "project", "end", t("ScheduleItem.end"))
 
             return [startItem, endItem]
         })
@@ -202,7 +205,7 @@ const ScheduleBoard = ({
             })
     
         return rangedData
-    }, [projects, currentScale, rangeToDisplay])
+    }, [projects, currentScale, rangeToDisplay, t])
 
     // scaledData with grouped overlaps
     const scaledDataWithOverlaps = useMemo(() => {
@@ -343,7 +346,7 @@ const ScheduleBoard = ({
             content += `${item.name}\n`
 
             if (showStartEnd) {
-                content += `Start at ${item[start]}\nEnd at${item[end]}`
+                content += `${t("start")} ${item[start]}\n${t("end")}${item[end]}`
             }
             return content
         }
@@ -394,7 +397,7 @@ const ScheduleBoard = ({
 
         return eventDivs
         
-    }, [projects, currentScale, renderEvents, scaledDataWithOverlaps])
+    }, [projects, currentScale, renderEvents, scaledDataWithOverlaps, t])
 
     // ==================================
 

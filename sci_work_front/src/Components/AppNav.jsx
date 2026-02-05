@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+import { useTranslation } from "react-i18next"
 
 import '../Styles/components/AppNav.sass'
 
@@ -14,6 +15,8 @@ const AppNav = () => {
     organisationType,
     recentActivities, setRecentActivities
   } = useContext(AppContext)
+
+  const { t } = useTranslation("base.nav")
 
   //project.name and activity.name pairs
   const clearRecent = () => {
@@ -132,7 +135,7 @@ const AppNav = () => {
         </ul>
           
         <ul className="nav-items">
-          <h4>Recent</h4>
+          <h4>{t("recent.name")}</h4>
           {projects.map((project) => {
             if (isInRecent(project)) {
               return (
@@ -154,7 +157,7 @@ const AppNav = () => {
             style={{ display: recentActivities.length === 0 ? 'none' : 'block' }}
             onClick={clearRecent}
           >
-            Clear recent
+            {t("recent.reset")}
           </button>
         </ul>
       </>

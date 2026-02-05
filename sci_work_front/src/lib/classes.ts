@@ -744,6 +744,7 @@ export class ScheduleItem {
     item: MetaActivity,   // або SchedulableItem
     type: string,
     kind?: ScheduleKind,
+    t?: string,
     d?: Date
   ) {
     const formatDate = (date: Date): string => {
@@ -759,7 +760,7 @@ export class ScheduleItem {
 
     switch (kind) {
       case "start": {
-        this.name = `${item.name} - .start`
+        this.name = `${item.name} - ${t}`
         this.startDate = item.startDate
         this.endDate = item.startDate
         this.eventId = `${item._id}.start`
@@ -768,14 +769,14 @@ export class ScheduleItem {
       case "repeat": {
         if (!d) throw new Error("Date is required for repeat kind")
 
-        this.name = `${item.name} - .repeat`
+        this.name = `${item.name} - ${t}`
         this.startDate = formatDate(d)
         this.endDate = formatDate(d)
         this.eventId = `${item._id}.repeat_${d.toLocaleDateString()}`
         break
       }
       case "end": {
-        this.name = `${item.name} - .end`
+        this.name = `${item.name} - ${t}`
         this.startDate = item.endDate
         this.endDate = item.endDate
         this.eventId = `${item._id}.end`
@@ -794,9 +795,10 @@ export const createScheduleItem = (
   item: MetaActivity,
   type: string,
   kind?: ScheduleKind,
-  d?: Date
+  t?: string,
+  d?: Date,
 ): ScheduleItem => {
-  return new ScheduleItem(item, type, kind, d)
+  return new ScheduleItem(item, type, kind, t, d)
 }
 
 // ==================================

@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+import { useTranslation } from "react-i18next"
 
 import '../../Styles/components/pages/Notifications.sass'
 
@@ -10,6 +11,8 @@ const Notifications = () => {
         navigate,
         notifications, setNotifications
     } = useContext(AppContext)
+
+    const { t } = useTranslation("pages.notifications")
 
     // ==================================
     // notification logic management
@@ -50,7 +53,7 @@ const Notifications = () => {
                 {(state === "seen") &&
                     <div className="notification-circle"></div>
                 }
-                {state}
+                {t(`state.${state}`)}
             </div>
         )
     }

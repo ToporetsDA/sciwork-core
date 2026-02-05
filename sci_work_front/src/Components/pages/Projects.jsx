@@ -1,4 +1,5 @@
 import { Suspense, useState, useEffect, useContext }  from 'react'
+import { useTranslation } from "react-i18next"
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, pointerWithin, rectIntersection, useSensor, useSensors, } from '@dnd-kit/core'
 import { arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
 
@@ -19,6 +20,8 @@ const Projects = () => {
         activities,
         setData
     } = useContext(AppContext)
+
+    const { t } = useTranslation("pages.projects")
 
     // ==================================
     // const, helpers and state management
@@ -54,7 +57,7 @@ const Projects = () => {
 
     if (projectId && containers.length !== getItemById(projects, projectId).activities.length) {
         return (
-            <>Loading Activities</>
+            <>{t("fallback.activities")}</>
         )
     }
 
@@ -293,7 +296,7 @@ const Projects = () => {
             />
             <div className={`page-wrapper ${DISPLAY_OPTIONS.get(userData.currentSettings.displayProjects)}`}>
                 {(currentPage === "Projects") ? (
-                    <Suspense fallback={<div>Loading projects...</div>}>
+                    <Suspense fallback={<div>{t("fallback.projects")}</div>}>
                         {DISPLAY_OPTIONS.get(userData.currentSettings.displayProjects) !== 'table' ?
                         (
                             getItemTiles("tiles", "Project")
@@ -309,7 +312,7 @@ const Projects = () => {
                         )}
                     </Suspense>
                 ) : (
-                    <Suspense fallback={<div>Loading activities...</div>}>
+                    <Suspense fallback={t("fallback.activities")}>
                         <DndContext
                             sensors={sensors}
                             collisionDetection={collisionDetection}

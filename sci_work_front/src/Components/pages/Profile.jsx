@@ -1,5 +1,6 @@
 
 import { useState, useContext } from 'react'
+import { useTranslation } from "react-i18next"
 
 import '../../Styles/components/pages/Profile.sass'
 
@@ -15,6 +16,8 @@ const Profile = () => {
         profileData,
         rights
     } = useContext(AppContext)
+
+    const { t } = useTranslation("pages.profile")
 
     // ==================================
     // const, helpers and state management
@@ -122,7 +125,7 @@ const Profile = () => {
                             className='button-main'
                             onClick={saveChanges}
                         >
-                            Save
+                            {t("actions.save")}
                         </button>
                         <button
                             className='button-main'
@@ -131,7 +134,7 @@ const Profile = () => {
                                 setEditMode(false)
                             }}
                         >
-                            Cancel
+                            {t("actions.cancel")}
                         </button>
                     </>
                 ) : (
@@ -139,7 +142,7 @@ const Profile = () => {
                         className='button-main'
                         onClick={() => setEditMode(true)}
                     >
-                        Edit Profile
+                        {t("actions.edit")}
                     </button>
                 )}
             </div>

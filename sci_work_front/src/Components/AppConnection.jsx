@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useContext } from 'react'
+import { useTranslation } from "react-i18next"
 import { useWebSocket } from 'react-use-websocket'
 
 import { createProjects, projectVerUp, createActivity, createActivities, activityVerUp } from '../lib/classes'
@@ -23,6 +24,8 @@ const Connection = ({
         activities,
         setLoggedIn
     } = useContext(AppContext)
+
+    const { t } = useTranslation("base.connection")
 
     // ==================================
     // const, vars, helpers and state management
@@ -315,7 +318,7 @@ const Connection = ({
     return (
         <div>
             {loading ? (
-                <p>Loading servers...</p> // Display loading message while fetching servers
+                <p>{t("fallback")}</p> // Display loading message while fetching servers
             ) : (
                 <>
                     {dialog.name === "LogIn" &&

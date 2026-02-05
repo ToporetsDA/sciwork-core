@@ -1,0 +1,110 @@
+{
+    "base": {
+        "connection": {
+            "fallback": "Loading servers..."
+        },
+        "content": {
+            "fallback": "Loading..."
+        },
+        "header": {
+            "pages": {
+                "home": "Home Page",
+                "schedule": "Schedule",
+                "projects": "Projects",
+                "subjects": "Subjects"
+            },
+            "more": {
+                "name": "More",
+                "profile": "Profile",
+                "notifications": "Notifications",
+                "chats": "Chats",
+                "settings": "Settings"
+            },
+            "auth": {
+                "in": "Log In/Register",
+                "out": "Log Out"
+            }
+        },
+        "nav": {
+            "recent": {
+                "name": "Recent",
+                "reset": "Clear recent"
+            }
+        }
+    },
+    "pages": {
+        "home": {},
+        "notifications": {
+            "state": {
+                "seen": "seen",
+                "unseen": "unseen",
+                "unread": "unread"
+            }
+        },
+        "profile": {
+            "actions": {
+                "save": "Save",
+                "edit": "Edit Profile",
+                "cancel": "Cancel"
+            }
+        },
+        "projects": {
+            "fallback": {
+                "projects": "Loading projects...",
+                "activities": "Loading activities..."
+            }
+        },
+        "schedule": {
+            "v": {
+                "day": {
+                    "Monday": "Monday",
+                    "Tuesday": "Tuesday",
+                    "Wednesday": "Wednesday",
+                    "Thursday": "Thursday",
+                    "Friday": "Friday",
+                    "Saturday": "Saturday",
+                    "Sunday": "Sunday"
+                },
+                "month": {
+                    "Jan": "Jan.",
+                    "Feb": "Feb.",
+                    "Mar": "Mar.",
+                    "Apr": "Apr.",
+                    "May": "May.",
+                    "Jun": "Jun.",
+                    "Jul": "Jul.",
+                    "Aug": "Aug.",
+                    "Sep": "Sep.",
+                    "Oct": "Oct.",
+                    "Nov": "Nov.",
+                    "Dec": "Dec."
+                }
+            },
+            "h": {
+                "week": "Week"
+            },
+            "scale": {
+                "week": {
+                    "warning": "Not timed events are not displayed at weekly scale"
+                },
+                "month": {},
+                "year": {}
+            }
+        },
+        "settings": {}
+    },
+    "pageAssets": {
+        "specific": {},
+        "shared": {
+            "scheduleBoard": {
+                "start": "Start at",
+                "end": "End at",
+                "ScheduleItem": {
+                    "start": ".start",
+                    "repeat": ".repeat",
+                    "end": ".end"
+                }
+            }
+        }
+    }
+}

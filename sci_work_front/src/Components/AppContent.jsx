@@ -1,4 +1,5 @@
 import { lazy, Suspense, useContext } from 'react'
+import { useTranslation } from "react-i18next"
 import { Routes, Route } from "react-router-dom"
 
 import '../Styles/components/AppContent.sass'
@@ -11,16 +12,18 @@ import * as Dialogs from './dialogs'
 const AppContent = () => {
 
     const {
-        state
+        dialog
     } = useContext(AppContext)
+
+    const { t } = useTranslation("base.content")
 
     const loadDialogComponent = (dialogName) => {
         return Dialogs[dialogName.replace(/\s+/g, '')]
     }
 
     const DialogComponent =
-        (state.currentDialog.name && state.currentDialog.name !== "LogIn")
-            ? loadDialogComponent(state.currentDialog.name)
+        (dialog.name && dialog.name !== "LogIn")
+            ? loadDialogComponent(dialog.name)
             : null
     
     //heavy pages
@@ -31,7 +34,7 @@ const AppContent = () => {
     <main className="content">
         {DialogComponent && <DialogComponent />}
 
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>{t("placeholder")}</div>}>
             <Routes>
                 <Route path="/HomePage" element={<HomePage />} />
                 <Route path="/Notifications" element={<Notifications />} />

@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
+import { useTranslation } from "react-i18next"
 
 import '../../Styles/components/pages/Schedule.sass'
 
@@ -9,6 +10,8 @@ import { ControlPanel } from '../pageAssets/shared'
 import ScheduleBoard from '../pageAssets/specific/ScheduleBoard'
 
 const Schedule = () => {
+
+    const { t } = useTranslation("pages.schedule")
 
     // ==================================
     // const, helpers and state management
@@ -48,16 +51,22 @@ const Schedule = () => {
                 
                 return (
                     <div key={'v-' + index} className="top-label">
-                        {day} {(currentScale === 'week') && formattedDate}
+                        {t(`v.${day}`)} {(currentScale === 'week') && formattedDate}
                     </div>
                 )
             })
         }
         if (currentScale === 'year') {
-            return MONTHS.map((month, index) => <div key={'v-' + index} className="top-label">{month}</div>)
+            return MONTHS.map((month, index) => {
+                return (
+                <div key={'v-' + index} className="top-label">
+                    {t(`v.month.${month}`)}
+                </div>
+                )
+            })
         }
         return []
-    }, [currentScale, intervalAnchor])
+    }, [currentScale, intervalAnchor, t])
 
     const scheduleHMap = useMemo(() => {
 
@@ -89,7 +98,7 @@ const Schedule = () => {
                     break
                 }
                 case 'month': {
-                    itemInfo = `Week ${index + getWeekOfYear(intervalAnchor)}`
+                    itemInfo = `${t("h.Week")}} ${index + getWeekOfYear(intervalAnchor)}`
                     break
                 }
                 case 'year': {
@@ -108,7 +117,7 @@ const Schedule = () => {
             )
         })
         
-    }, [currentScale, gridValues, intervalAnchor])
+    }, [currentScale, gridValues, intervalAnchor, t])
 
     // ==================================
     // schedule map display logic
@@ -160,7 +169,7 @@ const Schedule = () => {
             />
             <div className='schedule-container page-wrapper'>
                 {currentScale === "week" &&
-                    <p className='warning'>Not timed events are not displayed at weekly scale</p>
+                    <p className='warning'>{t("scale.week.warning")}</p>
                 }
                 <p className='current-map'>
                 {currentScale!=='year' && MONTHS[intervalAnchor.getMonth()]} {intervalAnchor.getFullYear()}

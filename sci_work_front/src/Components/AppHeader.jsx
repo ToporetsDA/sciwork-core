@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo, useContext } from 'react'
+import { useTranslation } from "react-i18next"
 
 import '../Styles/components/AppHeader.sass'
 import { PAGES, MORE_PAGES } from '../lib/constants'
@@ -18,6 +19,8 @@ const AppHeader = () => {
         notifications, setNotifications,
         organisationType
     } = useContext(AppContext)
+
+    const { t } = useTranslation("base.header")
 
     const format = (str) => {
         return str.replace(/\s+/g, '')
@@ -104,7 +107,8 @@ const AppHeader = () => {
         }
     }, [dropdownRef])
 
-    const getLi = (page) => {
+    const getLi = (page, toDisplay) => {
+
         return (
             <li
                 key={format(page)}
@@ -116,7 +120,7 @@ const AppHeader = () => {
                 opacity: currentPage === format(page) ? 0.5 : 1,
                 }}
             >
-                <p>{page}</p>
+                <p>{toDisplay}</p>
                 {format(page) === 'Notifications' && notificationsMark > 0 && (
                     <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
                 )}
@@ -130,8 +134,8 @@ const AppHeader = () => {
                 <ul className="menu">
                 {(isLoggedIn === true) ? (
                     <>
-                        {pages.map((page) => (
-                            getLi(page)
+                        {pages.map((page, index) => (
+                            getLi(page, t(`pages.${page}`))
                         ))}
                         <li
                             onClick={setIsMoreOpen(!isMoreOpen)}
@@ -145,17 +149,21 @@ const AppHeader = () => {
                                     opacity: isMoreOpen ? 0.5 : 1,
                                 }}
                             >
-                                More
+                                {t("more.name")}
                             </p>
                             {!isMoreOpen && notificationsMark > 0 && (
                                     <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
                             )}
                             {isMoreOpen && (
                                 <ul className="more">
-                                    {morePages.map((page) => (
-                                        getLi(page)
+                                    {morePages.map((page, index) => (
+                                        getLi(page, t(`more.${page}`))
                                     ))}
-                                    <li onClick={handleLogOut}><p>Log Out</p></li>
+                                    <li onClick={handleLogOut}>
+                                        <p>
+                                            {t("auth.out")}
+                                        </p>
+                                    </li>
                                 </ul>
                             )}
                         </li>
@@ -165,11 +173,12 @@ const AppHeader = () => {
                         key={"LogIn"}
                         onClick={() => handleDialog("LogIn")}
                     >
-                        <p>Log In/Register</p>
+                        <p>{t("auth.in")}</p>
                     </li>
                 )}
             </ul>
         </header>
-    )}
+    )
+}
 
 export default AppHeader

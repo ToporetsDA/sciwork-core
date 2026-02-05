@@ -108,18 +108,18 @@ export const DAYS_OF_WEEK_SHORT = Object.freeze([
     'Sun'
 ])
 export const MONTHS = Object.freeze([
-    'Jan.',
-    'Feb.',
-    'Mar.',
-    'Apr.',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
     'May',
-    'Jun.',
-    'Jul.',
-    'Aug.',
-    'Sep.',
-    'Oct.',
-    'Nov.',
-    'Dec.'
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
 ])
 
 // --- Settings.js ---
