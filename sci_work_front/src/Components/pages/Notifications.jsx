@@ -1,5 +1,4 @@
 import { useContext } from 'react'
-import { useTranslation } from "react-i18next"
 
 import '../../Styles/components/pages/Notifications.sass'
 
@@ -9,10 +8,11 @@ const Notifications = () => {
 
     const {
         navigate,
-        notifications, setNotifications
+        notifications, setNotifications,
+        useLocale
     } = useContext(AppContext)
 
-    const { t } = useTranslation("pages.notifications")
+    const { t } = useLocale("pages.notifications")
 
     // ==================================
     // notification logic management

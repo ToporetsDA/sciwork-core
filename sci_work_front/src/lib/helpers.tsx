@@ -101,6 +101,7 @@ type InputHandler = (e: ChangeEvent<HTMLInputElement>) => void
 
 export const getInput = (
     fieldName: string,
+    placeholderText: string,
     type: string,
     value: string | number,
     checked: boolean = false,
@@ -114,7 +115,7 @@ export const getInput = (
             <input
                 type={type}
                 className="input-field"
-                placeholder={fieldName}
+                placeholder={placeholderText}
                 name={fieldName}
                 id={fieldName}
                 data-section={section}
@@ -140,15 +141,15 @@ export const getSelect = (
   value: string | number,
   handler: (e: ChangeEvent<HTMLSelectElement>) => void,
   options: OptionType[],
+  showOptions: string[],
   keyField: string,
-  valueField: string,
-  contentField: string
+  valueField: string
 ) => {
   return (
     <select className="select-mini" value={value} onChange={handler}>
-      {options.map((option) => (
+      {options.map((option, index) => (
         <option key={option[keyField]} value={option[valueField]}>
-          {option[contentField]}
+          {showOptions[index]}
         </option>
       ))}
     </select>

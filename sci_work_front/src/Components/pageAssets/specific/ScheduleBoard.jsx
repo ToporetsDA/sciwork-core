@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback, useMemo, useContext } from 'react'
-import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
 import '../../../Styles/components/pageAssets/specific/ScheduleBoard.sass'
@@ -20,10 +19,11 @@ const ScheduleBoard = ({
     const {
         projects,
         setDialog,
-        recentActivities, setRecentActivities
+        recentActivities, setRecentActivities,
+        useLocale
     } = useContext(AppContext)
 
-    const { t } = useTranslation("pageAssets.specific.scheduleBoard")
+    const { t } = useLocale("pageAssets.specific.scheduleBoard")
 
     // ==================================
     // const, helpers and state management

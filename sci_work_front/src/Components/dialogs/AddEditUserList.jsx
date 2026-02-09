@@ -27,8 +27,11 @@ const AddEditUserList = () => {
         setData,
         dialog, setDialog,
         rights,
-        users
+        users,
+        useLocale
     } = useContext(AppContext)
+
+    const { t } = useLocale("dialogs.addEditUserList")
 
     // ==================================
     // const, helpers and state management
@@ -244,15 +247,15 @@ const AddEditUserList = () => {
     return (
         <div className="dialog-container">
             <div className="dialog-content">
-                <p>Users of {item.name}</p>
+                <p>{t("label", { name: item.name })}</p>
                 <div className="users-with-access">
-                    <h3>Users with Access</h3>
+                    <h3>{t("lists.with")}</h3>
                     <div className="scrollable-list">
                         {getTable(usersWithAccess, ITEM_KEYS_ALLOWED, ITEM_TYPES_ALLOWED)}
                     </div>
                 </div>
                 <div className="users-without-access">
-                    <h3>Users without Access</h3>
+                    <h3>{t("lists.without")}</h3>
                     <div className="scrollable-list">
                         {getTable(usersWithoutAccess, ITEM_KEYS, ITEM_TYPES)}
                     </div>
@@ -261,7 +264,7 @@ const AddEditUserList = () => {
                     className='button-main'
                     onClick={closeDialog}
                 >
-                    Back
+                    {t("actions.back")}
                 </button>
             </div>
         </div>

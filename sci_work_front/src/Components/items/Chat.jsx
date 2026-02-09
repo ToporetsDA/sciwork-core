@@ -15,8 +15,11 @@ const Chat = ({
         activityId,
         userData,
         activities,
-        setData
+        setData,
+        useLocale
     } = useContext(AppContext)
+
+    const { t } = useLocale("items.chat")
 
     // ==================================
     // const, helpers and state management
@@ -89,7 +92,7 @@ const Chat = ({
                     className='button-main'
                     onClick={handleAddMessage}
                 >
-                    Send
+                    {t("send")}
                 </button>
             </div>
         </div>

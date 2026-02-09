@@ -7,14 +7,15 @@ import './App.css'
 import { createUserData, createNotification }               from './lib/classes'
 import { DEFAULT_PROFILE_DATA, DEFAULT_ITEM_STRUCTURE }     from './lib/constants'
 import { getItemById, getFromLocalStorage, daysTillEvent }  from './lib/helpers'
-import { useTimer }                                         from './lib/hooks'
+import { useTimer, useDeepTranslation }                     from './lib/hooks'
 
 import { AppProvider } from './Components/pageAssets/shared'
 
 import AppConnection  from './Components/AppConnection'
-import AppHeader      from './Components/AppHeader'
-import AppNav         from './Components/AppNav'
-import AppContent     from './Components/AppContent'
+
+import AppHeader      from './Components/_base/AppHeader'
+import AppNav         from './Components/_base/AppNav'
+import AppContent     from './Components/_base/AppContent'
 
 const App = () => {
 
@@ -312,6 +313,7 @@ const App = () => {
     navigate: useNavigate(),
     setDialog: setDialog,
     setLoggedIn: setLoggedIn,
+    useLocale: useDeepTranslation,
     //data
     setData: updateData,
     //metadata

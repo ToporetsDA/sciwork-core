@@ -1,6 +1,5 @@
 
 import { useState, useContext } from 'react'
-import { useTranslation } from "react-i18next"
 
 import '../../Styles/components/pages/Profile.sass'
 
@@ -14,10 +13,11 @@ const Profile = () => {
         setData,
         userData,
         profileData,
-        rights
+        rights,
+        useLocale
     } = useContext(AppContext)
 
-    const { t } = useTranslation("pages.profile")
+    const { t } = useLocale("pages.profile")
 
     // ==================================
     // const, helpers and state management

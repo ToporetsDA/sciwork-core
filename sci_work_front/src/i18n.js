@@ -1,19 +1,22 @@
-// i18n.js
 import i18n from "i18next"
 import { initReactI18next } from "react-i18next"
-
-import en from "./locales/en.json"
-import uk from "./locales/uk.json"
+import Backend from "i18next-http-backend"
 
 i18n
+  .use(Backend)
   .use(initReactI18next)
   .init({
-    resources: {
-      en: { translation: en },
-      uk: { translation: uk }
-    },
     lng: "en",
     fallbackLng: "en",
+
+    ns: ["base", "pages", "dialogs", "items", "itemAssets"],
+    defaultNS: "base",
+
+    backend: {
+      loadPath: "/locales/{{lng}}/{{ns}}.json"
+    },
+
+    saveMissing: true,
     interpolation: { escapeValue: false }
   })
 

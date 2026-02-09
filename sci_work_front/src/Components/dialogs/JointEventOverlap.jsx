@@ -8,10 +8,15 @@ const JointEventOverlapDialog = () => {
 
     const { //can not apply url-based itemIds in dialogs
         projects,
-        setDialog
+        setDialog,
+        useLocale
     } = useContext(AppContext)
 
-    // Close the dialog
+    const { t } = useLocale("dialogs")
+
+    // ==================================
+    // dialog logic
+    // ==================================
 
     const closeDialog = (e) => {
         if (e.target === e.currentTarget) {
@@ -21,6 +26,8 @@ const JointEventOverlapDialog = () => {
             })
         }
     }
+
+    // ==================================
 
     return (
         <div
@@ -40,7 +47,7 @@ const JointEventOverlapDialog = () => {
                     className='button-main'
                     onClick={closeDialog}
                 >
-                    Back
+                    {t("jointEventOverlap.actions.back")}
                 </button>
             </div>
         </div>

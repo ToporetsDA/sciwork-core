@@ -18,8 +18,11 @@ const AddEditItem = () => {
         dialog, setDialog,
         rights,
         itemStructure,
-        defaultStructure
+        defaultStructure,
+        useLocale
     } = useContext(AppContext)
+
+    const { t } = useLocale("dialogs.addEditItem")
 
     // ==================================
     // const, helpers and state management
@@ -357,10 +360,12 @@ const AddEditItem = () => {
     return (
         <div className="add-edit-item-dialog dialog-container">
             <div className="dialog-content">
-                <h2>{currentItem === true 
-                    ? (projectId ? 'Add new Activity' : 'Add New Project')
-                    : `Edit: ${currentItem.name}`}
-
+                <h2>
+                    {
+                        currentItem === true 
+                            ? (projectId ? t("type.activity") : t("type.project"))
+                            : t("type.edit", { name: currentItem.name })
+                    }
                 </h2>
                 <form onSubmit={handleSubmit}>
                     {(showItemFields) && (
@@ -409,8 +414,12 @@ const AddEditItem = () => {
                             </div>
                         ))
                     )}
-                    <button type="submit" className="button-main">Save</button>
-                    <button type="button" className="button-main" onClick={closeDialog}>Cancel</button>
+                    <button type="submit" className="button-main">
+                        {t("actions.save")}
+                    </button>
+                    <button type="button" className="button-main" onClick={closeDialog}>
+                        {t("actions.back")}
+                    </button>
                 </form>
             </div>
         </div>

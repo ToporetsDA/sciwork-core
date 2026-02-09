@@ -2,7 +2,7 @@ import { useState, useContext } from 'react'
 
 import '../../Styles/components/dialogs/AddEditContent.sass'
 
-import { TECH_FIELDS } from '../../lib/constants'
+import { TECH_FIELDS, FIELD_TYPES } from '../../lib/constants'
 import { getInput, getItemById, getSelect } from '../../lib/helpers'
 
 import { AppContext } from '../pageAssets/shared'
@@ -15,7 +15,10 @@ const AddEditContent = () => {
         setData,
         setDialog,
         dialog,
+        useLocale
     } = useContext(AppContext)
+
+    const { t } = useLocale("dialogs.addEditContent")
 
     // ==================================
     // const, helpers and state management
@@ -179,8 +182,10 @@ const AddEditContent = () => {
                                         {getSelect(
                                             type,
                                             (e) => handleStructureChange(key, e.target.value),
-                                            [{value: "text"},{value: "checkbox"}],
-                                            "value",
+                                            FIELD_TYPES,
+                                            FIELD_TYPES.map(opt =>
+                                                t(`fields.structure.fieldTypes.${opt.value}`)
+                                            ),
                                             "value",
                                             "value"
                                         )}
@@ -203,8 +208,8 @@ const AddEditContent = () => {
                             ))}
                             <div className="add-field-form">
                                 {getInput(
-                                    "Field name",
-                                    "text",
+                                    t("fields.structure.fieldName.label"),
+                                    t("fields.structure.fieldName.placeholder"),
                                     newField.name,
                                     undefined,
                                     e => setNewField(prev => ({ ...prev, name: e.target.value })),
@@ -215,8 +220,10 @@ const AddEditContent = () => {
                                 {getSelect(
                                     newField.type,
                                     (e) => setNewField(prev => ({ ...prev, type: e.target.value })),
-                                    [{value: "text"},{value: "checkbox"}],
-                                    "value",
+                                    FIELD_TYPES,
+                                    FIELD_TYPES.map(opt =>
+                                        t(`fields.structure.fieldTypes.${opt.value}`)
+                                    ),
                                     "value",
                                     "value"
                                 )}
@@ -234,7 +241,7 @@ const AddEditContent = () => {
                                         }
                                     }}
                                 >
-                                    Add
+                                    {t("buttons.add")}
                                 </button>
                             </div>
                             {/* <p className='warning'>WARNING: deletion of a field will erase it from existing entries!</p> */}
@@ -247,7 +254,7 @@ const AddEditContent = () => {
                                         <label key={key}>
                                             {getInput(
                                                 key,
-                                                "text",
+                                                t(`fields.values.text.placeholder`),
                                                 formValues[key] || "",
                                                 false,
                                                 handleInputChange,
@@ -280,7 +287,7 @@ const AddEditContent = () => {
                                                 <label>
                                                     {getInput(
                                                         "date",
-                                                        "date",
+                                                        t("fields.values.markable.date"),
                                                         formValues.markable?.date || "",
                                                         false,
                                                         handleInputChange,
@@ -292,7 +299,7 @@ const AddEditContent = () => {
                                                 <label>
                                                     {getInput(
                                                         "startTime",
-                                                        "time",
+                                                        t("fields.values.markable.start"),
                                                         formValues.markable?.startTime || "",
                                                         false,
                                                         handleInputChange,
@@ -304,7 +311,7 @@ const AddEditContent = () => {
                                                 <label>
                                                     {getInput(
                                                         "endTime",
-                                                        "time",
+                                                        t("fields.values.markable.end"),
                                                         formValues.markable?.endTime || "",
                                                         false,
                                                         handleInputChange,
@@ -332,13 +339,13 @@ const AddEditContent = () => {
                         className='button-main'
                         onClick={handleSubmit}
                     >
-                        Save
+                        {t("actions.save")}
                     </button>
                     <button
                         className='button-main'
                         onClick={closeDialog}
                     >
-                        Close
+                        {t("actions.back")}
                     </button>
                 </div>
             </div>

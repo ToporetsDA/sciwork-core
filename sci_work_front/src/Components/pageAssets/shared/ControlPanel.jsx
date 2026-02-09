@@ -19,15 +19,18 @@ const ControlPanel = ({
         projects,
         setData,
         setDialog,
-        rights
+        rights,
+        useLocale
     } = useContext(AppContext)
+
+    const { t } = useLocale("pageAssets.shared.controlPanel.")
 
     // ==================================
     // const, helpers and state management
     // ==================================
 
     const filterOptions = {
-        sort: ["A-Z", "Z-A", "start date", "end date"],
+        sort: ["AZ", "ZA", "startDate", "endDate"],
         state: ["all", "expired", "expiring"]
     }
 
@@ -39,12 +42,6 @@ const ControlPanel = ({
 
     const sortDropdownRef = useRef(null)
     const stateDropdownRef = useRef(null)
-
-    
-
-    const getAccess = (item) => {
-        return item.userList.find(item => item.id === userData._id).access
-    }
 
     // ==================================
     // tools logic management
@@ -206,7 +203,9 @@ const ControlPanel = ({
                         data={userData.currentSettings}
                         setter={handleToggle}
                         field={"displayProjects"}
-                        displayOptions={DISPLAY_OPTIONS_CONTROLS}
+                        displayOptions={DISPLAY_OPTIONS_CONTROLS.map(opt =>
+                            t(`projects.display.${opt}`)
+                        )}
                     />
                 </>
             }
@@ -225,13 +224,13 @@ const ControlPanel = ({
                         disabled={false}
                     />
                     <button className='move-schedule-page button-mini' onClick={() => editIntervalAnchor(-1)}>
-                        Prev.
+                        {t("schedule.prev")}
                     </button>
                     <button className='move-schedule-page button-mini' onClick={() => editIntervalAnchor(0)}>
-                        To now
+                        {t("schedule.now")}
                     </button>
                     <button className='move-schedule-page button-mini' onClick={() => editIntervalAnchor(1)}>
-                        Next
+                        {t("schedule.next")}
                     </button>
                 </div>
             }
@@ -245,13 +244,13 @@ const ControlPanel = ({
                                 onClick={() => {setIsSortDropdownOpen(!isSortDropdownOpen)}}
                                 ref={sortDropdownRef}
                             >
-                                {userData.currentSettings.sortFilter}
+                                {t(`filters.sort.${userData.currentSettings.sortFilter}`)}
                             </button>
                             {isSortDropdownOpen && (
                                 <ul className="dropdown">
                                     {filterOptions.sort.map((option, index) => (
                                         <li key={index} onClick={() => { handleOptionSelect(option, "sortFilter")}}>
-                                            {option}
+                                            {t(`filters.sort.${option}`)}
                                         </li>
                                     ))}
                                 </ul>
@@ -263,13 +262,13 @@ const ControlPanel = ({
                                 onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
                                 ref={stateDropdownRef}
                             >
-                                {userData.currentSettings.statusFilter}
+                                {t(`filters.state.${userData.currentSettings.statusFilter}`)}
                             </button>
                             {isStateDropdownOpen && (
                                 <ul className="dropdown">
                                     {filterOptions.state.map((option, index) => (
                                         <li key={index} onClick={() => handleOptionSelect(option, "statusFilter")}>
-                                            {option}
+                                            {t(`filters.state.${option}`)}
                                         </li>
                                     ))}
                                 </ul>
@@ -277,8 +276,14 @@ const ControlPanel = ({
                         </div>
                     </div>
                     }
-                    {((currentPage !== "Projects")
-                    && ((projectId) ? rights.edit.includes(getAccess(getItemById(projects, projectId))) : false))
+                    {(
+                        (currentPage !== "Projects")
+                        && (
+                            (projectId)
+                            ? rights.edit.includes(getItemById(projects, projectId)?.getAccess(userData._id))
+                            : false
+                        )
+                    )
                     && (
                         <div>
                         {getDialogButton(
@@ -286,7 +291,7 @@ const ControlPanel = ({
                             "add-item button-mini",
                             'AddEditUserList',
                             [projectId],
-                            "Add/Edit users",
+                            t("buttons.addEditUsers"),
                             false
                         )
                         }
@@ -302,11 +307,12 @@ const ControlPanel = ({
                     "add-item button-mini",
                     'AddEditItem',
                     [true, false],
-                    "New Project",
+                    t("buttons.addProject"),
                     false
                 )
             )}
         </div>
-    )}
+    )
+}
 
 export default ControlPanel

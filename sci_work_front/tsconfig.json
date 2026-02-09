@@ -4,6 +4,9 @@
     "checkJs": false,             // не перевіряти JS файли
     "jsx": "react-jsx",           // щоб TS розумів JSX в tsx/jsx файлах
     "noEmit": true,               // нічого фізично не компілювати
+    // "moduleResolution": "node",
+    // "esModuleInterop": true,
+    // "allowSyntheticDefaultImports": true,
     "strict": true
   },
   "include": [

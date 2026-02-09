@@ -1,17 +1,20 @@
-import { useState, useCallback, useMemo } from 'react'
-import { useTranslation } from "react-i18next"
+import { useState, useCallback, useMemo, useContext } from 'react'
 
 import '../../Styles/components/pages/Schedule.sass'
 
 import { DAYS_OF_WEEK, MONTHS } from '../../lib/constants'
 
-import { ControlPanel } from '../pageAssets/shared'
+import { AppContext, ControlPanel } from '../pageAssets/shared'
 
 import ScheduleBoard from '../pageAssets/specific/ScheduleBoard'
 
 const Schedule = () => {
 
-    const { t } = useTranslation("pages.schedule")
+    const {
+        useLocale
+    } = useContext(AppContext)
+
+    const { t } = useLocale("pages.schedule")
 
     // ==================================
     // const, helpers and state management

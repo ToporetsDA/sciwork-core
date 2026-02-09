@@ -20,8 +20,11 @@ const ListItem = ({
         userData,
         projects,
         activities,
-        setData
+        setData,
+        useLocale
     } = useContext(AppContext)
+
+    const { t } = useLocale("itemAssets.subItems.chat")
 
     // ==================================
     // const, helpers and state management
@@ -85,7 +88,11 @@ const ListItem = ({
                 key={item._id + '.' + key}
             >
                 <>
-                    Markable for {markable.startTime}-{markable.endTime} on {markable.date}
+                    {t("markable.label", {
+                        start: markable.startTime,
+                        end: markable.endTime,
+                        date: markable.date
+                    })}
                 </>
                 {(userData._id === item.creatorId) ? (//creator sees if other users left mark
                     <ItemTable
@@ -125,7 +132,7 @@ const ListItem = ({
                                 <button
                                     onClick={(e) => {saveChanges(keyPath, [true, getTime(), reportInput], activity, index)}}
                                 >
-                                    Save
+                                    {t("save")}
                                 </button>
                             ) : (//if already saved
                                 // <button

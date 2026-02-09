@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useContext } from 'react'
 
 import '../../Styles/components/items/Text.sass'
 
+import { FONT_SIZES } from '../../lib/constants'
 import { getItemById } from '../../lib/helpers'
 
 import { AppContext } from '../pageAssets/shared'
@@ -29,8 +30,11 @@ const Text = ({
         projects,
         activities,
         setData,
-        rights
+        rights,
+        useLocale
     } = useContext(AppContext)
+
+    const { t } = useLocale("items.text")
 
     // ==================================
     // const, helpers and state management
@@ -138,10 +142,12 @@ const Text = ({
                         <button onMouseDown={(e) => { e.preventDefault(); exec('bold') }}><b>B</b></button>
                         <button onMouseDown={(e) => { e.preventDefault(); exec('italic') }}><i>I</i></button>
                         <button onMouseDown={(e) => { e.preventDefault(); exec('underline') }}><u>U</u></button>
-                        <select onChange={(e) => exec('fontSize', e.target.value)} defaultValue="3">
-                            <option value="3">Normal</option>
-                            <option value="4">Large</option>
-                            <option value="5">Larger</option>
+                        <select onChange={(e) => exec('fontSize', e.target.value)} defaultValue="normal">
+                            {FONT_SIZES.map(size => (
+                                <option key={size} value={size}>
+                                {t(`size.${size}`)}
+                                </option>
+                            ))}
                         </select>
                         <input type="color" onChange={(e) => exec('foreColor', e.target.value)} />
                     </div>

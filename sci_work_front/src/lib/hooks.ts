@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from "react-i18next"
 
 type TimerProps = {
   event: (now: Date, period: number, delay: number) => void
@@ -37,4 +38,14 @@ export const useTimer = ({event, period, delay, isLoggedIn}: TimerProps) => {
       if (intervalId) clearInterval(intervalId)
     }
   }, [event, period, delay, isLoggedIn])
+}
+
+export const useDeepTranslation = (path: string) => {
+  const parts = path.split('.')
+  const namespace = parts[0]
+  const basePath = parts.slice(1).join('.')
+  const { t } = useTranslation(namespace)
+  const translate = (key: string, options?: any) =>
+    t(basePath ? `${basePath}.${key}` : key, options)
+  return { t: translate }
 }

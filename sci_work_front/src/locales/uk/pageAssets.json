@@ -1,0 +1,46 @@
+{
+    "shared": {
+        "controlPanel": {
+            "filters": {
+                "sort": {
+                    "AZ": "А-Я",
+                    "ZA": "Я-А",
+                    "startDate": "дата початку",
+                    "endDate": "дата завершення"
+                },
+                "state": {
+                    "all": "всі",
+                    "expired": "завершені",
+                    "expiring": "завершуються"
+                }
+            },
+            "buttons": {
+                "addEditUsers": "Додати/Редагувати користувача",
+                "addProject": "Новий проект"
+            },
+            "projects": {
+                "display": {
+                    "tiles": "плитка",
+                    "list": "лист",
+                    "table": "таблиця"
+                }
+            },
+            "schedule": {
+                "prev": "Поп.",
+                "now": "До сьогодні",
+                "next": "Наст."
+            }
+        }
+    },
+    "specific": {
+        "scheduleBoard": {
+            "start": "Початок о",
+            "end": "Кінець о",
+            "ScheduleItem": {
+                "start": ".початок",
+                "repeat": ".повтор",
+                "end": ".кінець"
+            }
+        }
+    }
+}

@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect, useMemo, useContext } from 'react'
-import { useTranslation } from "react-i18next"
 
-import '../Styles/components/AppHeader.sass'
-import { PAGES, MORE_PAGES } from '../lib/constants'
+import '../../Styles/components/_base/AppHeader.sass'
+import { PAGES, MORE_PAGES } from '../../lib/constants'
 
-import { AppContext } from './pageAssets/shared'
+import { AppContext } from '../pageAssets/shared'
 
 import logo from '../logo.svg'
 
@@ -17,10 +16,11 @@ const AppHeader = () => {
         userData,
         isLoggedIn, setLoggedIn,
         notifications, setNotifications,
-        organisationType
+        organisationType,
+        useLocale
     } = useContext(AppContext)
 
-    const { t } = useTranslation("base.header")
+    const { t } = useLocale("base.header")
 
     const format = (str) => {
         return str.replace(/\s+/g, '')

@@ -4,6 +4,7 @@ import { useState, useContext } from 'react'
 import '../../Styles/components/dialogs/LogIn.sass'
 
 import { getInput } from '../../lib/helpers'
+import { TYPE_OPTIONS } from '../../lib/constants'
 
 import { AppContext, CustomSelect, ToggleButton } from '../pageAssets/shared'
 
@@ -14,8 +15,11 @@ const LogIn = ({
 
     const { //can not apply url-based itemIds in dialogs
         setDialog,
-        isLoggedIn
+        isLoggedIn,
+        useLocale
     } = useContext(AppContext)
+
+    const { t } = useLocale("dialogs.logIn")
 
     // ==================================
     // const, helpers and state management
@@ -74,7 +78,9 @@ const LogIn = ({
                 <div className="dialog-content">
                     <form onSubmit={handleSubmit}>
                         {/* Server Selection */}
-                        <label htmlFor="server">Server</label>
+                        <label htmlFor="server">
+                            {t("fields.server.label")}
+                        </label>
                         <CustomSelect
                             id={"server"}
                             name={"server"}
@@ -84,7 +90,7 @@ const LogIn = ({
                             optionSelectField={"id"}
                             optionContentField={"name"}
                             placeholder={"Select server"}
-                            emptyPlaceholder={"No servers available"}
+                            emptyPlaceholder={t("fields.server.placeholder")}
                             disabled={false}
                         />
                         {canReg ? (
@@ -92,16 +98,18 @@ const LogIn = ({
                                     data={type}
                                     setter={setType}
                                     field={"type"}
-                                    displayOptions={['Register', 'Log in']}
+                                    displayOptions={TYPE_OPTIONS}
+                                    showDisplayOptions={TYPE_OPTIONS.map(o => t(`options.${o}`))}
                                 />
                             ) : (
-                                <h3>Login</h3>
+                                <h3>{t("label")}</h3>
                             )
                         }
 
                         {
                             getInput(
                                 "login",
+                                t("fields.login"),
                                 "text",
                                 formValues.login,
                                 false,
@@ -114,6 +122,7 @@ const LogIn = ({
                         {
                             getInput(
                                 "password",
+                                t("fields.password"),
                                 "text",
                                 formValues.password,
                                 false,
@@ -129,13 +138,13 @@ const LogIn = ({
                                 type="submit"
                                 className="button-main"
                             >
-                                Log In
+                                {t("actions.logIn")}
                             </button>
                             <button
                                 className='button-main'
                                 onClick={closeDialog}
                             >
-                                Back
+                                {t("actions.back")}
                             </button>
                         </div>
                     </form>

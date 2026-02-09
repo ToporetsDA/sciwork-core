@@ -138,7 +138,7 @@ export const MONTHS = Object.freeze([
 
 // --- ControlPanel.js ---
 
-export const DISPLAY_OPTIONS_CONTROLS = ["tiles", "list", "table"]
+export const DISPLAY_OPTIONS_CONTROLS = Object.freeze(["tiles", "list", "table"])
 
 // --- CustomSelect.js ---
 
@@ -161,7 +161,7 @@ export const SUB_ACTIVITY_TYPES = Object.freeze({
     Chat: "Message"
 })
 
-export const NO_ACTIONS_CONTAINER = ["Chat"]
+export const NO_ACTIONS_CONTAINER = Object.freeze(["Chat"])
 
 // --- ItemActions.js ---
 
@@ -184,13 +184,18 @@ export const ITEM_TYPES_LIST_BASED = Object.freeze([
 
 // --- AddEditContent.js ---
 
-export const TECH_FIELDS = ["_id", "creatorId"]
+export const TECH_FIELDS = Object.freeze(["_id", "creatorId"])
+
+export const FIELD_TYPES = Object.freeze([
+    {value: "text"},
+    {value: "checkbox"}
+])
 
 // --- AddEditItem.js ---
 
 // --- AddEditUserList.js ---
 
-export const ITEM_KEYS_ALLOWED = [
+export const ITEM_KEYS_ALLOWED = Object.freeze([
     "name",
     "middleName",
     "surName",
@@ -198,9 +203,9 @@ export const ITEM_KEYS_ALLOWED = [
     "genStatus",
     "access",
     "accessLevel"
-]
+])
 
-export const ITEM_TYPES_ALLOWED = {
+export const ITEM_TYPES_ALLOWED = Object.freeze({
     name: "plain",
     middleName: "plain",
     surName: "plain",
@@ -208,29 +213,31 @@ export const ITEM_TYPES_ALLOWED = {
     genStatus: "access",
     access: "button",
     accessLevel: "combobox"
-}
+})
 
-export const ITEM_KEYS = [
+export const ITEM_KEYS = Object.freeze([
     "name",
     "middleName",
     "surName",
     "patronimic",
     "genStatus",
     "access"
-]
+])
 
-export const ITEM_TYPES = {
+export const ITEM_TYPES = Object.freeze({
     name: "plain",
     middleName: "plain",
     surName: "plain",
     patronimic: "plain",
     genStatus: "access",
     access: "button"
-}
+})
 
 // --- JointEventOverlap.js ---
 
 // --- LogIn.js ---
+
+export const TYPE_OPTIONS = Object.freeze(['Register', 'Log in'])
 
 // ==================================
 // Items
@@ -244,11 +251,13 @@ export const ITEM_TYPES = {
 
 // --- List.js ---
 
-export const ITEMS_WITH_DIALOG_BUTTON = ["List", "Attendance", "Table", /*no Chat*/]
+export const ITEMS_WITH_DIALOG_BUTTON = Object.freeze(["List", "Attendance", "Table", /*no Chat*/])
 
 // --- Project.js ---
 
 // --- Text.js ---
+
+export const FONT_SIZES = Object.freeze([ "normal", "large", "larger"])
 
 // ==================================
 // SubItems
@@ -256,20 +265,20 @@ export const ITEMS_WITH_DIALOG_BUTTON = ["List", "Attendance", "Table", /*no Cha
 
 // --- ListItem.js ---
 
-export const MARKABLE_FIELDS = [
+export const MARKABLE_FIELDS = Object.freeze([
     "checker",
     "name",
     "middleName",
     "surName",
     "patronimic"
-]
+])
 
-export const MARKABLE_TYPES = {
+export const MARKABLE_TYPES = Object.freeze({
     name: 'plain',
     middleName: 'plain',
     surName: 'plain',
     patronimic: 'plain',
     checker: 'checker'
-}
+})
 
 // --- Message.js ---

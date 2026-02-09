@@ -1,0 +1,12 @@
+{
+    "subItems": {
+        "listItem": {
+            "markable": {
+                "label": "Markable for {{start}}-{{end}} on {{date}}"
+            },
+            "buttons": {
+                "save": "Save"
+            }
+        }
+    }
+}

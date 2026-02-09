@@ -1,5 +1,4 @@
 import { Suspense, useState, useEffect, useContext }  from 'react'
-import { useTranslation } from "react-i18next"
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, pointerWithin, rectIntersection, useSensor, useSensors, } from '@dnd-kit/core'
 import { arrayMove, sortableKeyboardCoordinates, } from '@dnd-kit/sortable'
 
@@ -18,10 +17,11 @@ const Projects = () => {
         userData,
         projects, 
         activities,
-        setData
+        setData,
+        useLocale
     } = useContext(AppContext)
 
-    const { t } = useTranslation("pages.projects")
+    const { t } = useLocale("pages.projects")
 
     // ==================================
     // const, helpers and state management

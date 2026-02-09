@@ -32,7 +32,7 @@ const Project = ({
                 {item.name}
             </h3>
             <p className="timeLimit">
-                {item.startDate ? item.startDate : 'N/A'} - {item.endDate}
+                {item.startDate ? item.startDate : 'N/A'}{item.endDate ? ` - ${item.endDate}` : ''}
             </p>
             <ItemActions
                 item={item}

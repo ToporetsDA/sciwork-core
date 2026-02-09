@@ -1,21 +1,21 @@
 import { lazy, Suspense, useContext } from 'react'
-import { useTranslation } from "react-i18next"
 import { Routes, Route } from "react-router-dom"
 
-import '../Styles/components/AppContent.sass'
+import '../../Styles/components/_base/AppContent.sass'
 
-import { AppContext } from './pageAssets/shared'
+import { AppContext } from '../pageAssets/shared'
 
-import { HomePage, Notifications, Profile, Settings } from './pages'
-import * as Dialogs from './dialogs'
+import { HomePage, Notifications, Profile, Settings } from '../pages'
+import * as Dialogs from '../dialogs'
 
 const AppContent = () => {
 
     const {
-        dialog
+        dialog,
+        useLocale
     } = useContext(AppContext)
 
-    const { t } = useTranslation("base.content")
+    const { t } = useLocale("base.content")
 
     const loadDialogComponent = (dialogName) => {
         return Dialogs[dialogName.replace(/\s+/g, '')]
@@ -27,8 +27,8 @@ const AppContent = () => {
             : null
     
     //heavy pages
-    const Projects = lazy(() => import("./pages/Projects"))
-    const Schedule = lazy(() => import("./pages/Schedule"))
+    const Projects = lazy(() => import("../pages/Projects"))
+    const Schedule = lazy(() => import("../pages/Schedule"))
 
   return (
     <main className="content">

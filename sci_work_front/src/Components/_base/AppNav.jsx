@@ -1,7 +1,6 @@
 import { useContext } from 'react'
-import { useTranslation } from "react-i18next"
 
-import '../Styles/components/AppNav.sass'
+import '../../Styles/components/_base/AppNav.sass'
 
 import { AppContext } from './pageAssets/shared'
 
@@ -13,10 +12,11 @@ const AppNav = () => {
     projects,
     isLoggedIn,
     organisationType,
-    recentActivities, setRecentActivities
+    recentActivities, setRecentActivities,
+    useLocale
   } = useContext(AppContext)
 
-  const { t } = useTranslation("base.nav")
+  const { t } = useLocale("base.nav")
 
   //project.name and activity.name pairs
   const clearRecent = () => {
