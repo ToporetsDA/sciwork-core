@@ -8,11 +8,8 @@
         }
     },
     "profile": {
-        "actions": {
-            "save": "Save",
-            "edit": "Edit Profile",
-            "cancel": "Cancel"
-        }
+        "label": "Profile Details",
+        "shortLabel": "Profile"
     },
     "projects": {
         "fallback": {

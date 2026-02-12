@@ -184,10 +184,8 @@ const AddEditContent = () => {
                                             (e) => handleStructureChange(key, e.target.value),
                                             FIELD_TYPES,
                                             FIELD_TYPES.map(opt =>
-                                                t(`fields.structure.fieldTypes.${opt.value}`)
-                                            ),
-                                            "value",
-                                            "value"
+                                                t(`fields.structure.fieldTypes.${opt}`)
+                                            )
                                         )}
                                         <button
                                             className="button-mini"
@@ -222,10 +220,8 @@ const AddEditContent = () => {
                                     (e) => setNewField(prev => ({ ...prev, type: e.target.value })),
                                     FIELD_TYPES,
                                     FIELD_TYPES.map(opt =>
-                                        t(`fields.structure.fieldTypes.${opt.value}`)
-                                    ),
-                                    "value",
-                                    "value"
+                                        t(`fields.structure.fieldTypes.${opt}`)
+                                    )
                                 )}
                                 <button
                                     className="button-mini"

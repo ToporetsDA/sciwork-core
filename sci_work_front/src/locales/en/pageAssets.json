@@ -30,6 +30,11 @@
                 "now": "To now",
                 "next": "Next"
             }
+        },
+        "form": {
+            "save": "Save",
+            "edit": "Edit {{object}}",
+            "cancel": "Cancel"
         }
     },
     "specific": {

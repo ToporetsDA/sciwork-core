@@ -27,6 +27,10 @@ const App = () => {
   const [userData, setUserData] = useState(() => createUserData())
   const [rights, setRights] = useState()
 
+  //settings
+  const [displaySettings, setDisplaySettings] = useState()
+  const [functionalSettings, setFunctionalSettings] = useState()
+
   //items
   const defaultStructure = useMemo(() => DEFAULT_ITEM_STRUCTURE, [])
   const [projects, setProjects] = useState([])
@@ -79,6 +83,7 @@ const App = () => {
   // ==================================
 
   const socketRef = useRef(null)
+  const previousVersionsRef = useRef(null)
 
   const sendPatch = (type, id, patches) => {
 
@@ -99,6 +104,7 @@ const App = () => {
 
   const updateWithPatches = (setter, getState, recipe, onPatch) => {
     const [nextState, patches] = produceWithPatches(getState(), recipe)
+
     setter(nextState)
     if (patches.length) {
       onPatch(patches)
@@ -106,48 +112,62 @@ const App = () => {
   }
 
   const updateData = ({ domain, id, recipe }) => { //user update entry point
+
+    const domainTypeMap = {
+      projects: "Project",
+      activities: "Activity",
+      user: "UserData"
+    }
+    const getDraft = (item) => {
+      if (item) {
+        previousVersionsRef.current[id] = {
+          type: domainTypeMap[domain],
+          val: structuredClone(item)
+        }
+        recipe(item)
+      }
+    }
+
+    let setter
+    let prevState
+    let getDraftItem
+
     switch(domain) {
       case "projects": {
-        updateWithPatches(
-          setProjects,
-          () => projects,
-          draft => {
-            const item = getItemById(draft, id)
-            if (item) recipe(item)
-          },
-          patches => sendPatch(domain, id, patches)
-        )
+        setter = setProjects
+        prevState = projects
+        getDraftItem = (draft, id) => getItemById(draft, id)
         break
       }
 
       case "activities": {
-        updateWithPatches(
-          setActivities,
-          () => activities,
-          draft => {
-            const item = getItemById(draft, id)
-            if (item) recipe(item)
-          },
-          patches => sendPatch(domain, id, patches)
-        )
+        setter = setActivities
+        prevState = activities
+        getDraftItem = (draft, id) => getItemById(draft, id)
         break
       }
 
       case "user": {
-        updateWithPatches(
-          setUserData,
-          () => userData,
-          draft => {
-            recipe(draft)
-          },
-          patches => sendPatch(domain, id, patches)
-        )
+        setter = setUserData
+        prevState = userData
+        getDraftItem = (draft) => draft
         break
       }
       default: {
         console.warn("No such item domain. Update not sent")
+        return
       }
     }
+
+    updateWithPatches(
+      setter,
+      () => prevState,
+      draft => {
+        const item = getDraftItem(draft, id)
+        getDraft(item)
+      },
+      patches => sendPatch(domain, id, patches)
+    )
   }
 
   // page tracker
@@ -175,8 +195,8 @@ const App = () => {
   const [notifications, setNotifications] = useState([]) // [{userId, notifications[obj, ...]}, ...]
   const notificationsRef = useRef([])
 
-  const period = useMemo(() => userData.currentSettings.notificationsPeriod, [userData])
-  const delay = useMemo(() => userData.currentSettings.notificationsDelay, [userData])
+  const period = useMemo(() => functionalSettings.notificationsPeriod, [functionalSettings])
+  const delay = useMemo(() => functionalSettings.notificationsDelay, [functionalSettings])
 
   //create Notifications
   const checkActivities = useCallback((now, period, delay) => {
@@ -289,36 +309,43 @@ const App = () => {
   // Values for Provider
   const vals = {
     //tech
-    currentPage: currentPage,
-    projectId: projectId,
-    activityId: activityId,
-    dialog: dialog,
-    isLoggedIn: isLoggedIn,
-    isCompany: isCompany,
-    rights: rights,
+    currentPage,
+    projectId,
+    activityId,
+    dialog,
+    isLoggedIn,
+    isCompany,
+    rights,
     organisationType: isCompany,
     profileData: DEFAULT_PROFILE_DATA,
     itemStructure: DEFAULT_ITEM_STRUCTURE,
-    defaultStructure: defaultStructure,
+    defaultStructure,
     //data
-    userData: userData,
-    projects: projects,
-    activities: activities,
-    users: users,
+    userData,
+    projects,
+    activities,
+    users,
+    displaySettings,
+    functionalSettings,
+
     //metadata
-    notifications: notifications,
-    recentActivities: recentActivities,
+    notifications,
+    recentActivities,
     
     //tech
-    navigate: useNavigate(),
-    setDialog: setDialog,
-    setLoggedIn: setLoggedIn,
+    setDialog,
+    setLoggedIn,
     useLocale: useDeepTranslation,
     //data
     setData: updateData,
+    setDisplaySettings,
+    setFunctionalSettings,
     //metadata
-    setNotifications: setNotifications,
-    setRecentActivities: setRecentActivities,
+    setNotifications,
+    setRecentActivities,
+
+    //hooks
+    navigate: useNavigate()
   }
 
   // ==================================
@@ -345,6 +372,7 @@ const App = () => {
           //tech+meta
           setRights={setRights}
           setUsers={setUsers}
+          previousVersionsRef={previousVersionsRef}
         />
       </AppProvider>
   </Router>

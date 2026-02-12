@@ -16,6 +16,7 @@ const ControlPanel = ({
     const {
         currentPage, projectId,
         userData,
+        functionalSettings,
         projects,
         setData,
         setDialog,
@@ -106,7 +107,7 @@ const ControlPanel = ({
             return []
         }
 
-        const option = userData.currentSettings.sortFilter
+        const option = functionalSettings.sortFilter
 
         return items.sort((a, b) => {
             if (option === "A-Z") {
@@ -123,7 +124,7 @@ const ControlPanel = ({
             }
             return 0
         })
-    }, [userData.currentSettings.sortFilter])
+    }, [functionalSettings.sortFilter])
 
     //filter items 
 
@@ -133,7 +134,7 @@ const ControlPanel = ({
         filtered = filtered.filter(item => !item.deleted || (item.deleted && rights.fullView.includes(item.access)))
 
         // Filter by state first
-        const stateOption = userData.currentSettings.statusFilter
+        const stateOption = functionalSettings.statusFilter
         if (stateOption !== "all") {
             filtered = filtered.filter(item => {
 
@@ -158,7 +159,7 @@ const ControlPanel = ({
         }
 
         return filtered
-    }, [userData.currentSettings.statusFilter, searchQuery, rights.fullView])
+    }, [functionalSettings.statusFilter, searchQuery, rights.fullView])
 
     // ==================================
     // display logic management
@@ -200,7 +201,7 @@ const ControlPanel = ({
                 <>
                     {getInput("Search", "text", searchQuery, false, (e) => setSearchQuery(e.target.value), false, null, 25)}
                     <ToggleButton
-                        data={userData.currentSettings}
+                        data={functionalSettings}
                         setter={handleToggle}
                         field={"displayProjects"}
                         displayOptions={DISPLAY_OPTIONS_CONTROLS.map(opt =>
@@ -236,7 +237,7 @@ const ControlPanel = ({
             }
             {(currentPage === "Projects" || currentPage === "Project"  || currentPage === "Activity") &&
                 <>
-                    {userData.currentSettings.displayProjects !== "table" && currentPage === "Projects" &&
+                    {functionalSettings.displayProjects !== "table" && currentPage === "Projects" &&
                     <div className='sort-and-filter'>
                         <div>
                             <button
@@ -244,7 +245,7 @@ const ControlPanel = ({
                                 onClick={() => {setIsSortDropdownOpen(!isSortDropdownOpen)}}
                                 ref={sortDropdownRef}
                             >
-                                {t(`filters.sort.${userData.currentSettings.sortFilter}`)}
+                                {t(`filters.sort.${functionalSettings.sortFilter}`)}
                             </button>
                             {isSortDropdownOpen && (
                                 <ul className="dropdown">
@@ -262,7 +263,7 @@ const ControlPanel = ({
                                 onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
                                 ref={stateDropdownRef}
                             >
-                                {t(`filters.state.${userData.currentSettings.statusFilter}`)}
+                                {t(`filters.state.${functionalSettings.statusFilter}`)}
                             </button>
                             {isStateDropdownOpen && (
                                 <ul className="dropdown">

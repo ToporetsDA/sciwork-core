@@ -1,4 +1,19 @@
-import { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import { ChangeEvent } from 'react'
+
+import {
+  createUserData,
+  createProjectFromObject,
+  createActivityFromObject,
+  createFunctionalSettings,
+  createDisplaySettings
+} from './classes'
+
+import {
+  DialogButtonParams,
+  DomainType,
+  InputHandler,
+  OptionType,
+} from './constants'
 
 import '../Styles/lib/buttons.sass'
 import '../Styles/lib/input.sass'
@@ -32,16 +47,7 @@ export const sortByIds = <T extends { _id: string }>(
   return sortedArray
 }
 
-// "get" methods
-
-type DialogButtonParams = {
-  setDialog: Dispatch<SetStateAction<any>>
-  buttonClass: string
-  dialog: string
-  params?: any
-  text: string
-  stopPropagate?: boolean
-}
+// --- "get" methods ---
 
 export const getDialogButton = ({
   setDialog,
@@ -97,8 +103,6 @@ export const getFromLocalStorage = <T = any>(
   }
 }
 
-type InputHandler = (e: ChangeEvent<HTMLInputElement>) => void
-
 export const getInput = (
     fieldName: string,
     placeholderText: string,
@@ -135,23 +139,33 @@ export const getItemById = <T extends { _id: string }>(array: T[], _id: string):
   return array.find(item => item._id === _id) || {}
 }
 
-type OptionType = Record<string, any>
-
 export const getSelect = (
   value: string | number,
   handler: (e: ChangeEvent<HTMLSelectElement>) => void,
   options: OptionType[],
   showOptions: string[],
-  keyField: string,
-  valueField: string
+  keyField?: string,
+  valueField?: string
 ) => {
   return (
     <select className="select-mini" value={value} onChange={handler}>
-      {options.map((option, index) => (
-        <option key={option[keyField]} value={option[valueField]}>
-          {showOptions[index]}
-        </option>
-      ))}
+      {options.map((option, index) => {
+        const isObject = (typeof option === "object")
+
+        const key = isObject && keyField
+          ? option[keyField]
+          : option
+
+        const val = isObject && valueField
+          ? option[valueField]
+          : option
+
+        return (
+          <option key={key} value={val}>
+            {showOptions[index]}
+          </option>
+        )
+      })}
     </select>
   )
 }
@@ -178,4 +192,19 @@ export const updateTreeItemField = (arr: any[], targetId: string, field: string,
     }
     return a
   })
+}
+
+export const verUp = (obj: any, type: DomainType): any => {
+  const tmp = {
+    ...obj,
+    __v: obj.__v
+  }
+  const handlers: Record<DomainType, (obj: any) => any> = {
+    UserData:           obj => createUserData(obj),
+    Project:            obj => createProjectFromObject(obj),
+    Activity:           obj => createActivityFromObject(obj),
+    FunctionalSettings: obj => createFunctionalSettings(obj),
+    DisplaySettings:    obj => createDisplaySettings(obj)
+  }
+  return handlers[type]?.(obj)
 }

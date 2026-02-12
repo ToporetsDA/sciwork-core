@@ -1,3 +1,35 @@
+import { ChangeEvent, Dispatch, SetStateAction } from 'react'
+
+// ==================================
+// Core
+// ==================================
+
+// --- classes.ts ---
+
+// --- helpers.ts ---
+
+export type DialogButtonParams = {
+  setDialog: Dispatch<SetStateAction<any>>
+  buttonClass: string
+  dialog: string
+  params?: any
+  text: string
+  stopPropagate?: boolean
+}
+
+export type DomainType =
+  | "UserData"
+  | "Project"
+  | "Activity"
+  | "FunctionalSettings"
+  | "DisplaySettings"
+
+export type InputHandler = (e: ChangeEvent<HTMLInputElement>) => void
+
+export type OptionType = Record<string, any> | string | number
+
+// --- hooks.ts ---
+
 // ==================================
 // Main
 // ==================================
@@ -178,6 +210,22 @@ export const ITEM_TYPES_LIST_BASED = Object.freeze([
 
 // --- ToggleButton.js ---
 
+export const LANGUAGES = Object.freeze([
+    "en",
+    "uk"
+])
+
+export const LANGUAGES_FULL = Object.freeze([
+    "English",
+    "Українська"
+])
+
+export const SPECIAL_DISPLAY_FIELDS = Object.freeze([
+    "statusName"
+])
+
+// --- ToggleButton.js ---
+
 // ==================================
 // Dialogs
 // ==================================
@@ -187,8 +235,8 @@ export const ITEM_TYPES_LIST_BASED = Object.freeze([
 export const TECH_FIELDS = Object.freeze(["_id", "creatorId"])
 
 export const FIELD_TYPES = Object.freeze([
-    {value: "text"},
-    {value: "checkbox"}
+    "text",
+    "checkbox"
 ])
 
 // --- AddEditItem.js ---

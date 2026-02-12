@@ -14,7 +14,7 @@ const Projects = () => {
 
     const {
         currentPage, projectId,
-        userData,
+        functionalSettings,
         projects, 
         activities,
         setData,
@@ -294,10 +294,10 @@ const Projects = () => {
             <ControlPanel
                 setItemsToDisplay={setItemsToDisplay}
             />
-            <div className={`page-wrapper ${DISPLAY_OPTIONS.get(userData.currentSettings.displayProjects)}`}>
+            <div className={`page-wrapper ${DISPLAY_OPTIONS.get(functionalSettings.displayProjects)}`}>
                 {(currentPage === "Projects") ? (
                     <Suspense fallback={<div>{t("fallback.projects")}</div>}>
-                        {DISPLAY_OPTIONS.get(userData.currentSettings.displayProjects) !== 'table' ?
+                        {DISPLAY_OPTIONS.get(functionalSettings.displayProjects) !== 'table' ?
                         (
                             getItemTiles("tiles", "Project")
                         ) : (

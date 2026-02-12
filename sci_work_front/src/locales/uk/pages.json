@@ -8,11 +8,8 @@
         }
     },
     "profile": {
-        "actions": {
-            "save": "Зберегти",
-            "edit": "Редагувати профіль",
-            "cancel": "Відмінити"
-        }
+        "label": "Налаштування профілю",
+        "shortLabel": "Профіль"
     },
     "projects": {
         "fallback": {

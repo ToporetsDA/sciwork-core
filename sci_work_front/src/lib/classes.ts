@@ -235,18 +235,6 @@ export const createProjects = (projects: Partial<Project>[]): Project[] => {
     )
   )
 }
-export const projectVerUp = (project: Project) => {
-  return createProject(
-    project._id,
-    project.name,
-    project.dndCount,
-    project.startDate,
-    project.endDate,
-    project.activities,
-    project.userList,
-    project.__v + 1
-  )
-}
 
 class Activity extends Item {
   template: string
@@ -323,13 +311,13 @@ class Activity extends Item {
 export const createActivity = (_id: string, name: string, template: string, content: any /*ActivityContent*/, __v: number = 0) => {
   return new Activity(_id, name, template, content, __v)
 }
+export const createActivityFromObject = (a: any) => {
+  return createActivity(a._id!, a.name!, a.template!, a.content!, a.__v ?? 0)
+}
 export const createActivities = (activities: any[]) => {
   return activities.map(a =>
     createActivity(a._id, a.name, a.template, a.content, a.__v)
   )
-}
-export const activityVerUp = (activity: Activity) => {
-  return createActivity(activity._id, activity.name, activity.template, activity.content, activity.__v + 1)
 }
 
 class UserData {
@@ -343,11 +331,6 @@ class UserData {
   safetyMail: string
   phone: string
   safetyPhone: string
-  currentSettings: {
-    notificationsPeriod: number
-    notificationsDelay: number
-    displayProjects: string
-  }
   login: string
   password: string
   __v: number
@@ -365,11 +348,6 @@ class UserData {
     this.phone = data?.phone ?? ""
     this.safetyPhone = data?.safetyPhone ?? ""
     this.genStatus = data?.genStatus ?? -1
-    this.currentSettings = data?.currentSettings ?? {
-      notificationsPeriod: 5,
-      notificationsDelay: 15,
-      displayProjects: "grid",
-    }
     this.login = data?.login ?? ""
     this.password = data?.password ?? ""
     this.__v = data?.__v ?? 0
@@ -377,6 +355,47 @@ class UserData {
 }
 export const createUserData = (data?: Partial<UserData>): UserData => {
   return new UserData(data)
+}
+export const createUsersData = (users: any[]) => {
+  return users.map(u => createUserData(u))
+}
+
+class FunctionalSettings {
+  _id: string
+  notificationsPeriod: number
+  notificationsDelay: number
+  displayProjects: string
+  __v: number
+
+  constructor(
+    data?: Partial<Omit<FunctionalSettings, "constructor">> // дозволяємо передати часткові дані
+  ) {
+    this._id = data?._id ?? "placeholder"
+    this.notificationsPeriod = 5,
+    this.notificationsDelay = 15,
+    this.displayProjects = "grid",
+    this.__v = data?.__v ?? 0
+  }
+}
+export const createFunctionalSettings = (data?: Partial<FunctionalSettings>): FunctionalSettings => {
+  return new FunctionalSettings(data)
+}
+
+class DisplaySettings {
+  _id: string
+  language: string
+  __v: number
+
+  constructor(
+    data?: Partial<Omit<DisplaySettings, "constructor">> // дозволяємо передати часткові дані
+  ) {
+    this._id = data?._id ?? "placeholder"
+    this.language = data?.language ?? "en"
+    this.__v = data?.__v ?? 0
+  }
+}
+export const createDisplaySettings = (data?: Partial<DisplaySettings>): DisplaySettings => {
+  return new DisplaySettings(data)
 }
 
 class Notification {

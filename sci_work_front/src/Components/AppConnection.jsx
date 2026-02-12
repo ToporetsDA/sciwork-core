@@ -2,8 +2,14 @@ import { useState, useEffect, useCallback, useContext } from 'react'
 import { useTranslation } from "react-i18next"
 import { useWebSocket } from 'react-use-websocket'
 
-import { createProjects, projectVerUp, createActivity, createActivities, activityVerUp } from '../lib/classes'
-import { getItemById } from '../lib/helpers'
+import {
+    createUserData, createUsersData,
+    createDisplaySettings,
+    createFunctionalSettings,
+    createProjects, createProjectFromObject,
+    createActivity, createActivities
+} from '../lib/classes'
+import { getItemById, verUp } from '../lib/helpers'
 
 import { AppContext } from './pageAssets/shared'
 import { LogIn } from './dialogs'
@@ -20,6 +26,8 @@ const Connection = ({
     const {
         dialog,
         userData, setUserData,
+        displaySettings, setDisplaySettings,
+        functionalSettings, setFunctionalSettings,
         projects,
         activities,
         setLoggedIn
@@ -111,31 +119,53 @@ const Connection = ({
 
         // You can handle the data based on the type (user, projects, etc.)
         switch (type) {
-            case "all": {
-                setUserData(data.user)
-                console.log(data.items)
+            case "init": {
+                // user
+                setUserData(createUserData(data.user))
+                // top layer data
                 setProjects(createProjects(data.items))
+                // other users for top layer data
+                setUsers(createUsersData(data.users))
+                // tech
                 setRights(data.organisation.rights)
-                setUsers(data.users)
+                setDisplaySettings(createDisplaySettings(data.settings.display))
+                setFunctionalSettings(createFunctionalSettings(data.settings.functional))
                 break
             }
             case "users": {
-                setUsers(data)
+                setUsers(createUsersData(data))
                 break
             }
             case "user": {
-                setUserData(data)
+                setUserData(createUserData(data))
                 break
             }
-            case "data": {
+            case "settings": {
+                const settings = data
+                switch(settings.type) {
+                    case "display": {
+                        setDisplaySettings(createDisplaySettings(settings.display))
+                        break
+                    }
+                    case "functional": {
+                        setFunctionalSettings(createFunctionalSettings(settings.functional))
+                        break
+                    }
+                    default: {
+                        console.log("Unknown settings type:", type)
+                    }
+                }
+                break
+            }
+            case "projects": {
                 setProjects(createProjects(data))
                 break
             }
             case "project": {
                 const updatedData = currentData.map(item =>
-                    item._id === data._id ? data : item
+                    item._id === data._id ? createProjectFromObject(data) : item
                 )
-                setProjects(createProjects(updatedData))
+                setProjects(updatedData)
                 break
             }
             case "activities": {//add along with activity templates
@@ -174,80 +204,88 @@ const Connection = ({
                 console.log("Unknown data type:", type)
             }
         }
-    }, [ activities, projects, setActivities, setProjects, setRights, setUserData, setUsers])
+    }, [
+        activities, setActivities,
+        projects, setProjects, 
+        setRights,
+        setUserData,
+        setUsers,
+        setDisplaySettings,setFunctionalSettings
+    ])
 
     const handleResponseConfirm = useCallback((response) => {
         const { data, error } = response.data
-        console.log("confirm item", response.data, data.id, error)
-        if (error) {
-            const backup = previousVersionsRef.current[data.id]
-            if (backup) {
-                if (data.id === userData._id) {
-                setUserData(backup)
-                } else if (data.id.includes(".")) {
-                setActivities(prev => prev.map(i => i._id === data.id ? backup : i))
-                } else {
-                setProjects(prev => prev.map(p => p._id === data.id ? backup : p))
-                }
-            }
-            delete previousVersionsRef.current[data.id] // clean up
+
+        //save or disard
+        const action = error
+            ? (backup, obj) => backup.val
+            : (backup, obj) => verUp(obj, backup.type)
+
+        // data type handlers
+        const handlers = {
+            UserData: backup => setUserData(
+                action(backup, userData)
+            ),
+            Project: backup => setProjects(
+                prev => prev.map(p => p._id === backup.val._id
+                    ? action(backup, p)
+                    : p
+                )
+            ),
+            Activity: backup => setActivities(
+                prev => prev.map(a => a._id === backup.val._id
+                    ? action(backup, a)
+                    : a
+                )
+            ),
+            FunctionalSettings: backup => setFunctionalSettings(
+                action(backup, functionalSettings)
+            ),
+            DisplaySettings: backup => setDisplaySettings(
+                action(backup, displaySettings)
+            )
+        }
+
+        // save changes or roll back
+        
+        const backup = previousVersionsRef.current[data.id]
+
+        if (handlers.keys().includes(backup.type)) {
+            handlers[backup.type]?.(backup)
         }
         else {
-            // notify user that update happened and increment its __v
-            if (data.id === userData._id) {
-                setUserData((prevData) => ({
-                    ...prevData,
-                    __v: prevData.__v + 1
-                }))
-            }
-            else if (data.id.includes(".")) {
-                setActivities(prevItems => 
-                    prevItems.map(a => {
-                        return a._id === data.id
-                            ? activityVerUp(a)
-                            : a
-                    })
-                )
-            }
-            else if (!data.id.includes(".")) {
-                setProjects(prevItems =>
-                    prevItems.map(p => {
-                        return p._id === data.id
-                            ? projectVerUp(p)
-                            : p
-                    })
-                )
-            }
-
-            if (data.id in previousVersionsRef.current) {
-                delete previousVersionsRef.current[data.id]
-            }
-
-            console.log(data.id, "updated successfully")
+            console.warn("Unknown object type: ", backup.type, ". Update failed")
         }
-    }, [previousVersionsRef, setActivities, setProjects, setUserData, userData._id])
+
+        delete previousVersionsRef.current[data.id]
+    }, [
+        previousVersionsRef,
+        setActivities,
+        setProjects,
+        userData, setUserData,
+        functionalSettings, setFunctionalSettings,
+        displaySettings, setDisplaySettings
+    ])
 
     const handleResponse = useCallback((event) => {
-        console.log("from handleResponse: ")
+
+        const responses = {
+            data: r => handleResponseData(r),
+            confirm: r => handleResponseConfirm(r)
+        }
+
         try {
             const response = JSON.parse(event.data)
-             // This will log the entire response
-            // console.log(response)
 
-            switch(response.message) {
-                case "data": {
-                    handleResponseData(response)
-                    break
-                }
-                case "confirm": {
-                    handleResponseConfirm(response)
-                    break
-                }
-                default: {
-                    console.log("Unknown message: ", response.message)
-                }
+            if (responses.keys().includes(response.message)) {
+                responses[response.message]?.(response)
             }
-            setLoggedIn(true);
+            else {
+                console.warn("Unknown message: ", response.message)
+            }
+
+            setLoggedIn(true)
+            
         } catch (error) {
             console.error("Error processing message:", error.message)
         }
@@ -314,6 +352,8 @@ const Connection = ({
             console.error(error)
         }
     }
+
+    // ==================================
 
     return (
         <div>
