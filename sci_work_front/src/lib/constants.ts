@@ -77,29 +77,29 @@ export interface MARKABLE_VALUE {
   [key: string]: any
 }
 
-export type FORM_FIELD_TYPES =
-    | "select"
-    | "input"
+// export type FORM_FIELD_TYPES =
+//     | "select"
+//     | "input"
 
-export type FORM_FIELD_PARAMS =
-    | {
-        element: "input"
-        type: string
-        handler: INPUT_HANDLER
-        disabled: boolean
-    }
-    | {
-        element: "select"
-        handler: SELECT_HANDLER
-        options?: string[]
-        disabled: boolean
-    }
+// export type FORM_FIELD_PARAMS =
+//     | {
+//         element: "input"
+//         type: string
+//         handler: INPUT_HANDLER
+//         disabled: boolean
+//     }
+//     | {
+//         element: "select"
+//         handler: SELECT_HANDLER
+//         options?: string[]
+//         disabled: boolean
+//     }
 
-export type BUILDER<T extends FORM_FIELD_TYPES> = (
-  key: string,
-  value: any,
-  params: Extract<FORM_FIELD_PARAMS, { type: T }>
-) => JSX.Element
+// export type BUILDER<T extends FORM_FIELD_TYPES> = (
+//   key: string,
+//   value: any,
+//   params: Extract<FORM_FIELD_PARAMS, { type: T }>
+// ) => JSX.Element
 
 // --- hooks.ts ---
 

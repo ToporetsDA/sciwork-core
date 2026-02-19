@@ -17,9 +17,9 @@ import {
   TIME_UNIT,
   NORMALIZER,
   MARKABLE_VALUE,
-  FORM_FIELD_TYPES,
-  FORM_FIELD_PARAMS,
-  BUILDER
+  // FORM_FIELD_TYPES,
+  // FORM_FIELD_PARAMS,
+  // BUILDER
 } from './constants'
 
 import '../Styles/lib/buttons.sass'
@@ -397,48 +397,48 @@ export const formatFormValues = (
 
 // --- handle form field generation ---
 
-const handleFormInput = (key: string, value: any, params: Extract<FORM_FIELD_PARAMS, { element: "input" }>) => {
-  return getInput(
-    key,
-    params.type ?? "text",
-    "",
-    value || '',
-    false,
-    params.handler,
-    params.disabled,
-    undefined,
-    80
-  )
-}
+// const handleFormInput = (key: string, value: any, params: Extract<FORM_FIELD_PARAMS, { element: "input" }>) => {
+//   return getInput(
+//     key,
+//     params.type ?? "text",
+//     "",
+//     value || '',
+//     false,
+//     params.handler,
+//     params.disabled,
+//     undefined,
+//     80
+//   )
+// }
 
-const handleFormSelect = (key: string, value: any, params: Extract<FORM_FIELD_PARAMS, { element: "select" }>) => {
-  const options = params.options ?? []
-  const displayOptions = options.map(o => o.toString())
-  return getSelect(
-    value,
-    params.handler,
-    options,
-    displayOptions,
-    params.disabled
-  )
-}
+// const handleFormSelect = (key: string, value: any, params: Extract<FORM_FIELD_PARAMS, { element: "select" }>) => {
+//   const options = params.options ?? []
+//   const displayOptions = options.map(o => o.toString())
+//   return getSelect(
+//     value,
+//     params.handler,
+//     options,
+//     displayOptions,
+//     params.disabled
+//   )
+// }
 
-const BUILDERS: {
-  input: BUILDER<"input">,
-  select: BUILDER<"select">
-} = {
-  input: handleFormInput,
-  select: handleFormSelect
-} as const
+// const BUILDERS: {
+//   input: BUILDER<"input">,
+//   select: BUILDER<"select">
+// } = {
+//   input: handleFormInput,
+//   select: handleFormSelect
+// } as const
 
-export const handleFormField = <T extends FORM_FIELD_TYPES>(
-  element: T,
-  key: string,
-  value: any,
-  params: Extract<FORM_FIELD_PARAMS, { element: T }>
-): any => {
-  return BUILDERS[element](key, value, params)
-}
+// export const handleFormField = <T extends FORM_FIELD_TYPES>(
+//   element: T,
+//   key: string,
+//   value: any,
+//   params: Extract<FORM_FIELD_PARAMS, { element: T }>
+// ): any => {
+//   return BUILDERS[element](key, value, params)
+// }
 
 // --- validate form input ---
 

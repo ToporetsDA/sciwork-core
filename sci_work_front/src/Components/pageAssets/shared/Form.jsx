@@ -61,11 +61,12 @@ const Form = (
 
             case "select": {
                 const { handler, options, disabled = true } = params
+                const displayOprions = options.map(opt => opt.toString())
                 return getSelect(
                     value,
                     handler,
-                    "select",
                     options,
+                    displayOprions,
                     disabled
                 )
             }
@@ -77,7 +78,7 @@ const Form = (
 
 
     const validateRequiredFields = () => {
-        const newErrors = {}
+        const newErrors = errors
 
         Object.entries(dataFormat.basic).forEach(([key, [isRequired]]) => {
 
