@@ -1,4 +1,5 @@
 import { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import { DurationUnits } from 'luxon'
 
 // ==================================
 // Core
@@ -6,9 +7,33 @@ import { ChangeEvent, Dispatch, SetStateAction } from 'react'
 
 // --- classes.ts ---
 
+export type USER = {
+  id: string
+  access: number
+}
+
+export type META_ACTIVITY = {
+  _id: string
+  name: string
+  type: []
+  startDate: string
+  endDate: string
+  isTimed: boolean
+  startTime: string
+  endTime: string
+  repeat: boolean
+  days: []
+  thirdParty: boolean
+  serviceName: string
+  userList: USER[]
+  activities: META_ACTIVITY[]
+}
+
+export type SCHEDULE_KIND = "start" | "repeat" | "end" | undefined
+
 // --- helpers.ts ---
 
-export type DialogButtonParams = {
+export type DIALOG_BUTTON_PARAMS = {
   setDialog: Dispatch<SetStateAction<any>>
   buttonClass: string
   dialog: string
@@ -17,16 +42,64 @@ export type DialogButtonParams = {
   stopPropagate?: boolean
 }
 
-export type DomainType =
-  | "UserData"
-  | "Project"
-  | "Activity"
-  | "FunctionalSettings"
-  | "DisplaySettings"
+export type DOMAIN_TYPE =
+    | "UserData"
+    | "Project"
+    | "Activity"
+    | "FunctionalSettings"
+    | "DisplaySettings"
 
-export type InputHandler = (e: ChangeEvent<HTMLInputElement>) => void
+export type INPUT_HANDLER = (e: ChangeEvent<HTMLInputElement>) => void
 
-export type OptionType = Record<string, any> | string | number
+export type SELECT_HANDLER = (e: ChangeEvent<HTMLSelectElement>) => void
+
+export type OPTION_TYPE = Record<string, any> | string | number
+
+const TIME_UNITS = [
+  'milliseconds',
+  'seconds',
+  'minutes',
+  'hours',
+  'days'
+] as const satisfies readonly DurationUnits[]
+export type TIME_UNIT = typeof TIME_UNITS[number]
+
+export type NORMALIZER = (
+  v: any,
+  s: any,
+  direction: "toDomain" | "toUI"
+) => any
+
+export interface MARKABLE_VALUE {
+  date: string | null
+  startTime: string | null
+  endTime: string | null
+  [key: string]: any
+}
+
+export type FORM_FIELD_TYPES =
+    | "select"
+    | "input"
+
+export type FORM_FIELD_PARAMS =
+    | {
+        element: "input"
+        type: string
+        handler: INPUT_HANDLER
+        disabled: boolean
+    }
+    | {
+        element: "select"
+        handler: SELECT_HANDLER
+        options?: string[]
+        disabled: boolean
+    }
+
+export type BUILDER<T extends FORM_FIELD_TYPES> = (
+  key: string,
+  value: any,
+  params: Extract<FORM_FIELD_PARAMS, { type: T }>
+) => JSX.Element
 
 // --- hooks.ts ---
 
@@ -38,17 +111,60 @@ export type OptionType = Record<string, any> | string | number
 
 export const DEFAULT_PROFILE_DATA = Object.freeze({   // [isRequired, type]
     basic: {
-        name:         [true,  'string'],
-        middleName:   [false, 'string'],
-        surName:      [true,  'string'],
-        patronimic:   [false, 'string'],
-        statusName:   [true,  'string'],
-        mail:         [true,  'mail'],
-        safetyMail:   [false, 'mail'],
-        phone:        [false, 'phone'],
-        safetyPhone:  [false, 'phone'],
+        name: {
+            required: true,
+            type: 'string'
+        },
+        middleName: {
+            required: false,
+            type: 'string'
+        },
+        surName: {
+            required: true,
+            type: 'string'
+        },
+        patronimic: {
+            required: false,
+            type: 'string'
+        },
+        statusName: {
+            required: true,
+            type: 'string'
+        },
+        mail: {
+            required: true,
+            type: 'mail'
+        },
+        safetyMail: {
+            required: false,
+            type: 'mail'
+        },
+        phone: {
+            required: false,
+            type: 'phone'
+        },
+        safetyPhone: {
+            required: false,
+            type: 'phone'
+        },
     },
-    fixed: ['genStatus', 'statusName', 'id'],       //fields that can not be edited
+    fixed: ['genStatus', 'statusName', 'id'], //fields that can not be edited
+    special: ['statusName'],// pass back from form to handle where it is used
+    additional: {
+      //will be added in beta-version
+    }
+})
+
+export const DEFAULT_DISPLAY_SETTINGS = Object.freeze({   // [isRequired, type]
+    basic: {
+        language: {
+            required: true,
+            type: 'select',
+            options: ['en', 'ua']
+        },
+    },
+    fixed: ['_id', '__v'],       //fields that can not be edited
+    special: [],// pass back from form to handle where it is used
     additional: {
       //will be added in beta-version
     }
@@ -130,6 +246,7 @@ export const DAYS_OF_WEEK = Object.freeze([
     'Saturday',
     'Sunday'
 ])
+
 export const DAYS_OF_WEEK_SHORT = Object.freeze([
     'Mon',
     'Tue',
@@ -139,6 +256,7 @@ export const DAYS_OF_WEEK_SHORT = Object.freeze([
     'Sat',
     'Sun'
 ])
+
 export const MONTHS = Object.freeze([
     'Jan',
     'Feb',
@@ -173,6 +291,14 @@ export const MONTHS = Object.freeze([
 export const DISPLAY_OPTIONS_CONTROLS = Object.freeze(["tiles", "list", "table"])
 
 // --- CustomSelect.js ---
+
+// --- Form.js ---
+
+export type FORM_DEFAULTS = {
+    basic: Record<string, [boolean, any]> // [isRequired, defaultValue]
+    fixed: string[]
+    additional?: Record<string, any>
+}
 
 // --- Item.js ---
 
@@ -219,12 +345,6 @@ export const LANGUAGES_FULL = Object.freeze([
     "English",
     "Українська"
 ])
-
-export const SPECIAL_DISPLAY_FIELDS = Object.freeze([
-    "statusName"
-])
-
-// --- ToggleButton.js ---
 
 // ==================================
 // Dialogs

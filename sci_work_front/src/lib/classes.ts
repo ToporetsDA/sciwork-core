@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { updateTreeItemField } from './helpers'
+import { USER, META_ACTIVITY, SCHEDULE_KIND } from './constants'
+import { updateTreeItemField, toUTC } from './helpers'
 
 // ==================================
 // Main
@@ -8,26 +9,6 @@ import { updateTreeItemField } from './helpers'
 
 // --- App.js ---
 
-type User = {
-  id: string
-  access: number
-}
-type MetaActivity = {
-  _id: string
-  name: string
-  type: []
-  startDate: string
-  endDate: string
-  isTimed: boolean
-  startTime: string
-  endTime: string
-  repeat: boolean
-  days: []
-  thirdParty: boolean
-  serviceName: string
-  userList: User[]
-  activities: MetaActivity[]
-}
 // type ListItem = {
 //   userList?: User[]
 //   [key: string]: any
@@ -103,8 +84,8 @@ class Project extends Item {
   dndCount: number
   startDate: string
   endDate: string
-  activities: MetaActivity[]
-  userList: User[]
+  activities: META_ACTIVITY[]
+  userList: USER[]
   __v: number
 
   constructor(
@@ -113,8 +94,8 @@ class Project extends Item {
     dndCount: number,
     startDate: string,
     endDate: string,
-    activities: MetaActivity[] = [],
-    userList: User[] = [],
+    activities: META_ACTIVITY[] = [],
+    userList: USER[] = [],
     __v: number = 0,
     deleted: boolean = false
   ) {
@@ -160,7 +141,7 @@ class Project extends Item {
     }
   }
 
-  findItemWithParent<T extends Project | MetaActivity>(
+  findItemWithParent<T extends Project | META_ACTIVITY>(
     items: T[] = this.activities as T[],
     field: keyof T = "_id" as keyof T,
     target: string,
@@ -181,7 +162,7 @@ class Project extends Item {
     return { item: null, parent, index: null }
   }
 
-  treeToArray<T extends Project | MetaActivity>(
+  treeToArray<T extends Project | META_ACTIVITY>(
     list?: T[],
     field: keyof T = "activities" as keyof T,
     result: T[] = []
@@ -200,8 +181,8 @@ export const createProject = (
   dndCount: number,
   startDate: string,
   endDate: string,
-  activities: MetaActivity[],
-  userList: User[],
+  activities: META_ACTIVITY[],
+  userList: USER[],
   __v: number = 0,
   deleted: boolean = false
 ) => {
@@ -252,7 +233,7 @@ class Activity extends Item {
     const parts = id.split('.')
     const access =
       this.content?.listItems?.[Number(parts[2])]
-        ?.userList?.find((u: User) => u.id === userData._id)?.access
+        ?.userList?.find((u: USER) => u.id === userData._id)?.access
 
     return typeof access === "number" ? access : -1
   }
@@ -362,6 +343,7 @@ export const createUsersData = (users: any[]) => {
 
 class FunctionalSettings {
   _id: string
+  timeZone: string
   notificationsPeriod: number
   notificationsDelay: number
   displayProjects: string
@@ -371,9 +353,10 @@ class FunctionalSettings {
     data?: Partial<Omit<FunctionalSettings, "constructor">> // дозволяємо передати часткові дані
   ) {
     this._id = data?._id ?? "placeholder"
-    this.notificationsPeriod = 5,
-    this.notificationsDelay = 15,
-    this.displayProjects = "grid",
+    this.timeZone = data?.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+    this.notificationsPeriod = data?.notificationsPeriod ?? 5,
+    this.notificationsDelay = data?.notificationsDelay ?? 15,
+    this.displayProjects = data?.displayProjects ?? "grid",
     this.__v = data?.__v ?? 0
   }
 }
@@ -712,7 +695,7 @@ export const createNotification = (_id, state, page, content, now) => new Notifi
 
 class ItemsToDisplay {
   projects: Project[]
-  activities: MetaActivity[]
+  activities: META_ACTIVITY[]
 
   constructor(projects: Project[] = [], project?: Project) {
     this.projects = projects
@@ -748,8 +731,6 @@ export const createItemsToDisplay = (
 
 // --- ScheduleBoard.js ---
 
-type ScheduleKind = "start" | "repeat" | "end" | undefined
-
 export class ScheduleItem {
   _id: string
   type: string
@@ -760,9 +741,10 @@ export class ScheduleItem {
   isTimed?: boolean
 
   constructor(
-    item: MetaActivity,   // або SchedulableItem
+    item: META_ACTIVITY,   // або SchedulableItem
+    timeZone: string,
     type: string,
-    kind?: ScheduleKind,
+    kind?: SCHEDULE_KIND,
     t?: string,
     d?: Date
   ) {
@@ -770,7 +752,7 @@ export class ScheduleItem {
       const year = date.getFullYear()
       const month = (date.getMonth() + 1).toString().padStart(2, '0')
       const day = date.getDate().toString().padStart(2, '0')
-      return `${year}-${month}-${day}`
+      return toUTC(`${year}-${month}-${day}`, timeZone) ?? ""
     }
 
     this._id = item._id
@@ -811,13 +793,14 @@ export class ScheduleItem {
   }
 }
 export const createScheduleItem = (
-  item: MetaActivity,
+  item: META_ACTIVITY,
+  timeZone: string,
   type: string,
-  kind?: ScheduleKind,
+  kind?: SCHEDULE_KIND,
   t?: string,
   d?: Date,
 ): ScheduleItem => {
-  return new ScheduleItem(item, type, kind, t, d)
+  return new ScheduleItem(item, timeZone, type, kind, t, d)
 }
 
 // ==================================
@@ -874,7 +857,6 @@ export class Message {
     this.dateTime = date
   }
 }
-
 export const createMessage = (
   item: Activity,
   sender: UserData,

@@ -177,6 +177,7 @@ const AppHeader = () => {
                     </li>
                 )}
             </ul>
+            <LanguageSelect/>
         </header>
     )
 }

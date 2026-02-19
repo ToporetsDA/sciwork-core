@@ -59,6 +59,7 @@
         }
     },
     "jointEventOverlap": {
+        "name": "Накладка",
         "actions": {
             "back": "Назад"
         }

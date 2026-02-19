@@ -7,6 +7,7 @@ import { getSelect } from '../../../lib/helpers'
 import { AppContext } from './'
 
 const LanguageSelect = () => {
+    
     const { useLocale } = useContext(AppContext)
     const { i18n } = useLocale()
 

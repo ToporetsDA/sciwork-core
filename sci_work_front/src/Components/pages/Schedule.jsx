@@ -3,6 +3,7 @@ import { useState, useCallback, useMemo, useContext } from 'react'
 import '../../Styles/components/pages/Schedule.sass'
 
 import { DAYS_OF_WEEK, MONTHS } from '../../lib/constants'
+import { nowUTC } from '../../lib/helpers'
 
 import { AppContext, ControlPanel } from '../pageAssets/shared'
 
@@ -21,7 +22,7 @@ const Schedule = () => {
     // ==================================
 
     //date data
-    const now = useMemo(() => new Date(), [])
+    const now = useMemo(() => nowUTC(), [])
     const [intervalAnchor, setIntervalAnchor] = useState(now)
 
     const [currentScale, setCurrentScale] = useState('week')

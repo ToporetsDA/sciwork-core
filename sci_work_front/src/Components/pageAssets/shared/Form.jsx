@@ -3,17 +3,22 @@ import { useState, useContext } from 'react'
 
 import '../../../Styles/components/pageAssets/shared/Form.sass'
 
-import { SPECIAL_DISPLAY_FIELDS } from '../../../lib/constants'
-import { getInput } from '../../../lib/helpers'
+import { getInput, getSelect } from '../../../lib/helpers'
 
 import { AppContext } from '../pageAssets/shared'
 
+/* from:
+pages/Settings.js
+pages/Profile.js
+*/
+
 const Form = (
     label,
-    defaultData,
+    dataFormat,
     dataToEdit,
     handleSpecialDisplay,
     save,
+    immediateApply = false,
     alwaysEdit = false
 ) => {
 
@@ -31,29 +36,71 @@ const Form = (
     const [tmpData, setTempData] = useState({ ...dataToEdit })
     const [errors, setErrors] = useState({})
 
+    const fixedSet = new Set(dataFormat.fixed)
+
     // ==================================
     // userData update management
     // ==================================
-  
-    const handleInputChange = (field, value) => {
-        setTempData({ ...tmpData, [field]: value })
-        setErrors({ ...errors, [field]: false }) // Clear error on change
+
+    const getField = (element, key, value, params) => {
+        switch (element) {
+            case "input": {
+                const { type, handler, disabled = true } = params
+                return getInput(
+                    key,
+                    type,
+                    "",
+                    value || '',
+                    false,
+                    handler,
+                    disabled,
+                    null,
+                    80
+                )
+            }
+
+            case "select": {
+                const { handler, options, disabled = true } = params
+                return getSelect(
+                    value,
+                    handler,
+                    "select",
+                    options,
+                    disabled
+                )
+            }
+
+            default:
+                console.warn(`Unknown field type '${element}'`)
+        }
     }
 
 
     const validateRequiredFields = () => {
         const newErrors = {}
-        Object.entries(defaultData.basic).forEach(([key, [isRequired]]) => {
-            console.log(key, isRequired, tmpData[key])
-            if (isRequired && (!tmpData[key] || tmpData[key].trim() === '') && key !== "statusName") {
-            newErrors[key] = true // Mark field as invalid
+
+        Object.entries(dataFormat.basic).forEach(([key, [isRequired]]) => {
+
+            const value = tmpData[key]
+            const isEmpty =
+                value === null ||
+                value === undefined ||
+                (typeof value === "string" && value.trim() === '')
+            
+            if (
+                isRequired &&
+                isEmpty &&
+                !fixedSet.has(key))
+            {
+                newErrors[key] = true // Mark field as invalid
             }
         })
+
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0 // Return true if no errors
     }
 
-    const saveChanges = () => {
+    const handleSubmit = () => {
         if (!validateRequiredFields()) {
             alert("Please fill out all required fields.")
             return
@@ -63,86 +110,86 @@ const Form = (
         setEditMode(false)
     }
 
+    const updateField = (key, value) => {
+        setTempData(prev => {
+            const updated = { ...prev, [key]: value }
+
+            if (immediateApply) {
+                save(updated)
+            }
+
+            return updated
+        })
+
+        setErrors(prev => ({ ...prev, [key]: false }))
+    }
+
     // ==================================
     
     return (
         <div className="form-page .page-wrapper-no-cp">
             <h2>{label}</h2>
             <div className="form-info">
-                {Object.entries(defaultData.basic).map(([key, [isRequired, type]]) => (
-                    <div className="form-field" key={key}>
-                        {(editMode || alwaysEdit) ? (
-                            <>
-                                {
-                                    getInput(
-                                        key,
-                                        "text",
-                                        SPECIAL_DISPLAY_FIELDS.includes(key)
-                                            ? handleSpecialDisplay(key)
-                                            : (tmpData[key] || ' '),
-                                        false,
-                                        (e) => {
-                                            if (!defaultData.fixed.includes(key)) {
-                                                handleInputChange(key, e.target.value)
-                                            }
-                                        },
-                                        defaultData.fixed.includes(key),
-                                        null,
-                                        80
-                                    )
-                                }
-                                <p className='required'>
-                                    {isRequired && (editMode || alwaysEdit) && !defaultData.fixed.includes(key) && '*'}
-                                </p>
-                            </>
-                        ) : (
-                            getInput(
+                {Object.entries(dataFormat.basic).map(([key, value]) => {
+
+                    const elementType = (value.type === "select") ? "select" : "input"
+
+                    return (
+                        <div className="form-field" key={key}>
+                            {getField(
+                                elementType,
                                 key,
-                                "text",
-                                SPECIAL_DISPLAY_FIELDS.includes(key)
-                                    ? handleSpecialDisplay(key)
-                                    : (tmpData[key] || ' '),
-                                false,
-                                null,
-                                true,
-                                null,
-                                80
-                            )
-                        )}
-                    </div>
-                ))}
+                                tmpData[key] || '',
+                                {
+                                    type: value.type,
+                                    handler: (editMode || alwaysEdit)
+                                        ? (e) => {
+                                            if (!fixedSet.has(key)) {
+                                                updateField(key, e.target.value)
+                                            }
+                                        }
+                                        : null,
+                                    disabled: !(editMode || alwaysEdit) || fixedSet.has(key),
+                                    options: value?.options || []
+                                }
+                            )}
+                        </div>
+                    )
+                })}
             </div>
-            <div className="form-actions">
-                {(editMode || alwaysEdit) ? (
-                    <>
+            {!immediateApply && (
+                <div className="form-actions">
+                    {(editMode || alwaysEdit) ? (
+                        <>
+                            <button
+                                className='button-main'
+                                onClick={handleSubmit}
+                                disabled={alwaysEdit && (dataToEdit === tmpData)}
+                            >
+                                {t("save")}
+                            </button>
+                            {!alwaysEdit &&
+                            <button
+                                className='button-main'
+                                onClick={() => {
+                                    setTempData({ ...dataToEdit })
+                                    setEditMode(false)
+                                }}
+                            >
+                                {t("cancel")}
+                            </button>
+                            }
+                        </>
+                    ) : (
                         <button
                             className='button-main'
-                            onClick={saveChanges}
-                            disabled={alwaysEdit && (dataToEdit === tmpData)}
+                            onClick={() => setEditMode(true)}
                         >
-                            {t("save")}
+                            {t("edit")}
                         </button>
-                        {!alwaysEdit &&
-                        <button
-                            className='button-main'
-                            onClick={() => {
-                                setTempData({ ...dataToEdit })
-                                setEditMode(false)
-                            }}
-                        >
-                            {t("cancel")}
-                        </button>
-                        }
-                    </>
-                ) : (
-                    <button
-                        className='button-main'
-                        onClick={() => setEditMode(true)}
-                    >
-                        {t("edit")}
-                    </button>
-                )}
-            </div>
+                    )}
+                </div>
+            )}
         </div>
     )
 }

@@ -19,17 +19,20 @@ const ScheduleBoard = ({
     const {
         projects,
         setDialog,
+        functionalSettings,
         recentActivities, setRecentActivities,
         useLocale
     } = useContext(AppContext)
 
     const { t } = useLocale("pageAssets.specific.scheduleBoard")
 
+    const navigate = useNavigate()
+
     // ==================================
     // const, helpers and state management
     // ==================================
 
-    const navigate = useNavigate()
+    const timeZone = functionalSettings.timeZone
 
     //calculate scale values
     const getDaysInMonth = useCallback((month, year) => {
@@ -142,12 +145,12 @@ const ScheduleBoard = ({
             .flatMap(activity => {
     
                 if (activity.startDate === activity.endDate) {// Single-day activity
-                    return createScheduleItem(activity, "activity")
+                    return createScheduleItem(activity, timeZone, "activity")
                 }
     
                 // Multi-day activity
-                const startItem = createScheduleItem(activity, "activity", "start", t("ScheduleItem.start"))
-                const endItem = createScheduleItem(activity, "activity", "end", t("ScheduleItem.end"))
+                const startItem = createScheduleItem(activity, timeZone, "activity", "start", t("ScheduleItem.start"))
+                const endItem = createScheduleItem(activity, timeZone, "activity", "end", t("ScheduleItem.end"))
 
                 let repeatItems = []
 
@@ -170,7 +173,7 @@ const ScheduleBoard = ({
                         // Check if the day is one of the repeating days
                         if (daysOfWeek.includes(d.getDay())) {
 
-                            const repeatItem = createScheduleItem(activity, "activity", `repeat`, t("ScheduleItem.repeat"), d)
+                            const repeatItem = createScheduleItem(activity, timeZone, "activity", `repeat`, t("ScheduleItem.repeat"), d)
                             repeatItems.push(repeatItem)
                         }
                     }
@@ -183,8 +186,8 @@ const ScheduleBoard = ({
 
         const filteredProjects = projects.flatMap(project => {
     
-            const startItem = createScheduleItem(project, "project", "start", t("ScheduleItem.start"))
-            const endItem = createScheduleItem(project, "project", "end", t("ScheduleItem.end"))
+            const startItem = createScheduleItem(project, timeZone, "project", "start", t("ScheduleItem.start"))
+            const endItem = createScheduleItem(project, timeZone, "project", "end", t("ScheduleItem.end"))
 
             return [startItem, endItem]
         })
@@ -205,7 +208,7 @@ const ScheduleBoard = ({
             })
     
         return rangedData
-    }, [projects, currentScale, rangeToDisplay, t])
+    }, [projects, currentScale, rangeToDisplay, timeZone, t])
 
     // scaledData with grouped overlaps
     const scaledDataWithOverlaps = useMemo(() => {

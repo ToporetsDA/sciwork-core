@@ -3,7 +3,7 @@ import { useState, useContext } from 'react'
 import '../../Styles/components/dialogs/AddEditContent.sass'
 
 import { TECH_FIELDS, FIELD_TYPES } from '../../lib/constants'
-import { getInput, getItemById, getSelect } from '../../lib/helpers'
+import { getInput, getItemById, getSelect, getUTC, formatFormValues } from '../../lib/helpers'
 
 import { AppContext } from '../pageAssets/shared'
 
@@ -11,6 +11,7 @@ const AddEditContent = () => {
 
     const { //can not apply url-based itemIds in dialogs
         userData,
+        functionalSettings,
         activities,
         setData,
         setDialog,
@@ -69,19 +70,22 @@ const AddEditContent = () => {
         if (activity.content?.currentSettings?.markable) {
             const { date, startTime, endTime } = formValues.markable || {}
 
+            const { date: dateUTC, time: startUTC } = getUTC(date, startTime, functionalSettings.timeZone)
+            const { time: endUTC } = getUTC(date, endTime, functionalSettings.timeZone)
+
             // A. Check if start time is after end time
-            if (startTime && endTime) {
-                const start = new Date(`2000-01-01T${startTime}`)
-                const end = new Date(`2000-01-01T${endTime}`)
+            if (startUTC && endUTC) {
+                const start = new Date(`2000-01-01T${startUTC}`)
+                const end = new Date(`2000-01-01T${endUTC}`)
                 if (start >= end) {
                     newErrors["markableTime"] = "Start time must be before end time"
                 }
             }
 
             // B. Check if date is in the past (compared to today)
-            if (date) {
+            if (dateUTC) {
                 const today = new Date()
-                const inputDate = new Date(date)
+                const inputDate = new Date(dateUTC)
                 today.setHours(0, 0, 0, 0) // Strip time from today
                 inputDate.setHours(0, 0, 0, 0) // Strip time from input date
 
@@ -102,14 +106,20 @@ const AddEditContent = () => {
             return
         }
 
+        const formattedFormValues = formatFormValues(formValues, functionalSettings, "toDomain")
+
         setData({
             domain: "activities",
             id: activity._id,
             recipe: (draft) => {
-                if (!editType.includes("Structure")) {
+                if (editType.includes("Structure")) {
+                    draft.content.liStructure = { ...structureFields }
+                    console.log("I updated structure")
+                }
+                else {
                     // створюємо новий елемент
                     const newItem = {
-                        ...formValues,
+                        ...formattedFormValues,
                         _id: draft._id + '.' + listItems.length,
                         creatorId: userData._id,
                         userList: [{ id: userData._id, access: 0 }]
@@ -123,9 +133,6 @@ const AddEditContent = () => {
                     draft.content.listItems = [...listItems]
                     draft.content.listItems.splice(itemIndex + 1, 0, newItem)
                     itemIndex++
-                } else {
-                    draft.content.liStructure = { ...structureFields }
-                    console.log("I updated structure")
                 }
             }
         })
@@ -172,38 +179,40 @@ const AddEditContent = () => {
                 <form className="add-edit-content-dialog-form">
                     {(editType.includes("Structure")) ? (
                         <>
-                            {Object.entries(structureFields).filter(([key, type]) => !TECH_FIELDS.includes(key)).map(([key, type]) => (
-                                <div key={key}>
-                                    {key !== "markable" &&
-                                    <div
-                                        className='field'
-                                    >
-                                        <p>{key}</p>
-                                        {getSelect(
-                                            type,
-                                            (e) => handleStructureChange(key, e.target.value),
-                                            FIELD_TYPES,
-                                            FIELD_TYPES.map(opt =>
-                                                t(`fields.structure.fieldTypes.${opt}`)
-                                            )
-                                        )}
-                                        <button
-                                            className="button-mini"
-                                            type="button"
-                                            onClick={() => {
-                                                setStructureFields(prev => {
-                                                    const updated = { ...prev }
-                                                    delete updated[key]
-                                                    return updated
-                                                })
-                                            }}
+                            {Object.entries(structureFields).filter(
+                                ([key, type]) => !TECH_FIELDS.includes(key)).map(([key, type]) => (
+                                    <div key={key}>
+                                        {key !== "markable" &&
+                                        <div
+                                            className='field'
                                         >
-                                            X
-                                        </button>
+                                            <p>{key}</p>
+                                            {getSelect(
+                                                type,
+                                                (e) => handleStructureChange(key, e.target.value),
+                                                FIELD_TYPES,
+                                                FIELD_TYPES.map(opt =>
+                                                    t(`fields.structure.fieldTypes.${opt}`)
+                                                )
+                                            )}
+                                            <button
+                                                className="button-mini"
+                                                type="button"
+                                                onClick={() => {
+                                                    setStructureFields(prev => {
+                                                        const updated = { ...prev }
+                                                        delete updated[key]
+                                                        return updated
+                                                    })
+                                                }}
+                                            >
+                                                X
+                                            </button>
+                                        </div>
+                                        }
                                     </div>
-                                    }
-                                </div>
-                            ))}
+                                )
+                            )}
                             <div className="add-field-form">
                                 {getInput(
                                     t("fields.structure.fieldName.label"),

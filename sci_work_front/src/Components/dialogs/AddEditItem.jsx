@@ -3,7 +3,7 @@ import { ObjectId } from 'bson'
 
 import '../../Styles/components/dialogs/AddEditContent.sass'
 
-import { getInput, getItemById } from '../../lib/helpers'
+import { getInput, getItemById, toUTC, formatFormValues } from '../../lib/helpers'
 
 import { AppContext } from '../pageAssets/shared'
 
@@ -13,6 +13,7 @@ const AddEditItem = () => {
         currentPage,
         projectId,
         userData,
+        functionalSettings,
         projects,
         setData,
         dialog, setDialog,
@@ -36,6 +37,10 @@ const AddEditItem = () => {
     const selectedType = projectId ? "Activity" : "Project"
 
     const currentStructure = itemStructure[selectedType.toLowerCase()]
+
+    const [formValues, setFormValues] = useState(() => {
+        return initializeFormValues(defaultStructure[selectedType.toLowerCase()], itemStructure[selectedType.toLowerCase()])
+    })
 
     // --- helpers ---
 
@@ -76,8 +81,8 @@ const AddEditItem = () => {
         //date checks
         if (formValues.startDate && formValues.endDate && !currentItemId) {
 
-            const startDate = new Date(formValues.startDate)
-            const endDate = new Date(formValues.endDate)
+            const startDate = toUTC(new Date(formValues.startDate), functionalSettings.timeZone)
+            const endDate = toUTC(new Date(formValues.endDate), functionalSettings.timeZone)
 
             if (startDate > endDate) {
                 if ((startDate === endDate && selectedType === 'Project') || selectedType === 'Activity') {
@@ -130,29 +135,6 @@ const AddEditItem = () => {
         return errors
     }
 
-    const formatFormValues = (values) => {
-        const formatted = {}
-
-        for (const key in values) {
-            const value = values[key]
-            const field = itemStructure.lists[key]
-
-            if (!field) {
-                formatted[key] = value
-                continue
-            }
-
-            if (field.many === false && Array.isArray(value)) {
-                formatted[key] = value[0] ?? null
-            }
-            else {
-                formatted[key] = value
-            }
-        }
-
-        return formatted
-    }
-
     const handleSubmit = (e) => {
         e.preventDefault()
 
@@ -165,7 +147,7 @@ const AddEditItem = () => {
         }
 
         const project = getItemById(projects, projectId)
-        const formattedFormValues = formatFormValues(formValues)
+        const formattedFormValues = formatFormValues(formValues, functionalSettings, "toDomain")
 
         const { item: parent } = project.findItemWithParent(project?.activities || [], "_id", containerId, project)
 
@@ -248,16 +230,15 @@ const AddEditItem = () => {
         } else if (currentItem !== undefined) {
             // If currentItem is an object, fill with its values
             return Object.keys(defaultValues).reduce((acc, key) => {
-                acc[key] = currentItem[key] !== undefined ? currentItem[key] : defaultValues[key] || (structure[key] === 'checkbox' ? false : '') // Fallback to default if missing
+                acc[key] = (currentItem[key] !== undefined)
+                    ? currentItem[key]
+                    : defaultValues[key]
+                        || (structure[key] === 'checkbox' ? false : '') // Fallback to default if missing
                 return acc
             }, {})
         }
         return {} // Return empty object if currentItem is undefined
     }
-
-    const [formValues, setFormValues] = useState(() => {
-        return initializeFormValues(defaultStructure[selectedType.toLowerCase()], itemStructure[selectedType.toLowerCase()])
-    })
 
     // Reset form values for the new type
 

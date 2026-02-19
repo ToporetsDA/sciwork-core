@@ -59,6 +59,7 @@
         }
     },
     "jointEventOverlap": {
+        "name": "Joint event",
         "actions": {
             "back": "Back"
         }

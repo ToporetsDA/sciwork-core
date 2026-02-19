@@ -2,6 +2,8 @@ import { useContext } from 'react'
 
 import '../../Styles/components/pages/Settings.sass'
 
+import { formatFrorValuesmForSave } from '../../lib/helpers'
+
 import { AppContext, Form } from '../pageAssets/shared'
 
 const Settings = () => {
@@ -10,7 +12,7 @@ const Settings = () => {
         setData,
         userData,
         displaySettings,
-        profileData,
+        formatOfDisplaySettings,
         useLocale
     } = useContext(AppContext)
 
@@ -24,13 +26,15 @@ const Settings = () => {
     // userData update
     // ==================================
 
-    const saveChanges = (changedData) => {
+    const handleSubmit = (changedData) => {
+
+        const formatedChangedData = formatFrorValuesmForSave(changedData)
         
         setData({
             domain: "displaySettings",
             id: userData._id,
             recipe: (draft) => {
-                Object.assign(draft, changedData)
+                Object.assign(draft, formatedChangedData)
             }
         })
     }
@@ -54,11 +58,12 @@ const Settings = () => {
             <h2>{t("label")}</h2>
             <Form
                 label = {""}
-                defaultData = {profileData}
+                dataFormat = {formatOfDisplaySettings}
                 dataToEdit = {displaySettings}
                 handleSpecialDisplay = {handleSpecialDisplay}
-                save = {saveChanges}
+                save = {handleSubmit}
                 alwaysEdit = {false}
+                immediateApply = {true}
             />
         </div>
     )

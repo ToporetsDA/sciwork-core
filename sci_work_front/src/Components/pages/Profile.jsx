@@ -3,6 +3,8 @@ import { useContext } from 'react'
 
 import '../../Styles/components/pages/Profile.sass'
 
+import { formatFormValues } from '../../lib/helpers'
+
 import { AppContext, Form } from '../pageAssets/shared'
 
 const Profile = () => {
@@ -10,7 +12,8 @@ const Profile = () => {
     const {
         setData,
         userData,
-        profileData,
+        formatOfProfileData,
+        displaySettings,
         rights,
         useLocale
     } = useContext(AppContext)
@@ -25,13 +28,15 @@ const Profile = () => {
     // userData update
     // ==================================
 
-    const saveChanges = (changedData) => {
+    const handleSubmit = (changedData) => {
+
+        const formatedChangedData = formatFormValues(changedData, displaySettings, "toDomain")
         
         setData({
             domain: "user",
             id: userData._id,
             recipe: (draft) => {
-                Object.assign(draft, changedData)
+                Object.assign(draft, formatedChangedData)
             }
         })
     }
@@ -50,7 +55,7 @@ const Profile = () => {
     // ==================================
     
     return (
-        <div className="account-page  .page-wrapper-no-cp">
+        <div className="account-page .page-wrapper-no-cp">
             <h2>{t("label")}</h2>
             {/* <div className='accountImage'>
                 {userData.photo !== undefined &&
@@ -59,10 +64,10 @@ const Profile = () => {
             </div> */}
             <Form
                 label = {t("shortLabel")}
-                defaultData = {profileData}
+                dataFormat = {formatOfProfileData}
                 dataToEdit = {userData}
                 handleSpecialDisplay = {handleSpecialDisplay}
-                save = {saveChanges}
+                save = {handleSubmit}
                 alwaysEdit = {false}
             />
             <div className="account-actions">

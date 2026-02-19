@@ -4,10 +4,10 @@ import { produceWithPatches } from "immer"
 
 import './App.css'
 
-import { createUserData, createNotification }               from './lib/classes'
-import { DEFAULT_PROFILE_DATA, DEFAULT_ITEM_STRUCTURE }     from './lib/constants'
-import { getItemById, getFromLocalStorage, daysTillEvent }  from './lib/helpers'
-import { useTimer, useDeepTranslation }                     from './lib/hooks'
+import { createUserData, createNotification, createDisplaySettings, createFunctionalSettings } from './lib/classes'
+import { DEFAULT_PROFILE_DATA, DEFAULT_ITEM_STRUCTURE, DEFAULT_DISPLAY_SETTINGS } from './lib/constants'
+import { getItemById, getFromLocalStorage, daysTillEvent, nowUTC, diffTime } from './lib/helpers'
+import { useTimer, useDeepTranslation } from './lib/hooks'
 
 import { AppProvider } from './Components/pageAssets/shared'
 
@@ -24,12 +24,12 @@ const App = () => {
   // ==================================
 
   //user
-  const [userData, setUserData] = useState(() => createUserData())
+  const [userData, setUserData] = useState(createUserData())
   const [rights, setRights] = useState()
 
   //settings
-  const [displaySettings, setDisplaySettings] = useState()
-  const [functionalSettings, setFunctionalSettings] = useState()
+  const [displaySettings, setDisplaySettings] = useState(createDisplaySettings())
+  const [functionalSettings, setFunctionalSettings] = useState(createFunctionalSettings())
 
   //items
   const defaultStructure = useMemo(() => DEFAULT_ITEM_STRUCTURE, [])
@@ -205,12 +205,15 @@ const App = () => {
     // Loop through users and their activities
     projects.forEach((project) => {
       project.activities?.forEach((activity) => {
-        const activityStartTime = new Date(`${activity.startDate}T${activity.startTime}:00`)
 
-        const isWithinDateRange = now >= new Date(activity.startDate) && now <= new Date(activity.endDate)
+        const activityStartTime = new Date(`${activity.startDate}T${activity.startTime}:00`)
+        
+        const startRange = new Date(activity.startDate)
+        const endRange   = new Date(activity.endDate)
+        const isWithinDateRange = (startRange <= now) && (now <= endRange)
 
         // Get the difference in minutes
-        const diffMins = (activityStartTime.getHours() - now.getHours()) * 60 + activityStartTime.getMinutes() - now.getMinutes()
+        const diffMins = diffTime(activityStartTime, now, "minutes")
         const _id = `${activity._id}`
 
         const add    = diffMins > delay - period && diffMins <= delay         && isWithinDateRange
@@ -259,9 +262,9 @@ const App = () => {
       })
       notificationsRef.current = recentNotifications
       setNotifications(recentNotifications)
-      checkActivities(new Date(), 15, delay)
+      checkActivities(nowUTC(), 15, delay)
     }
-  }, [checkActivities, delay, userData._id, isLoggedIn])
+  }, [checkActivities, delay, userData._id, functionalSettings.timeZone, isLoggedIn])
   
   // save existing messages to storage on each change
   useEffect(() => {
@@ -317,7 +320,8 @@ const App = () => {
     isCompany,
     rights,
     organisationType: isCompany,
-    profileData: DEFAULT_PROFILE_DATA,
+    formatOfProfileData: DEFAULT_PROFILE_DATA,
+    formatOfDisplaySettings: DEFAULT_DISPLAY_SETTINGS,
     itemStructure: DEFAULT_ITEM_STRUCTURE,
     defaultStructure,
     //data

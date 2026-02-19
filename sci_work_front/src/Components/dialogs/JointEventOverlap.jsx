@@ -7,12 +7,12 @@ import { AppContext, ItemTable } from '../pageAssets/shared'
 const JointEventOverlapDialog = () => {
 
     const { //can not apply url-based itemIds in dialogs
-        projects,
+        dialog,
         setDialog,
         useLocale
     } = useContext(AppContext)
 
-    const { t } = useLocale("dialogs")
+    const { t } = useLocale("dialogs.jointEventOverlap")
 
     // ==================================
     // dialog logic
@@ -34,9 +34,10 @@ const JointEventOverlapDialog = () => {
             className="dialog-container"
             onClick={closeDialog}
         >
+            <h2>{t("name")}</h2>
             <div className="dialog-content">
                 <ItemTable
-                    itemsToDisplay={projects}
+                    itemsToDisplay={dialog.params[0]}
                     itemKeys={["name", "startDate", "endDate"]}
                     //itemTypes
                     editable={false}
@@ -47,7 +48,7 @@ const JointEventOverlapDialog = () => {
                     className='button-main'
                     onClick={closeDialog}
                 >
-                    {t("jointEventOverlap.actions.back")}
+                    {t("actions.back")}
                 </button>
             </div>
         </div>
