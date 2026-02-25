@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react'
-import { DateTime, DurationUnits } from 'luxon'
+import { DateTime } from 'luxon'
 
 import {
   createUserData,

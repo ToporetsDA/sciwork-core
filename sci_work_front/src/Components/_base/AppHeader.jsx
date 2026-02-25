@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useMemo, useContext } from 'react'
 
 import '../../Styles/components/_base/AppHeader.sass'
-import { PAGES, MORE_PAGES } from '../../lib/constants'
+import { PAGES, MORE_PAGES, HEADER_LANGUAGES } from '../../lib/constants'
 
-import { AppContext, LanguageSelect } from '../pageAssets/shared'
+import { AppContext, CustomSelect, LanguageSelect } from '../pageAssets/shared'
 
 import logo from '../logo.svg'
 
@@ -127,57 +127,67 @@ const AppHeader = () => {
             </li>
         )
     }
+
+    const LangSelect = LanguageSelect(CustomSelect)
     
     return (
         <header>
             <img className="logo" src={logo} alt="SciWork" />
-                <ul className="menu">
-                {(isLoggedIn === true) ? (
-                    <>
-                        {pages.map((page, index) => (
-                            getLi(page, t(`pages.${page}`))
-                        ))}
-                        <li
-                            onClick={setIsMoreOpen(!isMoreOpen)}
-                            ref={dropdownRef}
-                        >
-                            <p
-                                onClick={setIsMoreOpen(!isMoreOpen)}
-                                style={{
-                                    fontWeight: isMoreOpen ? 'bold' : 'normal',
-                                    pointerEvents: 'auto',
-                                    opacity: isMoreOpen ? 0.5 : 1,
-                                }}
-                            >
-                                {t("more.name")}
-                            </p>
-                            {!isMoreOpen && notificationsMark > 0 && (
-                                    <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
-                            )}
-                            {isMoreOpen && (
-                                <ul className="more">
-                                    {morePages.map((page, index) => (
-                                        getLi(page, t(`more.${page}`))
-                                    ))}
-                                    <li onClick={handleLogOut}>
-                                        <p>
-                                            {t("auth.out")}
-                                        </p>
-                                    </li>
-                                </ul>
-                            )}
-                        </li>
-                    </>
-                ) : (
+            <ul className="menu">
+            {(isLoggedIn === true) ? (
+                <>
+                    {pages.map((page, index) => (
+                        getLi(page, t(`pages.${page}`))
+                    ))}
                     <li
-                        key={"LogIn"}
-                        onClick={() => handleDialog("LogIn")}
+                        onClick={setIsMoreOpen(!isMoreOpen)}
+                        ref={dropdownRef}
                     >
-                        <p>{t("auth.in")}</p>
+                        <p
+                            onClick={setIsMoreOpen(!isMoreOpen)}
+                            style={{
+                                fontWeight: isMoreOpen ? 'bold' : 'normal',
+                                pointerEvents: 'auto',
+                                opacity: isMoreOpen ? 0.5 : 1,
+                            }}
+                        >
+                            {t("more.name")}
+                        </p>
+                        {!isMoreOpen && notificationsMark > 0 && (
+                                <span className="notification-circle">{(notificationsMark > 99) ? "99+" : notificationsMark}</span>
+                        )}
+                        {isMoreOpen && (
+                            <ul className="more">
+                                {morePages.map((page, index) => (
+                                    getLi(page, t(`more.${page}`))
+                                ))}
+                                <li onClick={handleLogOut}>
+                                    <p>
+                                        {t("auth.out")}
+                                    </p>
+                                </li>
+                            </ul>
+                        )}
                     </li>
-                )}
+                </>
+            ) : (
+                <li
+                    key={"LogIn"}
+                    onClick={() => handleDialog("LogIn")}
+                >
+                    <p>{t("auth.in")}</p>
+                </li>
+            )}
             </ul>
-            <LanguageSelect/>
+            <LangSelect
+                id="headerLanguageSelect"
+                name="Locale"
+                options={HEADER_LANGUAGES}
+                optionSelectField="code"
+                optionContentField="img"
+                placeholder="ERROR: Should be EN"
+                emptyPlaceholder="FATAL ERROR: languages not found"
+            />
         </header>
     )
 }

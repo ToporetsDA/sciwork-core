@@ -16,7 +16,7 @@ const Form = (
     label,
     dataFormat,
     dataToEdit,
-    handleSpecialDisplay,
+    handleSpecial,
     save,
     immediateApply = false,
     alwaysEdit = false
@@ -112,8 +112,13 @@ const Form = (
     }
 
     const updateField = (key, value) => {
+        const specialKeys = Object.keys(dataFormat.special)
+        const v = (specialKeys.includes(key))
+            ? handleSpecial(key, value)
+            : value
+            
         setTempData(prev => {
-            const updated = { ...prev, [key]: value }
+            const updated = { ...prev, [key]: v }
 
             if (immediateApply) {
                 save(updated)

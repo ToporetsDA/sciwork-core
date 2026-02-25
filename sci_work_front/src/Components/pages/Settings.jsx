@@ -40,12 +40,15 @@ const Settings = () => {
     }
 
     // cuurently not used
-    const handleSpecialDisplay = (field) => {
+    const handleSpecial = (field, value, formVals, setFormVals) => {
+
         switch(field) {
             case"": {
-                return ''
+                
+                return
             }
             default: {
+                console.warn(`No handler case for field ${field}`)
                 return ''
             }
         }
@@ -60,7 +63,7 @@ const Settings = () => {
                 label = {""}
                 dataFormat = {formatOfDisplaySettings}
                 dataToEdit = {displaySettings}
-                handleSpecialDisplay = {handleSpecialDisplay}
+                handleSpecial = {handleSpecial}
                 save = {handleSubmit}
                 alwaysEdit = {false}
                 immediateApply = {true}

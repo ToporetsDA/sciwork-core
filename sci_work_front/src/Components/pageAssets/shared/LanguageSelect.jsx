@@ -1,28 +1,39 @@
-import { useContext } from 'react'
+import { useContext } from "react"
 
+import { AppContext } from '.'
 
-import { LANGUAGES, LANGUAGES_FULL } from '../../../lib/constants'
-import { getSelect } from '../../../lib/helpers'
+const LanguageSelect = (Component) => {
 
-import { AppContext } from './'
+    const {
+        displaySettings,
+        updateData
+        
+    } = useContext(AppContext)
 
-const LanguageSelect = () => {
-    
-    const { useLocale } = useContext(AppContext)
-    const { i18n } = useLocale()
+    const LanguageEnhanced = (props) => {
 
-    const changeLang = (e) => {
-        const lng = e.target.value
-        i18n.changeLanguage(lng)
-        localStorage.setItem("lang", lng)
+        const changeLanguage = (lng) => {
+
+            updateData({
+                domain: "displaySettings",
+                id: displaySettings._id,
+                recipe: draft => {
+                    draft.language = lng
+                }
+            })
+
+        }
+
+        return (
+            <Component
+                {...props}
+                value={displaySettings.language}
+                handler={changeLanguage}
+            />
+        )
     }
 
-    return getSelect(
-        i18n.language,
-        changeLang,
-        LANGUAGES,
-        LANGUAGES_FULL
-    )
+    return LanguageEnhanced
 }
 
 export default LanguageSelect

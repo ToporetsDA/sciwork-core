@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback, useNavigate, useParams, useLocation } from 'react'
 import { BrowserRouter as Router, } from 'react-router-dom'
 import { produceWithPatches } from "immer"
+import { i18n } from "i18next"
 
 import './App.css'
 
@@ -71,6 +72,32 @@ const App = () => {
       return str.replace(/\s+/g, '')
   }
 
+  // --- state management ---
+
+  useEffect(() => { // apply display settings changes
+
+    if (displaySettings?.language) {
+      i18n.changeLanguage(displaySettings.language)
+    }
+
+  }, [displaySettings.language])
+
+  useEffect(() => { // page tracker
+    if (
+      (lastSentPage.current.currentPage === currentPage && lastSentPage.current.currentProject === projectId)
+      || !isLoggedIn
+    ) {
+      return
+    }
+    const location = projectId || currentPage
+    socketRef.current("goTo", { page: format(location), isId: (!!projectId)})
+    lastSentPage.current = {
+      currentPage: currentPage,
+      currentProject: projectId,
+      currentActivity: activityId
+    }
+  }, [ currentPage, projectId, activityId, isLoggedIn])
+
   // ==================================
 
   // const updateUsers = (itemId) => {
@@ -113,80 +140,69 @@ const App = () => {
 
   const updateData = ({ domain, id, recipe }) => { //user update entry point
 
-    const domainTypeMap = {
-      projects: "Project",
-      activities: "Activity",
-      user: "UserData"
+    const domainAssets = {
+      projects: {
+        type: "Project",
+        setter: setProjects,
+        prevState: () => projects,
+        getDraftItem: (draft, id) => getItemById(draft, id)
+      },
+      activities: {
+        type: "Activities",
+        setter: setActivities,
+        prevState: () => activities,
+        getDraftItem: (draft, id) => getItemById(draft, id)
+      },
+      user: {
+        type: "UserData",
+        setter: setUserData,
+        prevState: () => userData,
+        getDraftItem: (draft) => draft
+      },
+      functionalSettings: {
+        type: "functionalSettings",
+        setter: setFunctionalSettings,
+        prevState: () => functionalSettings,
+        getDraftItem: (draft) => draft
+      },
+      displaySettings: {
+        type: "displaySettings",
+        setter: setDisplaySettings,
+        prevState: () => displaySettings,
+        getDraftItem: (draft) => draft
+      }
     }
+
     const getDraft = (item) => {
+      const versionKey = id ?? domain
       if (item) {
-        previousVersionsRef.current[id] = {
-          type: domainTypeMap[domain],
+        previousVersionsRef.current[versionKey] = {
+          type: domainAssets[domain].type,
           val: structuredClone(item)
         }
         recipe(item)
       }
     }
 
-    let setter
-    let prevState
-    let getDraftItem
-
-    switch(domain) {
-      case "projects": {
-        setter = setProjects
-        prevState = projects
-        getDraftItem = (draft, id) => getItemById(draft, id)
-        break
-      }
-
-      case "activities": {
-        setter = setActivities
-        prevState = activities
-        getDraftItem = (draft, id) => getItemById(draft, id)
-        break
-      }
-
-      case "user": {
-        setter = setUserData
-        prevState = userData
-        getDraftItem = (draft) => draft
-        break
-      }
-      default: {
-        console.warn("No such item domain. Update not sent")
-        return
-      }
+    if (!domainAssets[domain]) {
+      console.warn("No such item domain. Update not sent")
+      return
     }
+
+    const { setter, prevState, getDraftItem } = domainAssets[domain]
 
     updateWithPatches(
       setter,
-      () => prevState,
+      prevState,
       draft => {
         const item = getDraftItem(draft, id)
         getDraft(item)
       },
-      patches => sendPatch(domain, id, patches)
+      patches => {
+        sendPatch(domain, id, patches)
+      }
     )
   }
-
-  // page tracker
-  
-  useEffect(() => {
-    if (
-      (lastSentPage.current.currentPage === currentPage && lastSentPage.current.currentProject === projectId)
-      || !isLoggedIn
-    ) {
-      return
-    }
-    const location = projectId || currentPage
-    socketRef.current("goTo", { page: format(location), isId: (!!projectId)})
-    lastSentPage.current = {
-      currentPage: currentPage,
-      currentProject: projectId,
-      currentActivity: activityId
-    }
-  }, [ currentPage, projectId, activityId, isLoggedIn])
 
   // ==================================
   // notifications logic
@@ -339,7 +355,6 @@ const App = () => {
     //tech
     setDialog,
     setLoggedIn,
-    useLocale: useDeepTranslation,
     //data
     setData: updateData,
     setDisplaySettings,
@@ -349,6 +364,7 @@ const App = () => {
     setRecentActivities,
 
     //hooks
+    useLocale: useDeepTranslation,
     navigate: useNavigate()
   }
 

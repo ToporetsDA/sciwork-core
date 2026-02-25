@@ -41,12 +41,13 @@ const Profile = () => {
         })
     }
 
-    const handleSpecialDisplay = (field) => {
+    const handleSpecial = (field, value) => {
         switch(field) {
             case"statusName": {
                 return rights.names[userData.genStatus]
             }
             default: {
+                console.warn(`No handler case for field ${field}`)
                 return ''
             }
         }
@@ -66,7 +67,7 @@ const Profile = () => {
                 label = {t("shortLabel")}
                 dataFormat = {formatOfProfileData}
                 dataToEdit = {userData}
-                handleSpecialDisplay = {handleSpecialDisplay}
+                handleSpecial = {handleSpecial}
                 save = {handleSubmit}
                 alwaysEdit = {false}
             />

@@ -26,11 +26,28 @@ const CustomSelect = ({
     const selectRef = useRef(null)
 
     const handleOptionClick = (val) => {
-        handler({ target: { name, value: val } })
+        handler(val)
         setIsOpen(false)
     }
 
     const selectedOption = options.find((o) => o[optionSelectField] === value)
+
+    const getValueToDisplay = (option) => {
+
+        switch(optionContentField) {
+            case"img": {
+                return (
+                    <>
+                        <img src={option[optionContentField]} alt="No flag"/>
+                        {option[optionSelectField]}
+                    </>
+                )
+            }
+            default: {
+                return option[optionContentField]
+            }
+        }
+    }
 
     return (
         <div className="custom-select-wrapper">
@@ -69,7 +86,7 @@ const CustomSelect = ({
                         }
                     }}
                 >
-                    {selectedOption?.[optionContentField] || placeholder}
+                    {getValueToDisplay(selectedOption)}
                 </span>
                 {isOpen && (
                     <div className="custom-options">
@@ -79,7 +96,7 @@ const CustomSelect = ({
                             className={`custom-option ${value === option[optionSelectField] ? "selection" : ""}`}
                             onClick={() => handleOptionClick(option[optionSelectField])}
                         >
-                            {option[optionContentField]}
+                            {getValueToDisplay(option)}
                         </span>
                         ))}
                     </div>

@@ -211,6 +211,11 @@ export const PAGES = Object.freeze(['Home Page', 'Schedule', 'Projects/Subjects'
 
 export const MORE_PAGES = Object.freeze(['Profile', 'Notifications', 'Chats', 'Settings'])
 
+export const HEADER_LANGUAGES = Object.freeze([
+    { code: "en", img: "gb.svg" },
+    { code: "uk", img: "ua.svg" }
+])
+
 // --- AppNav.js ---
 
 // --- AppDynamicContent.js ---
