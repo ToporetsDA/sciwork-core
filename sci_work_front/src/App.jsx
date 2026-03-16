@@ -12,7 +12,7 @@ import { useTimer, useDeepTranslation } from './lib/hooks'
 
 import { AppProvider } from './Components/pageAssets/shared'
 
-import AppConnection  from './Components/AppConnection'
+import AppConnection  from './Components/_connection/AppConnection'
 
 import AppHeader      from './Components/_base/AppHeader'
 import AppNav         from './Components/_base/AppNav'
@@ -90,7 +90,7 @@ const App = () => {
       return
     }
     const location = projectId || currentPage
-    socketRef.current("goTo", { page: format(location), isId: (!!projectId)})
+    patchHandlerRef.current("goTo", { page: format(location), isId: (!!projectId)})
     lastSentPage.current = {
       currentPage: currentPage,
       currentProject: projectId,
@@ -109,25 +109,8 @@ const App = () => {
   // update logic
   // ==================================
 
-  const socketRef = useRef(null)
+  const patchHandlerRef = useRef(null)
   const previousVersionsRef = useRef(null)
-
-  const sendPatch = (type, id, patches) => {
-
-    //null handling on not logged in
-    if (!socketRef.current) {
-      console.warn("Socket not ready yet")
-      return
-    }
-
-    socketRef.current("update", {
-      _id: id,
-      fields: patches.map(p => ({
-        path: p.path,   // масив ключів/індексів Immer
-        value: p.value
-      }))
-    })
-  }
 
   const updateWithPatches = (setter, getState, recipe, onPatch) => {
     const [nextState, patches] = produceWithPatches(getState(), recipe)
@@ -196,10 +179,11 @@ const App = () => {
       prevState,
       draft => {
         const item = getDraftItem(draft, id)
+        previousVersionsRef.current[id ?? domain] = structuredClone(item)
         getDraft(item)
       },
       patches => {
-        sendPatch(domain, id, patches)
+        patchHandlerRef(domain, id, patches)
       }
     )
   }
@@ -385,7 +369,7 @@ const App = () => {
             </div>
         </div>
         <AppConnection
-          onReady={fn => socketRef.current = fn}
+          onReady={fn => patchHandlerRef.current = fn}
           //data
           setProjects={setProjects}
           setActivities={setActivities}

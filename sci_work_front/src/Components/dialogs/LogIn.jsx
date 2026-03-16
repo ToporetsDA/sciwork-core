@@ -10,7 +10,9 @@ import { AppContext, CustomSelect, ToggleButton } from '../pageAssets/shared'
 
 const LogIn = ({
     servers,
-    loginToServer
+    loginToServer,
+    formValues,
+    setFormValues
 }) => {
 
     const { //can not apply url-based itemIds in dialogs
@@ -26,14 +28,6 @@ const LogIn = ({
     // ==================================
 
     const [canReg, setCanReg] = useState(false)
-
-    const [formValues, setFormValues] = useState(() => {
-        return {
-            server: "",
-            login: "",
-            password: ""
-        }
-    })
 
     const [type, setType] = useState({type: "Log in"})
 
@@ -105,7 +99,6 @@ const LogIn = ({
                                 <h3>{t("label")}</h3>
                             )
                         }
-
                         {
                             getInput(
                                 "login",
