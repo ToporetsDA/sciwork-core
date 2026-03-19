@@ -64,7 +64,7 @@
             "back": "Back"
         }
     },
-    "logIn": {
+    "enter": {
         "label": "Register/Login",
         "options": {
             "register": "Register",
@@ -80,6 +80,7 @@
         },
         "actions": {
             "logIn": "Log In",
+            "register": "Register",
             "back": "Back"
         }
     }

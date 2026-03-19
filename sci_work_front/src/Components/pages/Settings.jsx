@@ -4,7 +4,7 @@ import '../../Styles/components/pages/Settings.sass'
 
 import { formatFrorValuesmForSave } from '../../lib/helpers'
 
-import { AppContext, Form } from '../pageAssets/shared'
+import { AppContext, FormExtended } from '../pageAssets/shared'
 
 const Settings = () => {
 
@@ -59,7 +59,7 @@ const Settings = () => {
     return (
         <div className="settings-page .page-wrapper-no-cp">
             <h2>{t("label")}</h2>
-            <Form
+            <FormExtended
                 label = {""}
                 dataFormat = {formatOfDisplaySettings}
                 dataToEdit = {displaySettings}

@@ -5,7 +5,7 @@ import '../../Styles/components/pages/Profile.sass'
 
 import { formatFormValues } from '../../lib/helpers'
 
-import { AppContext, Form } from '../pageAssets/shared'
+import { AppContext, FormExtended } from '../pageAssets/shared'
 
 const Profile = () => {
 
@@ -63,7 +63,7 @@ const Profile = () => {
                     <></>
                 }
             </div> */}
-            <Form
+            <FormExtended
                 label = {t("shortLabel")}
                 dataFormat = {formatOfProfileData}
                 dataToEdit = {userData}

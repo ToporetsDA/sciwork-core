@@ -107,7 +107,7 @@ export interface MARKABLE_VALUE {
 // Main
 // ==================================
 
-// --- App.js ---
+// --- App.jsx ---
 
 export const DEFAULT_PROFILE_DATA = Object.freeze({   // [isRequired, type]
     basic: {
@@ -205,7 +205,7 @@ export const DEFAULT_ITEM_STRUCTURE = Object.freeze({
 // Page base
 // ==================================
 
-// --- AppHeader.js ---
+// --- AppHeader.jsx ---
 
 export const PAGES = Object.freeze(['Home Page', 'Schedule', 'Projects/Subjects'])
 
@@ -216,23 +216,23 @@ export const HEADER_LANGUAGES = Object.freeze([
     { code: "uk", img: "ua.svg" }
 ])
 
-// --- AppNav.js ---
+// --- AppNav.jsx ---
 
-// --- AppDynamicContent.js ---
+// --- AppDynamicContent.jsx ---
 
-// --- AppContend.js ---
+// --- AppContend.jsx ---
 
 // ==================================
 // Pages
 // ==================================
 
-// --- HomePage.js ---
+// --- HomePage.jsx ---
 
-// --- Notifications.js ---
+// --- Notifications.jsx ---
 
-// --- Profile.js ---
+// --- Profile.jsx ---
 
-// --- Projects.js ---
+// --- Projects.jsx ---
 
 export const DISPLAY_OPTIONS = Object.freeze(new Map([
     ['tiles', 'grid'],
@@ -240,7 +240,7 @@ export const DISPLAY_OPTIONS = Object.freeze(new Map([
     ['table', 'table']
 ]))
 
-// --- Schedule.js ---
+// --- Schedule.jsx ---
 
 export const DAYS_OF_WEEK = Object.freeze([
     'Monday',
@@ -277,27 +277,27 @@ export const MONTHS = Object.freeze([
     'Dec'
 ])
 
-// --- Settings.js ---
+// --- Settings.jsx ---
 
 // ==================================
 // Specific
 // ==================================
 
-// --- ScheduleBoard.js ---
+// --- ScheduleBoard.jsx ---
 
 // ==================================
 // Shared
 // ==================================
 
-// --- AppContext.js ---
+// --- AppContext.jsx ---
 
-// --- ControlPanel.js ---
+// --- ControlPanel.jsx ---
 
 export const DISPLAY_OPTIONS_CONTROLS = Object.freeze(["tiles", "list", "table"])
 
-// --- CustomSelect.js ---
+// --- CustomSelect.jsx ---
 
-// --- Form.js ---
+// --- Form.jsx ---
 
 export type FORM_DEFAULTS = {
     basic: Record<string, [boolean, any]> // [isRequired, defaultValue]
@@ -305,7 +305,9 @@ export type FORM_DEFAULTS = {
     additional?: Record<string, any>
 }
 
-// --- Item.js ---
+// --- FormExtended.jsx ---
+
+// --- Item.jsx ---
 
 export const ACTIVITY_TYPES = Object.freeze({
     Dev: "Dev",
@@ -326,11 +328,11 @@ export const SUB_ACTIVITY_TYPES = Object.freeze({
 
 export const NO_ACTIONS_CONTAINER = Object.freeze(["Chat"])
 
-// --- ItemActions.js ---
+// --- ItemActions.jsx ---
 
-// --- ItemTable.js ---
+// --- ItemTable.jsx ---
 
-// --- ItemTiles.js ---
+// --- ItemTiles.jsx ---
 
 export const ITEM_TYPES_LIST_BASED = Object.freeze([
     "List",
@@ -339,7 +341,7 @@ export const ITEM_TYPES_LIST_BASED = Object.freeze([
     "Report"
 ])
 
-// --- ToggleButton.js ---
+// --- ToggleButton.jsx ---
 
 export const LANGUAGES = Object.freeze([
     "en",
@@ -355,7 +357,7 @@ export const LANGUAGES_FULL = Object.freeze([
 // Dialogs
 // ==================================
 
-// --- AddEditContent.js ---
+// --- AddEditContent.jsx ---
 
 export const TECH_FIELDS = Object.freeze(["_id", "creatorId"])
 
@@ -364,9 +366,9 @@ export const FIELD_TYPES = Object.freeze([
     "checkbox"
 ])
 
-// --- AddEditItem.js ---
+// --- AddEditItem.jsx ---
 
-// --- AddEditUserList.js ---
+// --- AddEditUserList.jsx ---
 
 export const ITEM_KEYS_ALLOWED = Object.freeze([
     "name",
@@ -406,29 +408,63 @@ export const ITEM_TYPES = Object.freeze({
     access: "button"
 })
 
-// --- JointEventOverlap.js ---
+// --- JointEventOverlap.jsx ---
 
-// --- LogIn.js ---
+// --- Enter.jsx ---
 
-export const TYPE_OPTIONS = Object.freeze(['Register', 'Log in'])
+export const TYPE_OPTIONS = Object.freeze(['Log in', 'Register'])
+
+export const LOGIN_FORM = {
+    basic: {
+        login: {
+            type: "text",
+            required: true
+        },
+        password: {
+            type: "password",
+            required: true
+        }
+    },
+    fixed: [],
+    special: {}
+}
+
+export const REGISTER_FORM = {
+    basic: {
+        login: {
+            type: "text",
+            required: true
+        },
+        password: {
+            type: "password",
+            required: true
+        },
+        email: {
+            type: "email",
+            required: true
+        }
+    },
+    fixed: [],
+    special: {}
+}
 
 // ==================================
 // Items
 // ==================================
 
-// --- Chat.js ---
+// --- Chat.jsx ---
 
-// --- Dev.js ---
+// --- Dev.jsx ---
 
-// --- Group.js ---
+// --- Group.jsx ---
 
-// --- List.js ---
+// --- List.jsx ---
 
 export const ITEMS_WITH_DIALOG_BUTTON = Object.freeze(["List", "Attendance", "Table", /*no Chat*/])
 
-// --- Project.js ---
+// --- Project.jsx ---
 
-// --- Text.js ---
+// --- Text.jsx ---
 
 export const FONT_SIZES = Object.freeze([ "normal", "large", "larger"])
 
@@ -436,7 +472,7 @@ export const FONT_SIZES = Object.freeze([ "normal", "large", "larger"])
 // SubItems
 // ==================================
 
-// --- ListItem.js ---
+// --- ListItem.jsx ---
 
 export const MARKABLE_FIELDS = Object.freeze([
     "checker",
@@ -454,4 +490,4 @@ export const MARKABLE_TYPES = Object.freeze({
     checker: 'checker'
 })
 
-// --- Message.js ---
+// --- Message.jsx ---

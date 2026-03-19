@@ -1,5 +1,7 @@
 export { default as ControlPanel }          from './ControlPanel.jsx'
 export { default as CustomSelect }          from './CustomSelect.jsx'
+export { default as Form }                  from './Form.jsx'
+export { default as FormExtended }          from './FormExtended.jsx'
 export { default as Item }                  from './Item.jsx'
 export { default as ItemActions }           from './ItemActions.jsx'
 export { default as ItemTable }             from './ItemTable.jsx'

@@ -31,7 +31,7 @@
                 "next": "Наст."
             }
         },
-        "form": {
+        "formExtended": {
             "save": "Зберегти",
             "edit": "Редагувати {{object}}",
             "cancel": "Відмінити"

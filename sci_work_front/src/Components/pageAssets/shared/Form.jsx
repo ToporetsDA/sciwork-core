@@ -1,42 +1,42 @@
 
-import { useState, useContext } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 
 import '../../../Styles/components/pageAssets/shared/Form.sass'
 
 import { getInput, getSelect } from '../../../lib/helpers'
-
-import { AppContext } from '../pageAssets/shared'
 
 /* from:
 pages/Settings.js
 pages/Profile.js
 */
 
-const Form = (
-    label,
+const FormExtended = (
     dataFormat,
     dataToEdit,
     handleSpecial,
     save,
+    callSave,
+    tmpData,
+    setTempData,
+    editMode = true,
     immediateApply = false,
     alwaysEdit = false
 ) => {
-
-    const {
-        useLocale
-    } = useContext(AppContext)
-
-    const { t } = useLocale("pageAssets.shared.form")
 
     // ==================================
     // const, helpers and state management
     // ==================================
 
-    const [editMode, setEditMode] = useState(false)
-    const [tmpData, setTempData] = useState({ ...dataToEdit })
     const [errors, setErrors] = useState({})
 
-    const fixedSet = new Set(dataFormat.fixed)
+    const fixedSet = useMemo(
+        () => new Set(dataFormat.fixed || []),
+        [dataFormat.fixed]
+    )
+
+    useEffect(() => {
+        setTempData({ ...dataToEdit })
+    }, [setTempData, dataToEdit])
 
     // ==================================
     // userData update management
@@ -61,12 +61,12 @@ const Form = (
 
             case "select": {
                 const { handler, options, disabled = true } = params
-                const displayOprions = options.map(opt => opt.toString())
+                const displayOptions = options.map(opt => opt.toString())
                 return getSelect(
                     value,
                     handler,
                     options,
-                    displayOprions,
+                    displayOptions,
                     disabled
                 )
             }
@@ -76,17 +76,18 @@ const Form = (
         }
     }
 
+    const validateRequiredFields = useCallback(() => {
+        const newErrors = {}
 
-    const validateRequiredFields = () => {
-        const newErrors = errors
+        Object.entries(dataFormat.basic).forEach(([key, value]) => {
 
-        Object.entries(dataFormat.basic).forEach(([key, [isRequired]]) => {
-
-            const value = tmpData[key]
+            const isRequired = value.required
+            const val = tmpData[key]
+            
             const isEmpty =
-                value === null ||
-                value === undefined ||
-                (typeof value === "string" && value.trim() === '')
+                val === null ||
+                val === undefined ||
+                (typeof val === "string" && val.trim() === '')
             
             if (
                 isRequired &&
@@ -99,17 +100,20 @@ const Form = (
 
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0 // Return true if no errors
-    }
+    }, [dataFormat.basic, fixedSet, tmpData])
 
-    const handleSubmit = () => {
+    const handleSubmit = useCallback(() => {
         if (!validateRequiredFields()) {
             alert("Please fill out all required fields.")
             return
         }
 
         save(tmpData)
-        setEditMode(false)
-    }
+    }, [save, tmpData, validateRequiredFields])
+
+    useEffect(() => {
+        callSave.current = handleSubmit
+    }, [callSave, handleSubmit])
 
     const updateField = (key, value) => {
         const specialKeys = Object.keys(dataFormat.special)
@@ -133,71 +137,38 @@ const Form = (
     // ==================================
     
     return (
-        <div className="form-page .page-wrapper-no-cp">
-            <h2>{label}</h2>
-            <div className="form-info">
-                {Object.entries(dataFormat.basic).map(([key, value]) => {
+        <div className="form-info">
+            {Object.entries(dataFormat.basic).map(([key, value]) => {
 
-                    const elementType = (value.type === "select") ? "select" : "input"
+                const elementType = (value.type === "select") ? "select" : "input"
 
-                    return (
-                        <div className="form-field" key={key}>
-                            {getField(
-                                elementType,
-                                key,
-                                tmpData[key] || '',
-                                {
-                                    type: value.type,
-                                    handler: (editMode || alwaysEdit)
-                                        ? (e) => {
-                                            if (!fixedSet.has(key)) {
-                                                updateField(key, e.target.value)
-                                            }
+                return (
+                    <div className="form-field" key={key}>
+                        {errors[key] &&
+                            <p>!</p>
+                        }
+                        {getField(
+                            elementType,
+                            key,
+                            tmpData[key] || '',
+                            {
+                                type: value.type,
+                                handler: (editMode || alwaysEdit)
+                                    ? (e) => {
+                                        if (!fixedSet.has(key)) {
+                                            updateField(key, e.target.value)
                                         }
-                                        : null,
-                                    disabled: !(editMode || alwaysEdit) || fixedSet.has(key),
-                                    options: value?.options || []
-                                }
-                            )}
-                        </div>
-                    )
-                })}
-            </div>
-            {!immediateApply && (
-                <div className="form-actions">
-                    {(editMode || alwaysEdit) ? (
-                        <>
-                            <button
-                                className='button-main'
-                                onClick={handleSubmit}
-                                disabled={alwaysEdit && (dataToEdit === tmpData)}
-                            >
-                                {t("save")}
-                            </button>
-                            {!alwaysEdit &&
-                            <button
-                                className='button-main'
-                                onClick={() => {
-                                    setTempData({ ...dataToEdit })
-                                    setEditMode(false)
-                                }}
-                            >
-                                {t("cancel")}
-                            </button>
+                                    }
+                                    : null,
+                                disabled: !(editMode || alwaysEdit) || fixedSet.has(key),
+                                options: value?.options || []
                             }
-                        </>
-                    ) : (
-                        <button
-                            className='button-main'
-                            onClick={() => setEditMode(true)}
-                        >
-                            {t("edit")}
-                        </button>
-                    )}
-                </div>
-            )}
+                        )}
+                    </div>
+                )
+            })}
         </div>
     )
 }
 
-export default Form
+export default FormExtended

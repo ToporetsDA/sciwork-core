@@ -31,7 +31,7 @@
                 "next": "Next"
             }
         },
-        "form": {
+        "formExtended": {
             "save": "Save",
             "edit": "Edit {{object}}",
             "cancel": "Cancel"

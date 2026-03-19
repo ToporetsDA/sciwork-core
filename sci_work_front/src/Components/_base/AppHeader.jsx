@@ -172,8 +172,8 @@ const AppHeader = () => {
                 </>
             ) : (
                 <li
-                    key={"LogIn"}
-                    onClick={() => handleDialog("LogIn")}
+                    key={"LogIn/Register"}
+                    onClick={() => handleDialog("Enter")}
                 >
                     <p>{t("auth.in")}</p>
                 </li>

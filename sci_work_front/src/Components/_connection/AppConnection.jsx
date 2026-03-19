@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useContext } from 'react'
 import { useTranslation } from "react-i18next"
 
 import { AppContext } from '../pageAssets/shared'
-import { LogIn } from '../dialogs'
+import { Enter } from '../dialogs'
 
 import { AppSocket } from './socket/AppSocket'
 import { getApiMethod } from './api/AppApiClient'
@@ -33,13 +33,7 @@ const AppConnection = ({
     const [loading, setLoading] = useState(true)            // UI-флаг
     const [sessionToken, setToken] = useState()             // auth
     const [baseUrl, setBaseUrl] = useState()                // currnt server URL
-    const [formValues, setFormValues] = useState(() => {    // дані форми
-        return {
-            server: "",
-            login: "",
-            password: ""
-        }
-    })
+    
     const [wsUrl, setWsUrl] = useState(null)                // websocket endpoint
     
 
@@ -149,7 +143,7 @@ const AppConnection = ({
     }, [ onReady, sendRequest])
 
     // ==================================
-    // log in logic
+    // log in/register logic
     // ==================================
 
     //create server address string
@@ -172,46 +166,37 @@ const AppConnection = ({
         return `${domain}:${newPort}`
     }
 
-    //on login
-    const loginToServer = async (formValues) => {
-        const selectedServer = servers.find((server) => server.id === formValues.server)
-    
+    const handleEnter = async (t, server, payload) => {
+        const type = t.replace(/\s/g, '').toLowerCase()
+        const selectedServer = servers.find((s) => s.address === server.address)
         if (!selectedServer) {
             alert("Invalid server selected.")
             return
         }
-    
+
         try {
-            const response = await fetch(`${selectedServer.address}/users/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login: formValues.login, password: formValues.password })
-            })
+            const response = await callApi("post", `/users/${type}`, payload)
 
             if (response.status === 200) {
 
-                console.log('Login successful')
+                console.log(`${type} successful`)
                 
                 const data = await response.json()
                 setToken(data.sessionToken)
                 setBaseUrl(selectedServer.address)
 
-                setFormValues(formValues)
-
-                // Set WebSocket URL dynamically
                 const wsAddress = `ws://${serverAddress(selectedServer.address)}`
                 setWsUrl(wsAddress)
-                
 
                 fetchInitData()
 
                 console.log('WebSocket URL:', wsAddress)
             }
             else {
-                alert('Login failed')
+                alert(`${type} failed`)
             }
         } catch (error) {
-            alert('An error occurred during login.')
+            alert(`An error occurred during ${type}.`)
             console.error(error)
         }
     }
@@ -235,12 +220,10 @@ const AppConnection = ({
                 <p>{t("fallback")}</p> // Display loading message while fetching servers
             ) : (
                 <>
-                    {dialog.name === "LogIn" &&
-                        <LogIn
+                    {dialog.name === "Enter" &&
+                        <Enter
                             servers={servers}
-                            loginToServer={loginToServer}
-                            formValues={formValues}
-                            setFormValues={setFormValues}
+                            handleEnter={handleEnter}
                         />
                     }
                 </>
