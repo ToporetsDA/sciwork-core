@@ -1,2 +1,2 @@
 # SciWork
-Non comersial project for experience and Diploma
+Open-core project for experience and Diploma
