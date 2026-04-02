@@ -1,0 +1,51 @@
+{
+    "shared": {
+        "controlPanel": {
+            "filters": {
+                "sort": {
+                    "AZ": "A-Z",
+                    "ZA": "Z-A",
+                    "startDate": "start date",
+                    "endDate": "end date"
+                },
+                "state": {
+                    "all": "all",
+                    "expired": "expired",
+                    "expiring": "expiring"
+                }
+            },
+            "buttons": {
+                "addEditUsers": "Add/Edit users",
+                "addProject": "New Project"
+            },
+            "projects": {
+                "display": {
+                    "tiles": "tiles",
+                    "list": "list",
+                    "table": "table"
+                }
+            },
+            "schedule": {
+                "prev": "Prev.",
+                "now": "To now",
+                "next": "Next"
+            }
+        },
+        "formExtended": {
+            "save": "Save",
+            "edit": "Edit {{object}}",
+            "cancel": "Cancel"
+        }
+    },
+    "specific": {
+        "scheduleBoard": {
+            "start": "Start at",
+            "end": "End at",
+            "ScheduleItem": {
+                "start": ".start",
+                "repeat": ".repeat",
+                "end": ".end"
+            }
+        }
+    }
+}

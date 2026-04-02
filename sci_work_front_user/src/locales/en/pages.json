@@ -1,0 +1,58 @@
+{
+    "home": {},
+    "notifications": {
+        "state": {
+            "seen": "seen",
+            "unseen": "unseen",
+            "unread": "unread"
+        }
+    },
+    "profile": {
+        "label": "Profile Details",
+        "shortLabel": "Profile"
+    },
+    "projects": {
+        "fallback": {
+            "projects": "Loading projects...",
+            "activities": "Loading activities..."
+        }
+    },
+    "schedule": {
+        "v": {
+            "day": {
+                "Monday": "Monday",
+                "Tuesday": "Tuesday",
+                "Wednesday": "Wednesday",
+                "Thursday": "Thursday",
+                "Friday": "Friday",
+                "Saturday": "Saturday",
+                "Sunday": "Sunday"
+            },
+            "month": {
+                "Jan": "Jan.",
+                "Feb": "Feb.",
+                "Mar": "Mar.",
+                "Apr": "Apr.",
+                "May": "May.",
+                "Jun": "Jun.",
+                "Jul": "Jul.",
+                "Aug": "Aug.",
+                "Sep": "Sep.",
+                "Oct": "Oct.",
+                "Nov": "Nov.",
+                "Dec": "Dec."
+            }
+        },
+        "h": {
+            "week": "Week"
+        },
+        "scale": {
+            "week": {
+                "warning": "Not timed events are not displayed at weekly scale"
+            },
+            "month": {},
+            "year": {}
+        }
+    },
+    "settings": {}
+}

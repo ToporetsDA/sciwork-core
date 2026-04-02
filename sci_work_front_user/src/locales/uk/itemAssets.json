@@ -1,0 +1,12 @@
+{
+    "subItems": {
+        "listItem": {
+            "markable": {
+                "label": "Доступно з {{start}}-{{end}} до {{date}}"
+            },
+            "buttons": {
+                "save": "Зберегти"
+            }
+        }
+    }
+}

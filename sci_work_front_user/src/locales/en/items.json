@@ -1,0 +1,12 @@
+{
+    "chat": {
+        "send": "Send"
+    },
+    "text": {
+        "size": {
+            "normal": "Normal",
+            "large": "Large",
+            "larger": "Larger"
+        }
+    }
+}

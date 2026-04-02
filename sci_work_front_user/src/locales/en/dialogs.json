@@ -1,0 +1,87 @@
+{
+    "addEditContent": {
+        "buttons": {
+            "add": "Add",
+            "delete": "X"
+        },
+        "fields": {
+            "structure": {
+                "fieldTypes": {
+                    "text": "text",
+                    "checkbox": "checkbox"
+                },
+                "fieldName": {
+                    "label": "Field name",
+                    "placeholder": "text"
+                }
+            },
+            "values": {
+                "text": {
+                    "placeholder": "text"
+                },
+                "markable": {
+                    "date": {
+                        "placeholder": "date"
+                    },
+                    "start": {
+                        "placeholder": "time"
+                    },
+                    "end": {
+                        "placeholder": "time"
+                    }
+                }
+            }
+        },
+        "actions": {
+            "save": "Save",
+            "back": "Back"
+        }
+    },
+    "addEditItem": {
+        "type": {
+            "project": "Add New Project",
+            "activity": "Add new Activity",
+            "edit": "Edit: {{name}}"
+        },
+        "actions": {
+            "save": "Save",
+            "back": "Back"
+        }
+    },
+    "AddEditUserList": {
+        "label": "Users of {{name}}",
+        "lists": {
+            "with": "Users with Access",
+            "without": "Users without Access"
+        },
+        "actions": {
+            "back": "Back"
+        }
+    },
+    "jointEventOverlap": {
+        "name": "Joint event",
+        "actions": {
+            "back": "Back"
+        }
+    },
+    "enter": {
+        "label": "Register/Login",
+        "options": {
+            "register": "Register",
+            "login": "Log In"
+        },
+        "fields": {
+            "server": {
+                "label": "Server",
+                "placeholder": "No servers available"
+            },
+            "login": "Login",
+            "password": "Password"
+        },
+        "actions": {
+            "logIn": "Log In",
+            "register": "Register",
+            "back": "Back"
+        }
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "connection": {
+        "fallback": "Loading servers..."
+    },
+    "content": {
+        "fallback": "Loading..."
+    },
+    "header": {
+        "pages": {
+            "home": "Home Page",
+            "schedule": "Schedule",
+            "projects": "Projects",
+            "subjects": "Subjects"
+        },
+        "more": {
+            "name": "More",
+            "profile": "Profile",
+            "notifications": "Notifications",
+            "chats": "Chats",
+            "settings": "Settings"
+        },
+        "auth": {
+            "in": "Log In/Register",
+            "out": "Log Out"
+        }
+    },
+    "nav": {
+        "recent": {
+            "name": "Recent",
+            "reset": "Clear recent"
+        }
+    }
+}

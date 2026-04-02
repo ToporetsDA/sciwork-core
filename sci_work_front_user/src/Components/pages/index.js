@@ -1,0 +1,6 @@
+export { default as HomePage } from './HomePage.jsx'
+export { default as Notifications } from './Notifications.jsx'
+export { default as Profile } from './Profile.jsx'
+export { default as Projects } from './Projects.jsx'
+export { default as Schedule } from './Schedule.jsx'
+export { default as Settings } from './Settings.jsx'

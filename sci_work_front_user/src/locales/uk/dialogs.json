@@ -1,0 +1,87 @@
+{
+    "addEditContent": {
+        "buttons": {
+            "add": "Додати",
+            "delete": "X"
+        },
+        "fields": {
+            "structure": {
+                "fieldTypes": {
+                    "text": "текст",
+                    "checkbox": "прапорець"
+                },
+                "fieldName": {
+                    "label": "Назва поля",
+                    "placeholder": "текст"
+                }
+            },
+            "values": {
+                "text": {
+                    "placeholder": "текст"
+                },
+                "markable": {
+                    "date": {
+                        "placeholder": "дата"
+                    },
+                    "start": {
+                        "placeholder": "час"
+                    },
+                    "end": {
+                        "placeholder": "час"
+                    }
+                }
+            }
+        },
+        "actions": {
+            "save": "Зберегти",
+            "back": "Назад"
+        }
+    },
+    "addEditItem": {
+        "type": {
+            "project": "Додати проект",
+            "activity": "Додати активність",
+            "edit": "Редагування: {{name}}"
+        },
+        "actions": {
+            "save": "Зберегти",
+            "back": "Назад"
+        }
+    },
+    "AddEditUserList": {
+        "label": "Користувачі {{name}}-у",
+        "lists": {
+            "with": "Користувачі з доступом",
+            "without": "Користувачі без доступу"
+        },
+        "actions": {
+            "back": "Назад"
+        }
+    },
+    "jointEventOverlap": {
+        "name": "Накладка",
+        "actions": {
+            "back": "Назад"
+        }
+    },
+    "enter": {
+        "label": "Зареєструватись/Увійти",
+        "options": {
+            "register": "Зареєструватись",
+            "login": "Увійти"
+        },
+        "fields": {
+            "server": {
+                "label": "Сервер",
+                "placeholder": "Немає доступних серверів"
+            },
+            "login": "Логін",
+            "password": "Пароль"
+        },
+        "actions": {
+            "logIn": "Увійти",
+            "register": "Зареєструватись",
+            "back": "Назад"
+        }
+    }
+}
