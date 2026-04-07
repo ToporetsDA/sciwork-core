@@ -1,4 +1,3 @@
 
-/sci_work_back/coordinator-server/node_modules
-/sci_work_back/general-server/node_modules
-/sci_work_front/node_modules
+/sci_work_front_admin/node_modules
+/sci_work_front_user/node_modules
